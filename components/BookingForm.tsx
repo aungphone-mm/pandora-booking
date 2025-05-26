@@ -6,6 +6,38 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 
+type Service = {
+  id: string
+  name: string
+  price: number
+  duration: number
+  category?: {
+    name: string
+  }
+}
+
+type Product = {
+  id: string
+  name: string
+  price: number
+  category_id: string
+  category?: {
+    name: string
+  }
+}
+
+type ProductCategory = {
+  id: string
+  name: string
+  display_order: number
+}
+
+type TimeSlot = {
+  id: string
+  time: string
+  is_active: boolean
+}
+
 type FormData = {
   customerName: string
   customerEmail: string
@@ -22,10 +54,10 @@ export default function BookingForm({ user }: { user: any }) {
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [services, setServices] = useState<any[]>([])
-  const [products, setProducts] = useState<any[]>([])
-  const [productCategories, setProductCategories] = useState<any[]>([])
-  const [timeSlots, setTimeSlots] = useState<any[]>([])
+  const [services, setServices] = useState<Service[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [productCategories, setProductCategories] = useState<ProductCategory[]>([])
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [selectedDate, setSelectedDate] = useState('')
   const [availableSlots, setAvailableSlots] = useState<string[]>([])
   
@@ -204,13 +236,13 @@ export default function BookingForm({ user }: { user: any }) {
     }
   }
 
-  // Group services by category
+  // Group services by category with proper typing
   const servicesByCategory = services.reduce((acc, service) => {
     const category = service.category?.name || 'Other'
     if (!acc[category]) acc[category] = []
     acc[category].push(service)
     return acc
-  }, {} as Record<string, any[]>)
+  }, {} as Record<string, Service[]>)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
@@ -265,9 +297,9 @@ export default function BookingForm({ user }: { user: any }) {
           disabled={services.length === 0}
         >
           <option value="">Select a service</option>
-          {Object.entries(servicesByCategory).map(([category, services]) => (
+          {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
             <optgroup key={category} label={category}>
-              {services.map(service => (
+              {categoryServices.map(service => (
                 <option key={service.id} value={service.id}>
                   {service.name} - ${service.price} ({service.duration} min)
                 </option>
