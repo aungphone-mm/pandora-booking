@@ -74,8 +74,9 @@ export default function AppointmentManager() {
 
       // Load related data separately to avoid relationship issues
       const appointmentIds = appointmentsData.map(apt => apt.id)
-      const serviceIds = [...new Set(appointmentsData.map(apt => apt.service_id))]
-      const userIds = [...new Set(appointmentsData.map(apt => apt.user_id).filter(Boolean))]
+      // Fix: Use Array.from() instead of spread operator
+      const serviceIds = Array.from(new Set(appointmentsData.map(apt => apt.service_id)))
+      const userIds = Array.from(new Set(appointmentsData.map(apt => apt.user_id).filter(Boolean)))
 
       // Load services
       const { data: servicesData, error: servicesError } = await supabase
@@ -88,7 +89,7 @@ export default function AppointmentManager() {
       }
 
       // Load profiles (try to handle the relationship issue)
-      let profilesData = []
+      let profilesData: any[] = []
       if (userIds.length > 0) {
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
