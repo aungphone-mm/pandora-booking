@@ -11,7 +11,9 @@ export default function AdminSidebar() {
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/appointments', label: 'Appointments' },
     { href: '/admin/services', label: 'Services' },
+    { href: '/admin/service-categories', label: 'Service Categories' },
     { href: '/admin/products', label: 'Products' },
+    { href: '/admin/product-categories', label: 'Product Categories' },
     { href: '/admin/timeslots', label: 'Time Slots' },
   ]
 

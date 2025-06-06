@@ -152,7 +152,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
       setError('An unexpected error occurred. Please refresh the page.')
     }
   }
-
+  
   const checkAvailability = async (date: string) => {
     try {
       const { data, error } = await supabase
