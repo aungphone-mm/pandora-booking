@@ -35,60 +35,158 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+      <h1 style={{
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        marginBottom: '32px'
+      }}>Admin Dashboard</h1>
       
       {/* Statistics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Total Appointments</h3>
-          <p className="text-2xl font-bold text-gray-800">{totalAppointments || 0}</p>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '24px',
+        marginBottom: '32px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '24px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h3 style={{
+            color: '#6b7280',
+            fontSize: '0.875rem',
+            fontWeight: '500'
+          }}>Total Appointments</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>{totalAppointments || 0}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Today's Appointments</h3>
-          <p className="text-2xl font-bold text-gray-800">{todayAppointments || 0}</p>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '24px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h3 style={{
+            color: '#6b7280',
+            fontSize: '0.875rem',
+            fontWeight: '500'
+          }}>Today's Appointments</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>{todayAppointments || 0}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Active Services</h3>
-          <p className="text-2xl font-bold text-gray-800">{totalServices || 0}</p>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '24px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h3 style={{
+            color: '#6b7280',
+            fontSize: '0.875rem',
+            fontWeight: '500'
+          }}>Active Services</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>{totalServices || 0}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Active Products</h3>
-          <p className="text-2xl font-bold text-gray-800">{totalProducts || 0}</p>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '24px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h3 style={{
+            color: '#6b7280',
+            fontSize: '0.875rem',
+            fontWeight: '500'
+          }}>Active Products</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>{totalProducts || 0}</p>
         </div>
       </div>
 
       {/* Recent Appointments */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Recent Appointments</h2>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        padding: '24px'
+      }}>
+        <h2 style={{
+          fontSize: '1.25rem',
+          fontWeight: '600',
+          marginBottom: '16px'
+        }}>Recent Appointments</h2>
         {recentAppointments && recentAppointments.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Customer</th>
-                  <th className="text-left py-2">Service</th>
-                  <th className="text-left py-2">Date</th>
-                  <th className="text-left py-2">Time</th>
-                  <th className="text-left py-2">Status</th>
+                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '12px 8px',
+                    fontWeight: '600'
+                  }}>Customer</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '12px 8px',
+                    fontWeight: '600'
+                  }}>Service</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '12px 8px',
+                    fontWeight: '600'
+                  }}>Date</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '12px 8px',
+                    fontWeight: '600'
+                  }}>Time</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '12px 8px',
+                    fontWeight: '600'
+                  }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {recentAppointments.map((appointment) => (
-                  <tr key={appointment.id} className="border-b">
-                    <td className="py-2">{appointment.customer_name}</td>
-                    <td className="py-2">{appointment.service?.name}</td>
-                    <td className="py-2">
+                  <tr key={appointment.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '12px 8px' }}>{appointment.customer_name}</td>
+                    <td style={{ padding: '12px 8px' }}>{appointment.service?.name}</td>
+                    <td style={{ padding: '12px 8px' }}>
                       {new Date(appointment.appointment_date).toLocaleDateString()}
                     </td>
-                    <td className="py-2">{appointment.appointment_time}</td>
-                    <td className="py-2">
-                      <span className={`px-2 py-1 rounded text-sm ${
-                        appointment.status === 'confirmed' 
-                          ? 'bg-green-100 text-green-800'
+                    <td style={{ padding: '12px 8px' }}>{appointment.appointment_time}</td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <span style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.875rem',
+                        backgroundColor: appointment.status === 'confirmed' 
+                          ? '#dcfce7' 
                           : appointment.status === 'cancelled'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
+                          ? '#fee2e2'
+                          : '#fef3c7',
+                        color: appointment.status === 'confirmed' 
+                          ? '#166534' 
+                          : appointment.status === 'cancelled'
+                          ? '#991b1b'
+                          : '#92400e'
+                      }}>
                         {appointment.status}
                       </span>
                     </td>
@@ -98,7 +196,7 @@ export default async function AdminDashboardPage() {
             </table>
           </div>
         ) : (
-          <p className="text-gray-600">No appointments yet.</p>
+          <p style={{ color: '#6b7280' }}>No appointments yet.</p>
         )}
       </div>
     </div>

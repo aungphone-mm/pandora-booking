@@ -26,26 +26,115 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <header className="bg-pink-600 text-white">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex justify-between items-center">
-              <Link href="/" className="text-2xl font-bold">Pandora Beauty Salon</Link>
-              <nav className="flex gap-4 items-center">
-                <Link href="/booking" className="hover:text-pink-200">Book Now</Link>
+        <header style={{
+          backgroundColor: '#ec4899',
+          color: 'white'
+        }}>
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '16px'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '16px'
+            }}>
+              <Link 
+                href="/" 
+                style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  textDecoration: 'none'
+                }}
+              >
+                Pandora Beauty Salon
+              </Link>
+              <nav style={{
+                display: 'flex',
+                gap: '16px',
+                alignItems: 'center',
+                flexWrap: 'wrap'
+              }}>
+                <Link 
+                  href="/booking" 
+                  style={{
+                    color: 'white',
+                    textDecoration: 'none',
+                    padding: '8px 12px',
+                    borderRadius: '4px'
+                  }}
+                >
+                  Book Now
+                </Link>
                 {user ? (
                   <>
-                    <Link href="/account" className="hover:text-pink-200">My Account</Link>
+                    <Link 
+                      href="/account" 
+                      style={{
+                        color: 'white',
+                        textDecoration: 'none',
+                        padding: '8px 12px',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      My Account
+                    </Link>
                     {profile?.is_admin && (
-                      <Link href="/admin" className="hover:text-pink-200">Admin</Link>
+                      <Link 
+                        href="/admin" 
+                        style={{
+                          color: 'white',
+                          textDecoration: 'none',
+                          padding: '8px 12px',
+                          borderRadius: '4px'
+                        }}
+                      >
+                        Admin
+                      </Link>
                     )}
-                    <form action="/api/auth/signout" method="POST">
-                      <button className="hover:text-pink-200">Sign Out</button>
+                    <form action="/api/auth/signout" method="POST" style={{margin: 0}}>
+                      <button 
+                        style={{
+                          color: 'white',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '8px 12px',
+                          borderRadius: '4px'
+                        }}
+                      >
+                        Sign Out
+                      </button>
                     </form>
                   </>
                 ) : (
                   <>
-                    <Link href="/auth/login" className="hover:text-pink-200">Login</Link>
-                    <Link href="/auth/register" className="bg-white text-pink-600 px-4 py-2 rounded hover:bg-pink-50">
+                    <Link 
+                      href="/auth/login" 
+                      style={{
+                        color: 'white',
+                        textDecoration: 'none',
+                        padding: '8px 12px',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      Login
+                    </Link>
+                    <Link 
+                      href="/auth/register" 
+                      style={{
+                        backgroundColor: 'white',
+                        color: '#ec4899',
+                        padding: '8px 16px',
+                        borderRadius: '4px',
+                        textDecoration: 'none',
+                        fontWeight: '600'
+                      }}
+                    >
                       Register
                     </Link>
                   </>
@@ -54,7 +143,10 @@ export default async function RootLayout({
             </div>
           </div>
         </header>
-        <main className="min-h-screen bg-gray-50">
+        <main style={{
+          minHeight: '100vh',
+          backgroundColor: '#f9fafb'
+        }}>
           {children}
         </main>
       </body>

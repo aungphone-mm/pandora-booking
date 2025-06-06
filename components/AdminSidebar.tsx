@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+// Explicitly define the component with no props
 export default function AdminSidebar() {
   const pathname = usePathname()
   

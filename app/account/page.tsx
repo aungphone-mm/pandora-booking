@@ -1,3 +1,4 @@
+// ACCOUNT PAGE
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -20,40 +21,100 @@ export default async function AccountPage() {
     .order('appointment_date', { ascending: false })
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">My Account</h1>
+    <div style={{
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '32px 16px'
+    }}>
+      <h1 style={{
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        marginBottom: '24px'
+      }}>My Account</h1>
       
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
-        <p className="text-gray-600">Email: {user.email}</p>
-        <p className="text-gray-600">Name: {user.user_metadata?.full_name || 'Not set'}</p>
-        <p className="text-gray-600">Phone: {user.user_metadata?.phone || 'Not set'}</p>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        marginBottom: '32px'
+      }}>
+        <h2 style={{
+          fontSize: '1.25rem',
+          fontWeight: '600',
+          marginBottom: '16px'
+        }}>Profile Information</h2>
+        <p style={{
+          color: '#6b7280',
+          marginBottom: '8px'
+        }}>Email: {user.email}</p>
+        <p style={{
+          color: '#6b7280',
+          marginBottom: '8px'
+        }}>Name: {user.user_metadata?.full_name || 'Not set'}</p>
+        <p style={{
+          color: '#6b7280'
+        }}>Phone: {user.user_metadata?.phone || 'Not set'}</p>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">My Appointments</h2>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+      }}>
+        <h2 style={{
+          fontSize: '1.25rem',
+          fontWeight: '600',
+          marginBottom: '16px'
+        }}>My Appointments</h2>
         {appointments && appointments.length > 0 ? (
-          <div className="space-y-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {appointments.map((appointment) => (
-              <div key={appointment.id} className="border rounded-lg p-4">
-                <div className="flex justify-between items-start">
+              <div key={appointment.id} style={{
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                padding: '16px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start'
+                }}>
                   <div>
-                    <h3 className="font-semibold">{appointment.service?.name}</h3>
-                    <p className="text-gray-600">
+                    <h3 style={{ fontWeight: '600' }}>{appointment.service?.name}</h3>
+                    <p style={{
+                      color: '#6b7280',
+                      marginBottom: '4px'
+                    }}>
                       Date: {new Date(appointment.appointment_date).toLocaleDateString()}
                     </p>
-                    <p className="text-gray-600">Time: {appointment.appointment_time}</p>
-                    <p className="text-gray-600">Duration: {appointment.service?.duration} minutes</p>
+                    <p style={{
+                      color: '#6b7280',
+                      marginBottom: '4px'
+                    }}>Time: {appointment.appointment_time}</p>
+                    <p style={{
+                      color: '#6b7280'
+                    }}>Duration: {appointment.service?.duration} minutes</p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">${appointment.service?.price}</p>
-                    <span className={`inline-block px-2 py-1 rounded text-sm ${
-                      appointment.status === 'confirmed' 
-                        ? 'bg-green-100 text-green-800'
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontWeight: '600' }}>${appointment.service?.price}</p>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.875rem',
+                      backgroundColor: appointment.status === 'confirmed' 
+                        ? '#dcfce7' 
                         : appointment.status === 'cancelled'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                        ? '#fee2e2'
+                        : '#fef3c7',
+                      color: appointment.status === 'confirmed' 
+                        ? '#166534' 
+                        : appointment.status === 'cancelled'
+                        ? '#991b1b'
+                        : '#92400e'
+                    }}>
                       {appointment.status}
                     </span>
                   </div>
@@ -62,9 +123,11 @@ export default async function AccountPage() {
             ))}
           </div>
         ) : (
-          <p className="text-gray-600">No appointments found.</p>
+          <p style={{ color: '#6b7280' }}>No appointments found.</p>
         )}
       </div>
     </div>
   )
 }
+
+// CONFIRMATION PAGE

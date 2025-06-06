@@ -5,34 +5,81 @@ import Link from 'next/link'
 
 export default function ConfirmationPage() {
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-        <div className="mb-6">
-          <svg className="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    <div style={{
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '48px 16px'
+    }}>
+      <div style={{
+        maxWidth: '512px',
+        margin: '0 auto',
+        backgroundColor: 'white',
+        padding: '32px',
+        borderRadius: '8px',
+        boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center'
+      }}>
+        <div style={{ marginBottom: '24px' }}>
+          <svg 
+            style={{
+              width: '64px',
+              height: '64px',
+              color: '#10b981',
+              margin: '0 auto'
+            }}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M5 13l4 4L19 7" 
+            />
           </svg>
         </div>
         
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
+        <h1 style={{
+          fontSize: '2rem',
+          fontWeight: 'bold',
+          color: '#111827',
+          marginBottom: '16px'
+        }}>
           Booking Confirmed!
         </h1>
         
-        <p className="text-gray-600 mb-8">
+        <p style={{
+          color: '#6b7280',
+          marginBottom: '32px',
+          fontSize: '1.125rem'
+        }}>
           Thank you for booking with Pandora Beauty Salon. 
           We've sent a confirmation email with your appointment details.
         </p>
         
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <Link 
             href="/" 
-            className="inline-block bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition"
+            style={{
+              display: 'inline-block',
+              backgroundColor: '#ec4899',
+              color: 'white',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              fontWeight: '600'
+            }}
           >
             Return to Home
           </Link>
-          <br />
           <Link 
             href="/account" 
-            className="inline-block text-pink-600 hover:text-pink-700"
+            style={{
+              display: 'inline-block',
+              color: '#ec4899',
+              textDecoration: 'none'
+            }}
           >
             View My Appointments
           </Link>

@@ -89,52 +89,110 @@ export default function SimpleAppointmentManager() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-green-100 text-green-800'
+        return { backgroundColor: '#dcfce7', color: '#166534' }
       case 'cancelled':
-        return 'bg-red-100 text-red-800'
+        return { backgroundColor: '#fee2e2', color: '#991b1b' }
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
+        return { backgroundColor: '#fef3c7', color: '#92400e' }
       default:
-        return 'bg-gray-100 text-gray-800'
+        return { backgroundColor: '#f3f4f6', color: '#374151' }
     }
   }
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-bold mb-6">Appointment Management</h2>
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        padding: '24px'
+      }}>
+        <h2 style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+          marginBottom: '24px'
+        }}>Appointment Management</h2>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '32px 0'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            border: '2px solid #ec4899',
+            borderTop: '2px solid transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Appointment Management</h2>
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '24px'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '24px'
+      }}>
+        <h2 style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold'
+        }}>Appointment Management</h2>
         <button
           onClick={loadAppointments}
-          className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700"
+          style={{
+            backgroundColor: '#ec4899',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
         >
           Refresh
         </button>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
+        <div style={{
+          marginBottom: '24px',
+          padding: '16px',
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '8px'
+        }}>
+          <p style={{ color: '#b91c1c' }}>{error}</p>
         </div>
       )}
 
       {/* Filter */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+      <div style={{ marginBottom: '24px' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '4px'
+        }}>Filter by Status</label>
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border rounded-lg"
+          style={{
+            padding: '12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '8px',
+            outline: 'none'
+          }}
         >
           <option value="all">All Statuses</option>
           <option value="pending">Pending</option>
@@ -144,26 +202,79 @@ export default function SimpleAppointmentManager() {
       </div>
 
       {/* Summary Stats */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-600">Total</h3>
-          <p className="text-2xl font-bold text-gray-800">{appointments.length}</p>
+      <div style={{
+        marginBottom: '24px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '16px'
+      }}>
+        <div style={{
+          backgroundColor: '#f9fafb',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#6b7280'
+          }}>Total</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>{appointments.length}</p>
         </div>
-        <div className="bg-yellow-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-yellow-600">Pending</h3>
-          <p className="text-2xl font-bold text-yellow-800">
+        <div style={{
+          backgroundColor: '#fef3c7',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#92400e'
+          }}>Pending</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#92400e'
+          }}>
             {appointments.filter(a => a.status === 'pending').length}
           </p>
         </div>
-        <div className="bg-green-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-green-600">Confirmed</h3>
-          <p className="text-2xl font-bold text-green-800">
+        <div style={{
+          backgroundColor: '#dcfce7',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#166534'
+          }}>Confirmed</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#166534'
+          }}>
             {appointments.filter(a => a.status === 'confirmed').length}
           </p>
         </div>
-        <div className="bg-red-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium text-red-600">Cancelled</h3>
-          <p className="text-2xl font-bold text-red-800">
+        <div style={{
+          backgroundColor: '#fee2e2',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#991b1b'
+          }}>Cancelled</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#991b1b'
+          }}>
             {appointments.filter(a => a.status === 'cancelled').length}
           </p>
         </div>
@@ -171,8 +282,11 @@ export default function SimpleAppointmentManager() {
 
       {/* Appointments Table */}
       {filteredAppointments.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600">
+        <div style={{
+          textAlign: 'center',
+          padding: '32px 0'
+        }}>
+          <p style={{ color: '#6b7280' }}>
             {filterStatus === 'all' 
               ? 'No appointments found.' 
               : `No ${filterStatus} appointments found.`
@@ -180,61 +294,119 @@ export default function SimpleAppointmentManager() {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse'
+          }}>
             <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="text-left py-3 px-4">Customer</th>
-                <th className="text-left py-3 px-4">Service ID</th>
-                <th className="text-left py-3 px-4">Date & Time</th>
-                <th className="text-left py-3 px-4">Status</th>
-                <th className="text-left py-3 px-4">Actions</th>
+              <tr style={{
+                borderBottom: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb'
+              }}>
+                <th style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  fontWeight: '600'
+                }}>Customer</th>
+                <th style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  fontWeight: '600'
+                }}>Service ID</th>
+                <th style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  fontWeight: '600'
+                }}>Date & Time</th>
+                <th style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  fontWeight: '600'
+                }}>Status</th>
+                <th style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  fontWeight: '600'
+                }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredAppointments.map((appointment) => (
-                <tr key={appointment.id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-4">
+                <tr key={appointment.id} style={{
+                  borderBottom: '1px solid #e5e7eb'
+                }}>
+                  <td style={{ padding: '12px 16px' }}>
                     <div>
-                      <p className="font-medium">{appointment.customer_name}</p>
-                      <p className="text-sm text-gray-600">{appointment.customer_email}</p>
-                      <p className="text-sm text-gray-600">{appointment.customer_phone}</p>
+                      <p style={{ fontWeight: '500' }}>{appointment.customer_name}</p>
+                      <p style={{
+                        fontSize: '0.875rem',
+                        color: '#6b7280'
+                      }}>{appointment.customer_email}</p>
+                      <p style={{
+                        fontSize: '0.875rem',
+                        color: '#6b7280'
+                      }}>{appointment.customer_phone}</p>
                       {appointment.user_id && (
-                        <p className="text-xs text-blue-600">User ID: {appointment.user_id}</p>
+                        <p style={{
+                          fontSize: '0.75rem',
+                          color: '#2563eb'
+                        }}>User ID: {appointment.user_id}</p>
                       )}
                     </div>
                   </td>
-                  <td className="py-3 px-4">
-                    <p className="text-sm text-gray-600">{appointment.service_id}</p>
+                  <td style={{ padding: '12px 16px' }}>
+                    <p style={{
+                      fontSize: '0.875rem',
+                      color: '#6b7280'
+                    }}>{appointment.service_id}</p>
                   </td>
-                  <td className="py-3 px-4">
+                  <td style={{ padding: '12px 16px' }}>
                     <div>
-                      <p className="font-medium">
+                      <p style={{ fontWeight: '500' }}>
                         {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
                       </p>
-                      <p className="text-sm text-gray-600">{appointment.appointment_time}</p>
-                      <p className="text-xs text-gray-500">
+                      <p style={{
+                        fontSize: '0.875rem',
+                        color: '#6b7280'
+                      }}>{appointment.appointment_time}</p>
+                      <p style={{
+                        fontSize: '0.75rem',
+                        color: '#9ca3af'
+                      }}>
                         Created: {format(new Date(appointment.created_at), 'MMM d, h:mm a')}
                       </p>
                     </div>
                   </td>
-                  <td className="py-3 px-4">
+                  <td style={{ padding: '12px 16px' }}>
                     <select
                       value={appointment.status}
                       onChange={(e) => updateAppointmentStatus(
                         appointment.id, 
                         e.target.value as 'pending' | 'confirmed' | 'cancelled'
                       )}
-                      className={`px-2 py-1 rounded text-sm font-medium border-0 cursor-pointer ${getStatusColor(appointment.status)}`}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        border: 'none',
+                        cursor: 'pointer',
+                        ...getStatusColor(appointment.status)
+                      }}
                     >
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
                   </td>
-                  <td className="py-3 px-4">
+                  <td style={{ padding: '12px 16px' }}>
                     {appointment.notes && (
-                      <p className="text-xs text-gray-600 italic">
+                      <p style={{
+                        fontSize: '0.75rem',
+                        color: '#6b7280',
+                        fontStyle: 'italic'
+                      }}>
                         Note: {appointment.notes}
                       </p>
                     )}

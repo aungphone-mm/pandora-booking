@@ -1,12 +1,12 @@
-/* Add this to your app/globals.css file after the Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 /* Custom animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -14,19 +14,53 @@
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-/* Custom checkbox styling */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.animate-pulse-gentle {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Modern checkbox styling */
 input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   width: 1.25rem;
   height: 1.25rem;
   border: 2px solid #d1d5db;
-  border-radius: 0.25rem;
-  transition: all 0.2s;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
   cursor: pointer;
   position: relative;
   background-color: white;
@@ -46,38 +80,82 @@ input[type="checkbox"]:checked::before {
   color: white;
   font-weight: bold;
   font-size: 0.875rem;
+  line-height: 1;
 }
 
 input[type="checkbox"]:hover {
   border-color: #ec4899;
+  transform: scale(1.05);
 }
 
-/* Custom select styling */
+input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* Modern select styling */
 select {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 1rem center;
-  background-size: 1.5em 1.5em;
+  background-size: 1.2em 1.2em;
   padding-right: 3rem;
 }
 
-/* Mobile responsive improvements */
-@media (max-width: 768px) {
-  .booking-form-container {
-    padding: 1rem;
-  }
-  
-  form {
-    border-radius: 0.75rem;
-  }
-  
-  h2 {
-    font-size: 1.75rem;
-  }
-  
-  h3 {
-    font-size: 1.125rem;
-  }
+/* Enhanced focus states for accessibility */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+  border-color: #ec4899;
+}
+
+/* Button hover effects */
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Smooth scrolling */
@@ -85,51 +163,115 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Focus states for accessibility */
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  ring: 2;
-  ring-color: #ec4899;
-  border-color: transparent;
-}
-
-/* Loading spinner keyframe */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+  /* Prevent zoom on input focus on iOS */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  
+  /* Adjust form padding on mobile */
+  .mobile-form-padding {
+    padding: 1rem;
+  }
+  
+  /* Stack elements vertically on mobile */
+  .mobile-stack > * + * {
+    margin-top: 1rem;
   }
 }
 
-/* Optional: Add a subtle shadow to form sections */
-.form-section {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  background-color: white;
+@media (max-width: 768px) {
+  /* Responsive text sizes */
+  .responsive-title {
+    font-size: 2rem;
+  }
+  
+  .responsive-subtitle {
+    font-size: 1.125rem;
+  }
+  
+  /* Mobile-friendly form sections */
+  .form-section-mobile {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 1rem;
+  }
 }
 
-/* Optional: Add hover effects to service/product options */
-.option-card {
-  transition: all 0.2s ease;
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
 }
 
-.option-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
-/* Price display animation */
-.price-display {
-  transition: all 0.3s ease;
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
 }
 
-/* Responsive container for the booking page */
-.booking-page-container {
-  min-height: 100vh;
-  background-color: #f9fafb;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  input, select, textarea {
+    border-width: 2px;
+  }
+  
+  button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-ready {
+    /* Add dark mode styles here when needed */
+  }
+}
+
+/* Add this to app/globals.css */
+.book-button {
+  display: inline-block;
+  background-color: #ec4899;
+  color: white;
+  font-size: 1.125rem;
+  padding: 16px 32px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.book-button:hover {
+  background-color: #be185d;
 }

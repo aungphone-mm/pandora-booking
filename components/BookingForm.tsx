@@ -276,9 +276,9 @@ export default function BookingForm({ user }: { user: any }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
       {/* Header */}
-      <div className="bg-pink-600 text-white p-6 rounded-t-xl">
-        <h2 className="text-3xl font-bold text-center">Book Your Appointment</h2>
-        <p className="text-center mt-2 text-pink-100">Fill in the details below to schedule your visit</p>
+      <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-4 md:p-6 rounded-t-xl">
+        <h2 className="text-2xl md:text-3xl font-bold text-center">Book Your Appointment</h2>
+        <p className="text-center mt-1 text-pink-100 text-sm">Fill in the details below to schedule your visit</p>
       </div>
 
       <div className="p-6 md:p-8">
@@ -293,7 +293,8 @@ export default function BookingForm({ user }: { user: any }) {
 
         {/* Customer Information Section */}
         <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Customer Information</h3>
+          
+          <h3 className="text-lg md:text-xl font-semibold mb-3 text-gray-800">Customer Information</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-gray-700 font-medium mb-2">
@@ -467,10 +468,10 @@ export default function BookingForm({ user }: { user: any }) {
 
         {/* Total Price Display */}
         {totalPrice > 0 && (
-          <div className="mb-8 p-4 bg-pink-50 rounded-lg">
+          <div className="mb-6 p-3 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border border-pink-200">
             <div className="flex justify-between items-center">
-              <span className="text-lg font-semibold text-gray-800">Estimated Total:</span>
-              <span className="text-2xl font-bold text-pink-600">${totalPrice.toFixed(2)}</span>
+              <span className="text-base font-medium text-gray-700">Total:</span>
+              <span className="text-xl font-bold text-pink-600">${totalPrice.toFixed(2)}</span>
             </div>
           </div>
         )}
