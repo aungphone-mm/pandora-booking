@@ -1,10 +1,10 @@
-import AppointmentList from '@/components/AppointmentList'
+import AppointmentManager from '@/components/AppointmentManager'
 
 export default function AdminAppointmentsPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">Appointment Management</h1>
-      <AppointmentList />
+      <AppointmentManager />
     </div>
   )
 }

@@ -53,97 +53,37 @@ export default function AppointmentManager() {
       setLoading(true)
       setError(null)
 
-      // First, try a simple query to get appointments
       const { data: appointmentsData, error: appointmentsError } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          service:services(
+            id,
+            name,
+            price,
+            duration
+          ),
+          user:profiles(
+            id,
+            full_name
+          ),
+          appointment_products(
+            id,
+            quantity,
+            product:products(
+              id,
+              name,
+              price
+            )
+          )
+        `)
         .order('created_at', { ascending: false })
 
       if (appointmentsError) {
-        console.error('Error loading appointments:', appointmentsError)
-        throw new Error(`Failed to load appointments: ${appointmentsError.message}`)
+        throw appointmentsError
       }
 
-      if (!appointmentsData || appointmentsData.length === 0) {
-        console.log('No appointments found')
-        setAppointments([])
-        return
-      }
-
-      console.log('Found appointments:', appointmentsData.length)
-
-      // Load related data separately to avoid relationship issues
-      const appointmentIds = appointmentsData.map(apt => apt.id)
-      // Fix: Use Array.from() instead of spread operator
-      const serviceIds = Array.from(new Set(appointmentsData.map(apt => apt.service_id)))
-      const userIds = Array.from(new Set(appointmentsData.map(apt => apt.user_id).filter(Boolean)))
-
-      // Load services
-      const { data: servicesData, error: servicesError } = await supabase
-        .from('services')
-        .select('id, name, price, duration')
-        .in('id', serviceIds)
-
-      if (servicesError) {
-        console.warn('Error loading services:', servicesError)
-      }
-
-      // Load profiles (try to handle the relationship issue)
-      let profilesData: any[] = []
-      if (userIds.length > 0) {
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, full_name')
-          .in('id', userIds)
-
-        if (profilesError) {
-          console.warn('Error loading profiles:', profilesError)
-          // Don't throw error, just continue without profile data
-        } else {
-          profilesData = profiles || []
-        }
-      }
-
-      // Load appointment products
-      const { data: appointmentProductsData, error: productsError } = await supabase
-        .from('appointment_products')
-        .select(`
-          id,
-          appointment_id,
-          quantity,
-          product_id,
-          product:products(id, name, price)
-        `)
-        .in('appointment_id', appointmentIds)
-
-      if (productsError) {
-        console.warn('Error loading appointment products:', productsError)
-      }
-
-      // Create lookup maps
-      const servicesMap = new Map(servicesData?.map(s => [s.id, s]) || [])
-      const profilesMap = new Map(profilesData.map(p => [p.id, p]))
-      const productsMap = new Map()
-      
-      // Group products by appointment_id
-      appointmentProductsData?.forEach(ap => {
-        if (!productsMap.has(ap.appointment_id)) {
-          productsMap.set(ap.appointment_id, [])
-        }
-        productsMap.get(ap.appointment_id).push(ap)
-      })
-
-      // Combine all data
-      const enrichedAppointments = appointmentsData.map(appointment => ({
-        ...appointment,
-        service: servicesMap.get(appointment.service_id) || null,
-        user: appointment.user_id ? profilesMap.get(appointment.user_id) || null : null,
-        appointment_products: productsMap.get(appointment.id) || []
-      }))
-
-      console.log('Enriched appointments:', enrichedAppointments.length)
-      setAppointments(enrichedAppointments)
-
+      setAppointments(appointmentsData || [])
     } catch (err: any) {
       console.error('Error loading appointments:', err)
       setError(err.message || 'Failed to load appointments')
