@@ -2,7 +2,6 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -11,43 +10,45 @@ export const metadata = {
   description: 'Book your beauty appointment at Pandora Salon',
 }
 
+async function getUser() {
+  try {
+    const supabase = createClient()
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    if (error) {
+      console.warn('Auth error:', error.message)
+      return { user: null, profile: null }
+    }
+
+    if (!user) {
+      return { user: null, profile: null }
+    }
+
+    // Get profile data
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin, full_name')
+      .eq('id', user.id)
+      .single()
+    
+    if (profileError) {
+      console.warn('Profile error:', profileError.message)
+      return { user, profile: null }
+    }
+
+    return { user, profile: profileData }
+  } catch (error) {
+    console.error('Layout auth error:', error)
+    return { user: null, profile: null }
+  }
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Create a more controlled way to get user data without triggering cookie modifications
-  let user = null
-  let profile = null
-  
-  try {
-    const supabase = createClient()
-    
-    // Check if we have session cookies first
-    const cookieStore = cookies()
-    const accessToken = cookieStore.get('sb-access-token')
-    const refreshToken = cookieStore.get('sb-refresh-token')
-    
-    if (accessToken || refreshToken) {
-      const { data: { user: userData }, error } = await supabase.auth.getUser()
-      
-      if (!error && userData) {
-        user = userData
-        
-        // Get profile data
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', userData.id)
-          .single()
-        
-        profile = profileData
-      }
-    }
-  } catch (error) {
-    console.error('Auth error in layout:', error)
-    // Continue without user data rather than breaking the app
-  }
+  const { user, profile } = await getUser()
 
   return (
     <html lang="en">
@@ -98,6 +99,12 @@ export default async function RootLayout({
                 </Link>
                 {user ? (
                   <>
+                    <span style={{
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      fontSize: '0.875rem'
+                    }}>
+                      Welcome, {profile?.full_name || user.email?.split('@')[0] || 'User'}!
+                    </span>
                     <Link 
                       href="/account" 
                       style={{
@@ -116,7 +123,8 @@ export default async function RootLayout({
                           color: 'white',
                           textDecoration: 'none',
                           padding: '8px 12px',
-                          borderRadius: '4px'
+                          borderRadius: '4px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)'
                         }}
                       >
                         Admin
@@ -127,10 +135,11 @@ export default async function RootLayout({
                         style={{
                           color: 'white',
                           backgroundColor: 'transparent',
-                          border: 'none',
+                          border: '1px solid rgba(255, 255, 255, 0.3)',
                           cursor: 'pointer',
-                          padding: '8px 12px',
-                          borderRadius: '4px'
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          fontSize: '0.875rem'
                         }}
                       >
                         Sign Out
@@ -145,7 +154,8 @@ export default async function RootLayout({
                         color: 'white',
                         textDecoration: 'none',
                         padding: '8px 12px',
-                        borderRadius: '4px'
+                        borderRadius: '4px',
+                        border: '1px solid rgba(255, 255, 255, 0.3)'
                       }}
                     >
                       Login

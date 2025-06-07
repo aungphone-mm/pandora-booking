@@ -20,25 +20,40 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email: formData.email,
-      password: formData.password
-    })
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
+      })
 
-    if (signInError) {
-      // Check if the error is related to email confirmation
-      if (signInError.message.includes('email not confirmed') || 
-          signInError.message.includes('Email not confirmed')) {
-        setError('email_not_confirmed')
-      } else {
-        setError(signInError.message)
+      if (signInError) {
+        // Check if the error is related to email confirmation
+        if (signInError.message.includes('email not confirmed') || 
+            signInError.message.includes('Email not confirmed')) {
+          setError('email_not_confirmed')
+        } else {
+          setError(signInError.message)
+        }
+        setLoading(false)
+        return
       }
-      setLoading(false)
-      return
-    }
 
-    router.push('/booking')
-    router.refresh()
+      // Ensure session is established before redirect
+      if (data.session) {
+        // Add a small delay to ensure cookies are set
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // Force a hard navigation to ensure cookies are sent
+        window.location.href = '/booking'
+      } else {
+        setError('Login failed - no session created')
+        setLoading(false)
+      }
+    } catch (err: any) {
+      console.error('Login error:', err)
+      setError('An unexpected error occurred')
+      setLoading(false)
+    }
   }
 
   const resendConfirmation = async () => {
