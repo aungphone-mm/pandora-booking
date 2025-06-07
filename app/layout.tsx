@@ -2,6 +2,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,13 +16,38 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data: profile } = user ? await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single() : { data: null }
+  // Create a more controlled way to get user data without triggering cookie modifications
+  let user = null
+  let profile = null
+  
+  try {
+    const supabase = createClient()
+    
+    // Check if we have session cookies first
+    const cookieStore = cookies()
+    const accessToken = cookieStore.get('sb-access-token')
+    const refreshToken = cookieStore.get('sb-refresh-token')
+    
+    if (accessToken || refreshToken) {
+      const { data: { user: userData }, error } = await supabase.auth.getUser()
+      
+      if (!error && userData) {
+        user = userData
+        
+        // Get profile data
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', userData.id)
+          .single()
+        
+        profile = profileData
+      }
+    }
+  } catch (error) {
+    console.error('Auth error in layout:', error)
+    // Continue without user data rather than breaking the app
+  }
 
   return (
     <html lang="en">
