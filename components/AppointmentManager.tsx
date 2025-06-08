@@ -49,48 +49,56 @@ export default function AppointmentManager() {
   }, [])
 
   const loadAppointments = async () => {
-    try {
-      setLoading(true)
-      setError(null)
+  try {
+    setLoading(true)
+    setError(null)
 
-      const { data: appointmentsData, error: appointmentsError } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          service:services(
+    // Use explicit foreign key reference to avoid ambiguity
+    const { data: appointmentsData, error: appointmentsError } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        services!appointments_service_id_fkey(
+          id,
+          name,
+          price,
+          duration
+        ),
+        profiles!appointments_user_id_fkey(
+          id,
+          full_name
+        ),
+        appointment_products(
+          id,
+          quantity,
+          products!appointment_products_product_id_fkey(
             id,
             name,
-            price,
-            duration
-          ),
-          user:profiles(
-            id,
-            full_name
-          ),
-          appointment_products(
-            id,
-            quantity,
-            product:products(
-              id,
-              name,
-              price
-            )
+            price
           )
-        `)
-        .order('created_at', { ascending: false })
+        )
+      `)
+      .order('created_at', { ascending: false })
 
-      if (appointmentsError) {
-        throw appointmentsError
-      }
-
-      setAppointments(appointmentsData || [])
-    } catch (err: any) {
-      console.error('Error loading appointments:', err)
-      setError(err.message || 'Failed to load appointments')
-    } finally {
-      setLoading(false)
+    if (appointmentsError) {
+      throw appointmentsError
     }
+
+    // Transform the data to match the expected structure
+    const transformedData = appointmentsData?.map(appointment => ({
+      ...appointment,
+      service: appointment.services,
+      user: appointment.profiles
+    })) || []
+
+    setAppointments(transformedData)
+  } catch (err: any) {
+    console.error('Error loading appointments:', err)
+    setError(err.message || 'Failed to load appointments')
+  } finally {
+    setLoading(false)
   }
+}
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
     try {

@@ -15,6 +15,7 @@ export default function AdminSidebar() {
     { href: '/admin/products', label: 'Products' },
     { href: '/admin/product-categories', label: 'Product Categories' },
     { href: '/admin/timeslots', label: 'Time Slots' },
+    { href: '/admin/health-check', label: '🔍 Health Check', badge: 'NEW' }, 
   ]
 
   return (
