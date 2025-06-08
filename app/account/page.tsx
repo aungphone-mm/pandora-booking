@@ -98,7 +98,7 @@ export default async function AccountPage() {
                     }}>Duration: {appointment.service?.duration} minutes</p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontWeight: '600' }}>${appointment.service?.price}</p>
+                    <p style={{ fontWeight: '600' }}>{appointment.service?.price}Ks</p>
                     <span style={{
                       display: 'inline-block',
                       padding: '4px 8px',

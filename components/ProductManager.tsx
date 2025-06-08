@@ -207,7 +207,7 @@ export default function ProductManager() {
                       className="px-2 py-1 border rounded w-20"
                     />
                   ) : (
-                    `$${product.price}`
+                    `${product.price}Ks`
                   )}
                 </td>
                 <td className="py-2">

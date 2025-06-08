@@ -285,7 +285,7 @@ export default function ServiceManager() {
                       }}
                     />
                   ) : (
-                    `$${service.price}`
+                    `${service.price}Ks`
                   )}
                 </td>
                 <td style={{ padding: '12px 8px' }}>

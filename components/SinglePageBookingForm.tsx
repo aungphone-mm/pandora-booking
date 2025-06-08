@@ -663,7 +663,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                                     fontSize: '1.5rem',
                                     fontWeight: 'bold',
                                     color: '#ec4899'
-                                  }}>${service.price}</span>
+                                  }}>{service.price}Ks</span>
                                 </div>
                               </div>
                             </div>
@@ -850,7 +850,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                                     <span style={{
                                       color: '#7c3aed',
                                       fontWeight: '600'
-                                    }}>${product.price}</span>
+                                    }}>{product.price}Ks</span>
                                   </div>
                                 </div>
                               </div>
@@ -919,7 +919,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                       fontSize: '2rem',
                       fontWeight: 'bold',
                       color: '#ec4899'
-                    }}>${totalPrice.toFixed(2)}</span>
+                    }}>{totalPrice.toFixed(2)}Ks</span>
                   </div>
                 </section>
               )}

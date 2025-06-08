@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 
 type Appointment = {
   id: string
+  user_id?: string | null  // Added missing user_id field
   customer_name: string
   customer_email: string
   customer_phone: string
@@ -49,56 +50,42 @@ export default function AppointmentManager() {
   }, [])
 
   const loadAppointments = async () => {
-  try {
-    setLoading(true)
-    setError(null)
+    try {
+      setLoading(true)
+      setError(null)
 
-    // Use explicit foreign key reference to avoid ambiguity
-    const { data: appointmentsData, error: appointmentsError } = await supabase
-      .from('appointments')
-      .select(`
-        *,
-        services!appointments_service_id_fkey(
-          id,
-          name,
-          price,
-          duration
-        ),
-        profiles!appointments_user_id_fkey(
-          id,
-          full_name
-        ),
-        appointment_products(
-          id,
-          quantity,
-          products!appointment_products_product_id_fkey(
-            id,
-            name,
-            price
-          )
-        )
-      `)
-      .order('created_at', { ascending: false })
+      // Basic query first to test
+      const { data: appointmentsData, error: appointmentsError } = await supabase
+        .from('appointments')
+        .select('*')
+        .order('created_at', { ascending: false })
 
-    if (appointmentsError) {
-      throw appointmentsError
+      if (appointmentsError) {
+        throw appointmentsError
+      }
+
+      // Get services separately 
+      const { data: servicesData } = await supabase
+        .from('services')
+        .select('id, name, price, duration')
+
+      // Transform data
+      const transformedData = appointmentsData?.map(appointment => {
+        const service = servicesData?.find(s => s.id === appointment.service_id)
+        return {
+          ...appointment,
+          service: service || { name: 'Unknown Service', price: 0, duration: 0 }
+        }
+      }) || []
+
+      setAppointments(transformedData)
+    } catch (err: any) {
+      console.error('Error loading appointments:', err)
+      setError(err.message || 'Failed to load appointments')
+    } finally {
+      setLoading(false)
     }
-
-    // Transform the data to match the expected structure
-    const transformedData = appointmentsData?.map(appointment => ({
-      ...appointment,
-      service: appointment.services,
-      user: appointment.profiles
-    })) || []
-
-    setAppointments(transformedData)
-  } catch (err: any) {
-    console.error('Error loading appointments:', err)
-    setError(err.message || 'Failed to load appointments')
-  } finally {
-    setLoading(false)
   }
-}
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
     try {
@@ -122,10 +109,6 @@ export default function AppointmentManager() {
             : apt
         )
       )
-
-      // Show success message briefly
-      const successMessage = `Appointment ${newStatus} successfully`
-      setError(null)
       
     } catch (err: any) {
       console.error('Error updating appointment status:', err)
@@ -214,10 +197,10 @@ export default function AppointmentManager() {
   const calculateTotal = (appointment: Appointment) => {
     const servicePrice = appointment.service?.price || 0
     const productsTotal = appointment.appointment_products?.reduce(
-      (sum, ap) => sum + (ap.product.price * ap.quantity), 0
-    ) || 0
-    return servicePrice + productsTotal
-  }
+        (sum, ap) => sum + (ap.product.price * ap.quantity), 0
+      ) || 0
+      return servicePrice + productsTotal
+    }
 
   if (loading) {
     return (
@@ -400,25 +383,6 @@ export default function AppointmentManager() {
         </div>
       </div>
 
-      {/* Debug Information (development only) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{
-          marginBottom: '16px',
-          padding: '12px',
-          backgroundColor: '#dbeafe',
-          border: '1px solid #93c5fd',
-          borderRadius: '8px',
-          fontSize: '0.875rem'
-        }}>
-          <p><strong>Debug Info:</strong></p>
-          <p>Total appointments loaded: {appointments.length}</p>
-          <p>Loading state: {loading ? 'true' : 'false'}</p>
-          <p>Error state: {error ? 'true' : 'false'}</p>
-          <p>Filter: {filterStatus}</p>
-          <p>Filtered count: {filteredAndSortedAppointments.length}</p>
-        </div>
-      )}
-
       {/* Summary Stats */}
       <div style={{
         marginBottom: '24px',
@@ -570,6 +534,16 @@ export default function AppointmentManager() {
                         fontSize: '0.875rem',
                         color: '#6b7280'
                       }}>{appointment.customer_phone}</p>
+                      <span style={{
+                        fontSize: '0.75rem',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        backgroundColor: appointment.user_id ? '#dcfce7' : '#fef3c7',
+                        color: appointment.user_id ? '#166534' : '#92400e',
+                        fontWeight: '500'
+                      }}>
+                        {appointment.user_id ? '👤 Registered' : '👥 Guest'}
+                      </span>
                       {appointment.user?.full_name && (
                         <p style={{
                           fontSize: '0.75rem',
@@ -585,7 +559,7 @@ export default function AppointmentManager() {
                         fontSize: '0.875rem',
                         color: '#6b7280'
                       }}>
-                        ${appointment.service?.price} • {appointment.service?.duration} min
+                        {appointment.service?.price}Ks • {appointment.service?.duration} min
                       </p>
                       {appointment.appointment_products && appointment.appointment_products.length > 0 && (
                         <div style={{
@@ -596,7 +570,7 @@ export default function AppointmentManager() {
                           <p>Add-ons:</p>
                           {appointment.appointment_products.map((ap) => (
                             <p key={ap.id}>
-                              {ap.product.name} x{ap.quantity} (${ap.product.price * ap.quantity})
+                              {ap.product.name} x{ap.quantity} ({ap.product.price * ap.quantity}Ks)
                             </p>
                           ))}
                         </div>
@@ -621,7 +595,7 @@ export default function AppointmentManager() {
                     </div>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <p style={{ fontWeight: '500' }}>${calculateTotal(appointment).toFixed(2)}</p>
+                    <p style={{ fontWeight: '500' }}>{calculateTotal(appointment).toFixed(2)}Ks</p>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <select
