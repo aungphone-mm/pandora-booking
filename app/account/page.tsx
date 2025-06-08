@@ -10,15 +10,29 @@ export default async function AccountPage() {
     redirect('/auth/login')
   }
 
-  // Fetch user's appointments
-  const { data: appointments } = await supabase
-    .from('appointments')
-    .select(`
-      *,
-      service:services(name, price, duration)
-    `)
-    .eq('user_id', user.id)
-    .order('appointment_date', { ascending: false })
+// Fetch user's appointments
+const { data: appointments } = await supabase
+  .from('appointments')
+  .select(`
+    *,
+    service:services(name, price, duration),
+    appointment_products(
+      id,
+      quantity,
+      product:products(id, name, price)
+    )
+  `)
+  .eq('user_id', user.id)
+  .order('appointment_date', { ascending: false })
+
+  // Helper function to calculate total
+  const calculateTotal = (appointment: any) => {
+    const servicePrice = appointment.service?.price || 0
+    const productsTotal = appointment.appointment_products?.reduce(
+      (sum: number, ap: any) => sum + (ap.product.price * ap.quantity), 0
+    ) || 0
+    return servicePrice + productsTotal
+  }
 
   return (
     <div style={{
@@ -94,11 +108,27 @@ export default async function AccountPage() {
                       marginBottom: '4px'
                     }}>Time: {appointment.appointment_time}</p>
                     <p style={{
-                      color: '#6b7280'
+                      color: '#6b7280',
+                      marginBottom: '4px'
                     }}>Duration: {appointment.service?.duration} minutes</p>
+                    {appointment.appointment_products && appointment.appointment_products.length > 0 && (
+                      <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '8px' }}>
+                        <p style={{ fontWeight: '500' }}>Add-ons:</p>
+                        {appointment.appointment_products.map((ap: any) => (
+                          <p key={ap.id} style={{ marginLeft: '12px' }}>
+                            • {ap.product.name} x{ap.quantity} ({ap.product.price * ap.quantity}Ks)
+                          </p>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontWeight: '600' }}>{appointment.service?.price}Ks</p>
+                    <p style={{ fontWeight: '600', fontSize: '1.125rem' }}>
+                      {calculateTotal(appointment).toFixed(2)}Ks
+                    </p>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '8px' }}>
+                      Service: {appointment.service?.price}Ks
+                    </p>
                     <span style={{
                       display: 'inline-block',
                       padding: '4px 8px',

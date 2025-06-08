@@ -49,43 +49,62 @@ export default function AppointmentManager() {
     loadAppointments()
   }, [])
 
-  const loadAppointments = async () => {
-    try {
-      setLoading(true)
-      setError(null)
+  // Replace the loadAppointments function in components/AppointmentManager.tsx
 
-      // Basic query first to test
-      const { data: appointmentsData, error: appointmentsError } = await supabase
-        .from('appointments')
-        .select('*')
-        .order('created_at', { ascending: false })
+// Replace the loadAppointments function in components/AppointmentManager.tsx (around line 53)
 
-      if (appointmentsError) {
-        throw appointmentsError
-      }
+const loadAppointments = async () => {
+  try {
+    setLoading(true)
+    setError(null)
 
-      // Get services separately 
-      const { data: servicesData } = await supabase
-        .from('services')
-        .select('id, name, price, duration')
+    // First get appointments with services and products
+    const { data: appointmentsData, error: appointmentsError } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        service:services(id, name, price, duration),
+        appointment_products(
+          id,
+          quantity,
+          product:products(id, name, price)
+        )
+      `)
+      .order('created_at', { ascending: false })
 
-      // Transform data
-      const transformedData = appointmentsData?.map(appointment => {
-        const service = servicesData?.find(s => s.id === appointment.service_id)
-        return {
-          ...appointment,
-          service: service || { name: 'Unknown Service', price: 0, duration: 0 }
-        }
-      }) || []
-
-      setAppointments(transformedData)
-    } catch (err: any) {
-      console.error('Error loading appointments:', err)
-      setError(err.message || 'Failed to load appointments')
-    } finally {
-      setLoading(false)
+    if (appointmentsError) {
+      throw appointmentsError
     }
+
+    // Get user profiles separately for users who have accounts
+    const userIds = appointmentsData?.filter(apt => apt.user_id).map(apt => apt.user_id) || []
+    let profilesData: any[] = []
+    
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', userIds)
+      profilesData = profiles || []
+    }
+
+    // Combine appointments with user profiles
+    const combinedData = appointmentsData?.map(appointment => {
+      const userProfile = profilesData.find(profile => profile.id === appointment.user_id)
+      return {
+        ...appointment,
+        user: userProfile || null
+      }
+    }) || []
+
+    setAppointments(combinedData)
+  } catch (err: any) {
+    console.error('Error loading appointments:', err)
+    setError(err.message || 'Failed to load appointments')
+  } finally {
+    setLoading(false)
   }
+}
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
     try {
