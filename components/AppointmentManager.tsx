@@ -24,11 +24,8 @@ type Appointment = {
   }
   staff?: {
     id: string
-    name: string
-    category?: {
-      name: string
-    }
-  }
+    full_name: string
+  } | null
   user?: {
     full_name: string
   }
@@ -46,7 +43,7 @@ type Appointment = {
 export default function AppointmentManager() {
   const supabase = createClient()
   const [appointments, setAppointments] = useState<Appointment[]>([])
-  const [staff, setStaff] = useState<any[]>([])
+  const [staff, setStaff] = useState<{id: string, full_name: string}[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('all')
@@ -68,13 +65,12 @@ const loadAppointments = async () => {
     setLoading(true)
     setError(null)
 
-    // First get appointments with services, products, and staff
+    // First get appointments with services and products
     const { data: appointmentsData, error: appointmentsError } = await supabase
       .from('appointments')
       .select(`
         *,
         service:services(id, name, price, duration),
-        staff:staff(id, name, category:staff_categories(name)),
         appointment_products(
           id,
           quantity,
@@ -85,6 +81,25 @@ const loadAppointments = async () => {
 
     if (appointmentsError) {
       throw appointmentsError
+    }
+
+    // Check if staff_id column exists and has values
+    const staffIds = appointmentsData?.map(apt => apt.staff_id).filter(id => id) || []
+    
+    // Get staff information separately
+    let staffData: any[] = []
+    
+    if (staffIds.length > 0) {
+      const { data: staffInfo, error: staffError } = await supabase
+        .from('staff')
+        .select('id, full_name')
+        .in('id', staffIds)
+      
+      if (staffError) {
+        console.error('Error loading staff info:', staffError)
+      }
+      
+      staffData = staffInfo || []
     }
 
     // Get user profiles separately for users who have accounts
@@ -99,24 +114,28 @@ const loadAppointments = async () => {
       profilesData = profiles || []
     }
 
-    // Load staff list for dropdown
-    const { data: staffData } = await supabase
+    // Load all active staff for dropdown
+    const { data: allStaffData, error: allStaffError } = await supabase
       .from('staff')
-      .select(`
-        id, name, 
-        category:staff_categories(name)
-      `)
+      .select('id, full_name')
       .eq('is_active', true)
-      .order('name')
+      .order('full_name')
 
-    setStaff(staffData || [])
+    if (allStaffError) {
+      console.error('Error loading all staff:', allStaffError)
+    }
 
-    // Combine appointments with user profiles
+    setStaff(allStaffData || [])
+
+    // Combine appointments with user profiles and staff info
     const combinedData = appointmentsData?.map(appointment => {
       const userProfile = profilesData.find(profile => profile.id === appointment.user_id)
+      const staffInfo = staffData.find(staff => staff.id === appointment.staff_id)
+      
       return {
         ...appointment,
-        user: userProfile || null
+        user: userProfile || null,
+        staff: staffInfo || null
       }
     }) || []
 
@@ -655,6 +674,42 @@ const loadAppointments = async () => {
                         </div>
                       )}
                     </div>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <select
+                      value={appointment.staff_id || ''}
+                      onChange={(e) => updateAppointmentStaff(
+                        appointment.id, 
+                        e.target.value || null
+                      )}
+                      disabled={updatingStaff === appointment.id}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '4px',
+                        fontSize: '0.875rem',
+                        border: '1px solid #d1d5db',
+                        cursor: updatingStaff === appointment.id ? 'not-allowed' : 'pointer',
+                        opacity: updatingStaff === appointment.id ? 0.5 : 1,
+                        backgroundColor: 'white',
+                        minWidth: '150px'
+                      }}
+                    >
+                      <option value="">No Staff Assigned</option>
+                      {staff.map((staffMember) => (
+                        <option key={staffMember.id} value={staffMember.id}>
+                          {staffMember.full_name}
+                        </option>
+                      ))}
+                    </select>
+                    {appointment.staff && (
+                      <p style={{
+                        fontSize: '0.75rem',
+                        color: '#6b7280',
+                        marginTop: '4px'
+                      }}>
+                        Assigned
+                      </p>
+                    )}
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <div>

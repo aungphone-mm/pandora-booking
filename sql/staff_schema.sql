@@ -8,7 +8,7 @@ CREATE TABLE public.staff (
   full_name text NOT NULL,
   email text,
   phone text,
-  position text, -- 'stylist', 'beautician', 'nail_technician', 'manager', etc.
+  job_position text, -- 'stylist', 'beautician', 'nail_technician', 'manager', etc.
   specializations text[], -- Array of specializations like ['haircut', 'coloring', 'facial']
   bio text, -- Staff bio for customer-facing display
   profile_image_url text,
@@ -85,39 +85,11 @@ CREATE TABLE public.staff_metrics (
   CONSTRAINT staff_metrics_staff_date_unique UNIQUE (staff_id, metric_date)
 );
 
--- Insert sample staff data
-INSERT INTO public.staff (full_name, email, phone, position, specializations, bio, is_active) VALUES
-('Sarah Johnson', 'sarah@pandorabeauty.com', '+95 9123456789', 'Senior Stylist', ARRAY['haircut', 'coloring', 'styling'], 'Senior stylist with 8 years of experience specializing in modern cuts and creative coloring.', true),
-('Maya Chen', 'maya@pandorabeauty.com', '+95 9234567890', 'Beautician', ARRAY['facial', 'skincare', 'eyebrows'], 'Licensed beautician focused on skincare and facial treatments for all skin types.', true),
-('Thant Zin', 'thantzin@pandorabeauty.com', '+95 9345678901', 'Nail Technician', ARRAY['manicure', 'pedicure', 'nail_art'], 'Creative nail artist with expertise in gel, acrylic, and intricate nail designs.', true),
-('Lisa Wang', 'lisa@pandorabeauty.com', '+95 9456789012', 'Manager', ARRAY['management', 'customer_service'], 'Salon manager ensuring exceptional customer experience and smooth operations.', true);
+-- Staff data will be managed through the application interface
 
--- Insert sample staff schedules (Monday-Saturday, 9 AM - 6 PM)
-INSERT INTO public.staff_schedules (staff_id, day_of_week, start_time, end_time, break_start_time, break_end_time) 
-SELECT 
-  s.id,
-  dow,
-  '09:00'::time,
-  '18:00'::time,
-  '12:00'::time,
-  '13:00'::time
-FROM public.staff s
-CROSS JOIN generate_series(1, 6) as dow -- Monday to Saturday
-WHERE s.is_active = true;
+-- Staff schedules will be managed through the application interface
 
--- Link staff to services they can perform
-INSERT INTO public.staff_services (staff_id, service_id, is_primary_provider)
-SELECT 
-  s.id,
-  srv.id,
-  true
-FROM public.staff s
-JOIN public.services srv ON (
-  (s.position = 'Senior Stylist' AND srv.name ILIKE '%hair%') OR
-  (s.position = 'Beautician' AND srv.name ILIKE '%facial%') OR
-  (s.position = 'Nail Technician' AND srv.name ILIKE '%nail%')
-)
-WHERE s.position != 'Manager';
+-- Staff services assignments will be managed through the application interface
 
 -- Create indexes for performance
 CREATE INDEX idx_staff_active ON public.staff(is_active);
@@ -201,7 +173,7 @@ CREATE OR REPLACE FUNCTION get_available_staff_for_service(
 RETURNS TABLE (
   staff_id uuid,
   staff_name text,
-  position text,
+  job_position text,
   is_primary boolean
 ) AS $$
 BEGIN
@@ -209,7 +181,7 @@ BEGIN
   SELECT 
     s.id,
     s.full_name,
-    s.position,
+    s.job_position,
     ss.is_primary_provider
   FROM public.staff s
   JOIN public.staff_services ss ON s.id = ss.staff_id

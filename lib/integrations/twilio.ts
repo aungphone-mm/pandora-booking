@@ -1,10 +1,22 @@
 // Twilio SMS Integration
 import twilio from 'twilio'
 
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-)
+// Lazy initialization of Twilio client
+let client: any = null
+
+const getTwilioClient = () => {
+  if (!client) {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID
+    const authToken = process.env.TWILIO_AUTH_TOKEN
+    
+    if (!accountSid || !authToken) {
+      throw new Error('Twilio credentials not configured')
+    }
+    
+    client = twilio(accountSid, authToken)
+  }
+  return client
+}
 
 export interface SMSMessage {
   to: string
@@ -14,7 +26,8 @@ export interface SMSMessage {
 
 export const sendSMS = async ({ to, message, appointmentId }: SMSMessage) => {
   try {
-    const result = await client.messages.create({
+    const twilioClient = getTwilioClient()
+    const result = await twilioClient.messages.create({
       body: message,
       from: process.env.TWILIO_PHONE_NUMBER,
       to: to

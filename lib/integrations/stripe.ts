@@ -1,9 +1,23 @@
 // Stripe Payment Integration
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-05-28.basil'
-})
+// Lazy initialization of Stripe client
+let stripe: Stripe | null = null
+
+const getStripeClient = () => {
+  if (!stripe) {
+    const secretKey = process.env.STRIPE_SECRET_KEY
+    
+    if (!secretKey) {
+      throw new Error('Stripe secret key not configured')
+    }
+    
+    stripe = new Stripe(secretKey, {
+      apiVersion: '2025-05-28.basil'
+    })
+  }
+  return stripe
+}
 
 export interface PaymentIntent {
   amount: number // in cents
@@ -14,7 +28,8 @@ export interface PaymentIntent {
 
 export const createPaymentIntent = async (payment: PaymentIntent) => {
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
+    const stripeClient = getStripeClient()
+    const paymentIntent = await stripeClient.paymentIntents.create({
       amount: payment.amount,
       currency: 'usd', // or 'mmk' for Myanmar Kyat
       receipt_email: payment.customerEmail,
@@ -36,7 +51,8 @@ export const createPaymentIntent = async (payment: PaymentIntent) => {
 
 export const confirmPayment = async (paymentIntentId: string) => {
   try {
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+    const stripeClient = getStripeClient()
+    const paymentIntent = await stripeClient.paymentIntents.retrieve(paymentIntentId)
     return paymentIntent.status === 'succeeded'
   } catch (error) {
     console.error('Payment confirmation error:', error)
@@ -47,7 +63,8 @@ export const confirmPayment = async (paymentIntentId: string) => {
 // Refund for cancelled appointments
 export const processRefund = async (paymentIntentId: string, amount?: number) => {
   try {
-    const refund = await stripe.refunds.create({
+    const stripeClient = getStripeClient()
+    const refund = await stripeClient.refunds.create({
       payment_intent: paymentIntentId,
       amount // partial refund if specified
     })

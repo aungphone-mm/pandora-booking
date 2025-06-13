@@ -8,7 +8,7 @@ type Staff = {
   full_name: string
   email: string
   phone: string
-  position: string
+  job_position: string
   specializations: string[]
   bio: string
   is_active: boolean
@@ -17,9 +17,17 @@ type Staff = {
   hire_date: string
 }
 
+type Position = {
+  id: string
+  name: string
+  category_id: string
+  description: string
+}
+
 export default function StaffManager() {
   const supabase = createClient()
   const [staff, setStaff] = useState<Staff[]>([])
+  const [positions, setPositions] = useState<Position[]>([])
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -27,35 +35,29 @@ export default function StaffManager() {
     full_name: '',
     email: '',
     phone: '',
-    position: '',
-    specializations: [] as string[],
+    job_position: '',
+    specializations: '',
     bio: '',
     hourly_rate: 0,
     commission_rate: 0,
-    hire_date: new Date().toISOString().split('T')[0]
+    hire_date: new Date().toISOString().split('T')[0],
+    is_active: true
   })
 
-  const positions = [
-    'Senior Stylist',
-    'Stylist', 
-    'Beautician',
-    'Nail Technician',
-    'Massage Therapist',
-    'Manager',
-    'Receptionist'
-  ]
-
-  const allSpecializations = [
-    'haircut', 'coloring', 'styling', 'perms', 'extensions',
-    'facial', 'skincare', 'eyebrows', 'lashes', 'waxing',
-    'manicure', 'pedicure', 'nail_art', 'gel_nails',
-    'massage', 'aromatherapy', 'hot_stone',
-    'management', 'customer_service', 'reception'
-  ]
-
   useEffect(() => {
-    loadStaff()
+    loadData()
   }, [])
+
+  const loadData = async () => {
+    try {
+      await Promise.all([
+        loadStaff(),
+        loadPositions()
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const loadStaff = async () => {
     try {
@@ -68,18 +70,43 @@ export default function StaffManager() {
       setStaff(data || [])
     } catch (error) {
       console.error('Error loading staff:', error)
-    } finally {
-      setLoading(false)
+    }
+  }
+
+  const loadPositions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('staff_positions')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order')
+
+      if (error) throw error
+      setPositions(data || [])
+    } catch (error) {
+      console.error('Error loading positions:', error)
     }
   }
 
   const handleAddStaff = async () => {
     try {
+      const specializationsArray = newStaff.specializations
+        ? newStaff.specializations.split(',').map(s => s.trim()).filter(s => s)
+        : []
+
       const { error } = await supabase
         .from('staff')
         .insert([{
-          ...newStaff,
-          is_active: true
+          full_name: newStaff.full_name,
+          email: newStaff.email,
+          phone: newStaff.phone,
+          job_position: newStaff.job_position,
+          specializations: specializationsArray,
+          bio: newStaff.bio,
+          hourly_rate: newStaff.hourly_rate,
+          commission_rate: newStaff.commission_rate,
+          hire_date: newStaff.hire_date,
+          is_active: newStaff.is_active
         }])
 
       if (error) throw error
@@ -88,15 +115,16 @@ export default function StaffManager() {
         full_name: '',
         email: '',
         phone: '',
-        position: '',
-        specializations: [],
+        job_position: '',
+        specializations: '',
         bio: '',
         hourly_rate: 0,
         commission_rate: 0,
-        hire_date: new Date().toISOString().split('T')[0]
+        hire_date: new Date().toISOString().split('T')[0],
+        is_active: true
       })
       setShowAddForm(false)
-      loadStaff()
+      loadData()
     } catch (error) {
       console.error('Error adding staff:', error)
       alert('Failed to add staff member')
@@ -105,14 +133,18 @@ export default function StaffManager() {
 
   const handleUpdateStaff = async (staffMember: Staff) => {
     try {
+      const specializationsArray = Array.isArray(staffMember.specializations)
+        ? staffMember.specializations
+        : (staffMember.specializations as string).split(',').map(s => s.trim()).filter(s => s)
+
       const { error } = await supabase
         .from('staff')
         .update({
           full_name: staffMember.full_name,
           email: staffMember.email,
           phone: staffMember.phone,
-          position: staffMember.position,
-          specializations: staffMember.specializations,
+          job_position: staffMember.job_position,
+          specializations: specializationsArray,
           bio: staffMember.bio,
           hourly_rate: staffMember.hourly_rate,
           commission_rate: staffMember.commission_rate,
@@ -125,7 +157,7 @@ export default function StaffManager() {
       if (error) throw error
 
       setEditingStaff(null)
-      loadStaff()
+      loadData()
     } catch (error) {
       console.error('Error updating staff:', error)
       alert('Failed to update staff member')
@@ -140,25 +172,9 @@ export default function StaffManager() {
         .eq('id', id)
 
       if (error) throw error
-      loadStaff()
+      loadData()
     } catch (error) {
       console.error('Error updating staff status:', error)
-    }
-  }
-
-  const handleSpecializationToggle = (specialization: string, isEditing: boolean = false) => {
-    if (isEditing && editingStaff) {
-      const updated = editingStaff.specializations.includes(specialization)
-        ? editingStaff.specializations.filter(s => s !== specialization)
-        : [...editingStaff.specializations, specialization]
-      
-      setEditingStaff({ ...editingStaff, specializations: updated })
-    } else {
-      const updated = newStaff.specializations.includes(specialization)
-        ? newStaff.specializations.filter(s => s !== specialization)
-        : [...newStaff.specializations, specialization]
-      
-      setNewStaff({ ...newStaff, specializations: updated })
     }
   }
 
@@ -181,12 +197,20 @@ export default function StaffManager() {
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Staff Management</h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700"
-        >
-          Add Staff Member
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.open('/admin/staff-categories', '_blank')}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Add Position
+          </button>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700"
+          >
+            Add Staff Member
+          </button>
+        </div>
       </div>
 
       {/* Add Staff Form */}
@@ -216,13 +240,13 @@ export default function StaffManager() {
               className="px-3 py-2 border rounded"
             />
             <select
-              value={newStaff.position}
-              onChange={(e) => setNewStaff({ ...newStaff, position: e.target.value })}
+              value={newStaff.job_position}
+              onChange={(e) => setNewStaff({ ...newStaff, job_position: e.target.value })}
               className="px-3 py-2 border rounded"
             >
               <option value="">Select Position</option>
-              {positions.map(pos => (
-                <option key={pos} value={pos}>{pos}</option>
+              {positions.map(position => (
+                <option key={position.id} value={position.name}>{position.name}</option>
               ))}
             </select>
             <input
@@ -248,25 +272,29 @@ export default function StaffManager() {
               onChange={(e) => setNewStaff({ ...newStaff, hire_date: e.target.value })}
               className="px-3 py-2 border rounded"
             />
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="active"
+                checked={newStaff.is_active}
+                onChange={(e) => setNewStaff({ ...newStaff, is_active: e.target.checked })}
+                className="mr-2"
+              />
+              <label htmlFor="active" className="text-sm font-medium text-gray-700">
+                Active
+              </label>
+            </div>
           </div>
           
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Specializations
-            </label>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-              {allSpecializations.map(spec => (
-                <label key={spec} className="flex items-center text-sm">
-                  <input
-                    type="checkbox"
-                    checked={newStaff.specializations.includes(spec)}
-                    onChange={() => handleSpecializationToggle(spec)}
-                    className="mr-1"
-                  />
-                  {spec.replace('_', ' ')}
-                </label>
-              ))}
-            </div>
+            <input
+              type="text"
+              placeholder="Specializations (comma separated)"
+              value={newStaff.specializations}
+              onChange={(e) => setNewStaff({ ...newStaff, specializations: e.target.value })}
+              className="w-full px-3 py-2 border rounded"
+            />
+            <p className="text-xs text-gray-500 mt-1">Enter specializations separated by commas (e.g. Hair Cutting, Hair Coloring, Styling)</p>
           </div>
 
           <textarea
@@ -307,43 +335,89 @@ export default function StaffManager() {
                     value={editingStaff.full_name}
                     onChange={(e) => setEditingStaff({ ...editingStaff, full_name: e.target.value })}
                     className="px-3 py-2 border rounded"
+                    placeholder="Full Name"
                   />
                   <input
                     type="email"
                     value={editingStaff.email}
                     onChange={(e) => setEditingStaff({ ...editingStaff, email: e.target.value })}
                     className="px-3 py-2 border rounded"
+                    placeholder="Email"
                   />
                   <input
                     type="tel"
                     value={editingStaff.phone}
                     onChange={(e) => setEditingStaff({ ...editingStaff, phone: e.target.value })}
                     className="px-3 py-2 border rounded"
+                    placeholder="Phone"
                   />
                   <select
-                    value={editingStaff.position}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, position: e.target.value })}
+                    value={editingStaff.job_position}
+                    onChange={(e) => setEditingStaff({ ...editingStaff, job_position: e.target.value })}
                     className="px-3 py-2 border rounded"
                   >
-                    {positions.map(pos => (
-                      <option key={pos} value={pos}>{pos}</option>
+                    <option value="">Select Position</option>
+                    {positions.map(position => (
+                      <option key={position.id} value={position.name}>{position.name}</option>
                     ))}
                   </select>
-                </div>
-                
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                  {allSpecializations.map(spec => (
-                    <label key={spec} className="flex items-center text-sm">
-                      <input
-                        type="checkbox"
-                        checked={editingStaff.specializations.includes(spec)}
-                        onChange={() => handleSpecializationToggle(spec, true)}
-                        className="mr-1"
-                      />
-                      {spec.replace('_', ' ')}
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editingStaff.hourly_rate}
+                    onChange={(e) => setEditingStaff({ ...editingStaff, hourly_rate: parseFloat(e.target.value) || 0 })}
+                    className="px-3 py-2 border rounded"
+                    placeholder="Hourly Rate"
+                  />
+                  <input
+                    type="number"
+                    step="0.1"
+                    max="100"
+                    value={editingStaff.commission_rate}
+                    onChange={(e) => setEditingStaff({ ...editingStaff, commission_rate: parseFloat(e.target.value) || 0 })}
+                    className="px-3 py-2 border rounded"
+                    placeholder="Commission Rate (%)"
+                  />
+                  <input
+                    type="date"
+                    value={editingStaff.hire_date}
+                    onChange={(e) => setEditingStaff({ ...editingStaff, hire_date: e.target.value })}
+                    className="px-3 py-2 border rounded"
+                  />
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={`active-${editingStaff.id}`}
+                      checked={editingStaff.is_active}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, is_active: e.target.checked })}
+                      className="mr-2"
+                    />
+                    <label htmlFor={`active-${editingStaff.id}`} className="text-sm font-medium text-gray-700">
+                      Active
                     </label>
-                  ))}
+                  </div>
                 </div>
+
+                <div>
+                  <input
+                    type="text"
+                    value={Array.isArray(editingStaff.specializations) ? editingStaff.specializations.join(', ') : editingStaff.specializations}
+                    onChange={(e) => setEditingStaff({ 
+                      ...editingStaff, 
+                      specializations: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                    })}
+                    className="w-full px-3 py-2 border rounded"
+                    placeholder="Specializations (comma separated)"
+                  />
+                </div>
+
+                <textarea
+                  value={editingStaff.bio}
+                  onChange={(e) => setEditingStaff({ ...editingStaff, bio: e.target.value })}
+                  className="w-full px-3 py-2 border rounded"
+                  rows={3}
+                  placeholder="Bio"
+                />
 
                 <div className="flex gap-2">
                   <button
@@ -379,7 +453,7 @@ export default function StaffManager() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                     <div>
-                      <p><strong>Position:</strong> {staffMember.position}</p>
+                      <p><strong>Position:</strong> {staffMember.job_position || 'No position assigned'}</p>
                       <p><strong>Email:</strong> {staffMember.email}</p>
                       <p><strong>Phone:</strong> {staffMember.phone}</p>
                     </div>
@@ -390,13 +464,13 @@ export default function StaffManager() {
                     </div>
                   </div>
 
-                  {staffMember.specializations.length > 0 && (
+                  {staffMember.specializations && staffMember.specializations.length > 0 && (
                     <div className="mt-2">
                       <p className="text-sm font-medium text-gray-700">Specializations:</p>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {staffMember.specializations.map(spec => (
-                          <span key={spec} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                            {spec.replace('_', ' ')}
+                        {staffMember.specializations.map((spec, index) => (
+                          <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                            {spec}
                           </span>
                         ))}
                       </div>
@@ -459,9 +533,9 @@ export default function StaffManager() {
           </div>
           <div>
             <div className="text-2xl font-bold text-blue-600">
-              {positions.length}
+              {staff.filter(s => s.job_position).length}
             </div>
-            <div className="text-sm text-gray-600">Positions</div>
+            <div className="text-sm text-gray-600">With Positions</div>
           </div>
         </div>
       </div>
