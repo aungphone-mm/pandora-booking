@@ -10,6 +10,7 @@ export default function AdminSidebar() {
   const links = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/appointments', label: 'Appointments' },
+    { href: '/admin/staff', label: 'Staff Management' },
     { href: '/admin/services', label: 'Services' },
     { href: '/admin/service-categories', label: 'Service Categories' },
     { href: '/admin/products', label: 'Products' },

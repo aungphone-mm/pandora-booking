@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 type Appointment = {
   id: string
   user_id?: string | null  // Added missing user_id field
+  staff_id?: string | null  // Added staff_id field
   customer_name: string
   customer_email: string
   customer_phone: string
@@ -20,6 +21,13 @@ type Appointment = {
     name: string
     price: number
     duration: number
+  }
+  staff?: {
+    id: string
+    name: string
+    category?: {
+      name: string
+    }
   }
   user?: {
     full_name: string
@@ -38,12 +46,14 @@ type Appointment = {
 export default function AppointmentManager() {
   const supabase = createClient()
   const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [staff, setStaff] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [sortBy, setSortBy] = useState<'date' | 'created' | 'customer'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  const [updatingStaff, setUpdatingStaff] = useState<string | null>(null)
 
   useEffect(() => {
     loadAppointments()
@@ -58,12 +68,13 @@ const loadAppointments = async () => {
     setLoading(true)
     setError(null)
 
-    // First get appointments with services and products
+    // First get appointments with services, products, and staff
     const { data: appointmentsData, error: appointmentsError } = await supabase
       .from('appointments')
       .select(`
         *,
         service:services(id, name, price, duration),
+        staff:staff(id, name, category:staff_categories(name)),
         appointment_products(
           id,
           quantity,
@@ -87,6 +98,18 @@ const loadAppointments = async () => {
         .in('id', userIds)
       profilesData = profiles || []
     }
+
+    // Load staff list for dropdown
+    const { data: staffData } = await supabase
+      .from('staff')
+      .select(`
+        id, name, 
+        category:staff_categories(name)
+      `)
+      .eq('is_active', true)
+      .order('name')
+
+    setStaff(staffData || [])
 
     // Combine appointments with user profiles
     const combinedData = appointmentsData?.map(appointment => {
@@ -134,6 +157,38 @@ const loadAppointments = async () => {
       setError(err.message || 'Failed to update appointment status')
     } finally {
       setUpdatingStatus(null)
+    }
+  }
+
+  const updateAppointmentStaff = async (appointmentId: string, staffId: string | null) => {
+    try {
+      setUpdatingStaff(appointmentId)
+      setError(null)
+
+      const { error: updateError } = await supabase
+        .from('appointments')
+        .update({ staff_id: staffId })
+        .eq('id', appointmentId)
+
+      if (updateError) {
+        throw updateError
+      }
+
+      // Update local state
+      const selectedStaff = staffId ? staff.find(s => s.id === staffId) : null
+      setAppointments(prev => 
+        prev.map(apt => 
+          apt.id === appointmentId 
+            ? { ...apt, staff_id: staffId, staff: selectedStaff }
+            : apt
+        )
+      )
+      
+    } catch (err: any) {
+      console.error('Error updating appointment staff:', err)
+      setError(err.message || 'Failed to update appointment staff')
+    } finally {
+      setUpdatingStaff(null)
     }
   }
 
@@ -515,6 +570,11 @@ const loadAppointments = async () => {
                   padding: '12px 16px',
                   fontWeight: '600'
                 }}>Service</th>
+                <th style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  fontWeight: '600'
+                }}>Staff</th>
                 <th style={{
                   textAlign: 'left',
                   padding: '12px 16px',

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createPaymentIntent } from '@/lib/integrations/stripe'
 import { sendBookingConfirmation } from '@/lib/integrations/twilio'
-import { createSalonAppointment } from '@/lib/integrations/google-calendar'
+// import { createSalonAppointment } from '@/lib/integrations/google-calendar'
 
 export async function POST(request: NextRequest) {
   try {
@@ -88,17 +88,17 @@ export async function POST(request: NextRequest) {
 
     // 6. CREATE CALENDAR EVENT
     try {
-      const startDateTime = new Date(`${data.appointmentDate}T${data.appointmentTime}`)
-      const endDateTime = new Date(startDateTime.getTime() + (appointment.service.duration * 60000))
+      // const startDateTime = new Date(`${data.appointmentDate}T${data.appointmentTime}`)
+      // const endDateTime = new Date(startDateTime.getTime() + (appointment.service.duration * 60000))
       
-      await createSalonAppointment({
-        summary: `${appointment.service.name} - ${data.customerName}`,
-        description: `Customer: ${data.customerName}\nPhone: ${data.customerPhone}\nEmail: ${data.customerEmail}\nNotes: ${data.notes || 'None'}`,
-        startDateTime: startDateTime.toISOString(),
-        endDateTime: endDateTime.toISOString(),
-        customerEmail: data.customerEmail,
-        location: 'Pandora Beauty Salon'
-      })
+      // await createSalonAppointment({
+      //   summary: `${appointment.service.name} - ${data.customerName}`,
+      //   description: `Customer: ${data.customerName}\nPhone: ${data.customerPhone}\nEmail: ${data.customerEmail}\nNotes: ${data.notes || 'None'}`,
+      //   startDateTime: startDateTime.toISOString(),
+      //   endDateTime: endDateTime.toISOString(),
+      //   customerEmail: data.customerEmail,
+      //   location: 'Pandora Beauty Salon'
+      // })
     } catch (calendarError) {
       console.warn('Calendar creation failed:', calendarError)
       // Don't fail the booking if calendar fails

@@ -7,6 +7,15 @@ import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import Link from 'next/link'
 
+type Staff = {
+  id: string
+  full_name: string
+  position: string
+  specializations: string[]
+  bio: string
+  is_active: boolean
+}
+
 type Service = {
   id: string
   name: string
@@ -44,6 +53,7 @@ type FormData = {
   customerEmail: string
   customerPhone: string
   serviceId: string
+  staffId: string
   appointmentDate: string
   appointmentTime: string
   products: string[]
@@ -56,6 +66,8 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [services, setServices] = useState<Service[]>([])
+  const [staff, setStaff] = useState<Staff[]>([])
+  const [availableStaff, setAvailableStaff] = useState<Staff[]>([]) 
   const [products, setProducts] = useState<Product[]>([])
   const [productCategories, setProductCategories] = useState<ProductCategory[]>([])
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
@@ -70,6 +82,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
       customerName: user?.user_metadata?.full_name || '',
       customerEmail: user?.email || '',
       customerPhone: user?.user_metadata?.phone || '',
+      staffId: '',
       products: []
     }
   })
@@ -90,6 +103,17 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
     calculateTotal()
   }, [selectedServiceId, selectedProducts])
 
+  useEffect(() => {
+    // Filter staff who can perform the selected service
+    if (selectedServiceId && staff.length > 0) {
+      // For now, show all active staff. In a full implementation,
+      // you would filter based on staff_services table
+      setAvailableStaff(staff)
+    } else {
+      setAvailableStaff([])
+    }
+  }, [selectedServiceId, staff])
+
   const loadData = async () => {
     try {
       // Load services with categories
@@ -105,6 +129,17 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
       if (servicesError) {
         console.error('Error loading services:', servicesError)
         setError('Failed to load services. Please refresh the page.')
+      }
+
+      // Load staff
+      const { data: staffData, error: staffError } = await supabase
+        .from('staff')
+        .select('*')
+        .eq('is_active', true)
+        .order('full_name')
+
+      if (staffError) {
+        console.error('Error loading staff:', staffError)
       }
 
       // Load products with categories
@@ -144,6 +179,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
       }
 
       setServices(servicesData || [])
+      setStaff(staffData || [])
       setProducts(productsData || [])
       setProductCategories(categoriesData || [])
       setTimeSlots(slotsData || [])
@@ -220,6 +256,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
           customer_email: data.customerEmail,
           customer_phone: data.customerPhone,
           service_id: data.serviceId,
+          staff_id: data.staffId || null,
           appointment_date: data.appointmentDate,
           appointment_time: data.appointmentTime,
           notes: data.notes,
@@ -597,6 +634,158 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                   </div>
                 </div>
               </section>
+
+              {/* Staff Selection */}
+              {selectedServiceId && availableStaff.length > 0 && (
+                <section style={{ marginBottom: '40px' }}>
+                  <div style={{
+                    borderBottom: '1px solid #e5e7eb',
+                    paddingBottom: '16px',
+                    marginBottom: '24px'
+                  }}>
+                    <h2 style={{
+                      fontSize: '1.5rem',
+                      fontWeight: '600',
+                      color: '#111827'
+                    }}>Choose Your Stylist (Optional)</h2>
+                    <p style={{
+                      color: '#6b7280',
+                      marginTop: '4px'
+                    }}>Select a preferred staff member or leave blank for automatic assignment</p>
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: '20px'
+                  }}>
+                    {/* No preference option */}
+                    <label style={{ cursor: 'pointer' }}>
+                      <input
+                        type="radio"
+                        {...register('staffId')}
+                        value=""
+                        style={{ display: 'none' }}
+                      />
+                      <div style={{
+                        padding: '20px',
+                        border: !watch('staffId') ? '3px solid #ec4899' : '2px solid #e5e7eb',
+                        borderRadius: '12px',
+                        backgroundColor: !watch('staffId') ? '#fdf2f8' : 'white',
+                        boxShadow: !watch('staffId') ? '0 8px 25px rgba(236, 72, 153, 0.15)' : '0 4px 6px rgba(0, 0, 0, 0.05)',
+                        transform: !watch('staffId') ? 'translateY(-2px)' : 'none',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        <h4 style={{
+                          fontWeight: '600',
+                          color: '#111827',
+                          fontSize: '1.125rem',
+                          marginBottom: '8px'
+                        }}>No Preference</h4>
+                        <p style={{
+                          color: '#6b7280',
+                          fontSize: '0.875rem'
+                        }}>We'll assign the best available stylist for your service</p>
+                        {!watch('staffId') && (
+                          <div style={{
+                            marginTop: '12px',
+                            padding: '8px',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            borderRadius: '6px',
+                            fontSize: '0.875rem',
+                            color: '#be185d',
+                            fontWeight: '500'
+                          }}>
+                            ✓ Selected
+                          </div>
+                        )}
+                      </div>
+                    </label>
+
+                    {/* Staff options */}
+                    {availableStaff.map(staffMember => (
+                      <label key={staffMember.id} style={{ cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          {...register('staffId')}
+                          value={staffMember.id}
+                          style={{ display: 'none' }}
+                        />
+                        <div style={{
+                          padding: '20px',
+                          border: watch('staffId') === staffMember.id ? '3px solid #ec4899' : '2px solid #e5e7eb',
+                          borderRadius: '12px',
+                          backgroundColor: watch('staffId') === staffMember.id ? '#fdf2f8' : 'white',
+                          boxShadow: watch('staffId') === staffMember.id ? '0 8px 25px rgba(236, 72, 153, 0.15)' : '0 4px 6px rgba(0, 0, 0, 0.05)',
+                          transform: watch('staffId') === staffMember.id ? 'translateY(-2px)' : 'none',
+                          transition: 'all 0.2s ease'
+                        }}>
+                          <h4 style={{
+                            fontWeight: '600',
+                            color: '#111827',
+                            fontSize: '1.125rem',
+                            marginBottom: '4px'
+                          }}>{staffMember.full_name}</h4>
+                          <p style={{
+                            color: '#7c3aed',
+                            fontSize: '0.875rem',
+                            fontWeight: '500',
+                            marginBottom: '8px'
+                          }}>{staffMember.position}</p>
+                          {staffMember.specializations.length > 0 && (
+                            <div style={{ marginBottom: '8px' }}>
+                              <div style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: '4px'
+                              }}>
+                                {staffMember.specializations.slice(0, 3).map(spec => (
+                                  <span key={spec} style={{
+                                    backgroundColor: '#dbeafe',
+                                    color: '#1e40af',
+                                    padding: '2px 6px',
+                                    borderRadius: '12px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '500'
+                                  }}>
+                                    {spec.replace('_', ' ')}
+                                  </span>
+                                ))}
+                                {staffMember.specializations.length > 3 && (
+                                  <span style={{
+                                    color: '#6b7280',
+                                    fontSize: '0.75rem'
+                                  }}>+{staffMember.specializations.length - 3} more</span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          {staffMember.bio && (
+                            <p style={{
+                              color: '#6b7280',
+                              fontSize: '0.875rem',
+                              lineHeight: '1.4'
+                            }}>{staffMember.bio.slice(0, 80)}{staffMember.bio.length > 80 ? '...' : ''}</p>
+                          )}
+                          {watch('staffId') === staffMember.id && (
+                            <div style={{
+                              marginTop: '12px',
+                              padding: '8px',
+                              backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                              borderRadius: '6px',
+                              fontSize: '0.875rem',
+                              color: '#be185d',
+                              fontWeight: '500'
+                            }}>
+                              ✓ Selected
+                            </div>
+                          )}
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* Service Selection */}
               <section style={{ marginBottom: '40px' }}>

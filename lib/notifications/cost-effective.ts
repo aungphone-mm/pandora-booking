@@ -155,7 +155,7 @@ export class CostEffectiveNotifications {
       .gte('sent_at', `${month}-01`)
       .lt('sent_at', `${month}-31`)
     
-    return data?.reduce((acc, record) => {
+    return data?.reduce((acc, record: { channel: NotificationChannel; cost: number; success: boolean }) => {
       acc[record.channel] = (acc[record.channel] || 0) + record.cost
       return acc
     }, {} as Record<NotificationChannel, number>) || {}
