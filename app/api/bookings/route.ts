@@ -1,9 +1,6 @@
-// Enhanced booking API with integrations
+// Enhanced booking API
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createPaymentIntent } from '@/lib/integrations/stripe'
-import { sendBookingConfirmation } from '@/lib/integrations/twilio'
-// import { createSalonAppointment } from '@/lib/integrations/google-calendar'
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,65 +54,12 @@ export async function POST(request: NextRequest) {
     const productsTotal = selectedProducts?.reduce((sum, p) => sum + p.price, 0) || 0
     const totalAmount = servicePrice + productsTotal
 
-    // 4. CREATE PAYMENT INTENT (if payment required)
+    // 4. Payment integration removed
     let paymentDetails = null
-    if (data.requirePayment && totalAmount > 0) {
-      try {
-        if (process.env.STRIPE_SECRET_KEY) {
-          paymentDetails = await createPaymentIntent({
-            amount: Math.round(totalAmount * 100), // Convert to cents
-            customerEmail: data.customerEmail,
-            appointmentId: appointment.id,
-            metadata: {
-              service: appointment.service.name,
-              date: data.appointmentDate,
-              time: data.appointmentTime
-            }
-          })
-        } else {
-          console.warn('Stripe not configured, skipping payment processing')
-        }
-      } catch (paymentError) {
-        console.warn('Payment processing failed:', paymentError)
-        // Don't fail the booking if payment fails
-      }
-    }
 
-    // 5. SEND SMS CONFIRMATION
-    try {
-      if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-        await sendBookingConfirmation(
-          data.customerPhone,
-          data.customerName,
-          appointment.service.name,
-          data.appointmentDate,
-          data.appointmentTime
-        )
-      } else {
-        console.warn('Twilio not configured, skipping SMS')
-      }
-    } catch (smsError) {
-      console.warn('SMS sending failed:', smsError)
-      // Don't fail the booking if SMS fails
-    }
+    // 5. SMS integration removed
 
-    // 6. CREATE CALENDAR EVENT
-    try {
-      // const startDateTime = new Date(`${data.appointmentDate}T${data.appointmentTime}`)
-      // const endDateTime = new Date(startDateTime.getTime() + (appointment.service.duration * 60000))
-      
-      // await createSalonAppointment({
-      //   summary: `${appointment.service.name} - ${data.customerName}`,
-      //   description: `Customer: ${data.customerName}\nPhone: ${data.customerPhone}\nEmail: ${data.customerEmail}\nNotes: ${data.notes || 'None'}`,
-      //   startDateTime: startDateTime.toISOString(),
-      //   endDateTime: endDateTime.toISOString(),
-      //   customerEmail: data.customerEmail,
-      //   location: 'Pandora Beauty Salon'
-      // })
-    } catch (calendarError) {
-      console.warn('Calendar creation failed:', calendarError)
-      // Don't fail the booking if calendar fails
-    }
+    // 6. Calendar integration removed
 
     // 7. Return success with payment details if needed
     return NextResponse.json({
