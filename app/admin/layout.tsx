@@ -1,6 +1,9 @@
 import AdminSidebar from '@/components/AdminSidebar'
 import { ReactNode } from 'react'
 
+// Force dynamic rendering for admin pages
+export const dynamic = 'force-dynamic'
+
 interface AdminLayoutProps {
   children: ReactNode
 }

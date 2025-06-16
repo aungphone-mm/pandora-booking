@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import SinglePageBookingForm from '@/components/SinglePageBookingForm'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function BookingPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()

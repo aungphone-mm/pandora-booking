@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = createClient()
@@ -8,7 +11,9 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate') || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     const endDate = searchParams.get('endDate') || new Date().toISOString().split('T')[0]
 
-    // Seasonal Trends (Week over Week)
+    console.log('Detailed analytics request:', { startDate, endDate })
+
+    // Seasonal Trends (Week over Week) - with better error handling
     const { data: seasonalData, error: seasonalError } = await supabase
       .from('appointments')
       .select(`
@@ -21,7 +26,10 @@ export async function GET(request: NextRequest) {
       .gte('appointment_date', startDate)
       .lte('appointment_date', endDate)
 
-    if (seasonalError) throw seasonalError
+    if (seasonalError) {
+      console.error('Seasonal data error:', seasonalError)
+      throw new Error(`Failed to fetch seasonal data: ${seasonalError.message}`)
+    }
 
     // Customer Demographics & Behavior
     const { data: customerBehavior, error: customerError } = await supabase
@@ -99,36 +107,52 @@ export async function GET(request: NextRequest) {
 
     if (forecastError) throw forecastError
 
-    // Process Seasonal Trends
-    const weeklyTrends = seasonalData?.reduce((acc, appointment) => {
-      const week = new Date(appointment.appointment_date).toISOString().slice(0, 10)
-      const weekStart = new Date(appointment.appointment_date)
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay())
-      const weekKey = weekStart.toISOString().slice(0, 10)
-      
-      if (!acc[weekKey]) {
-        acc[weekKey] = {
-          appointments: 0,
-          revenue: 0,
-          services: {}
-        }
+    // Process Seasonal Trends - with safer processing
+    const weeklyTrends = (() => {
+      try {
+        return seasonalData?.reduce((acc, appointment) => {
+          if (!appointment?.appointment_date) return acc
+          
+          const date = new Date(appointment.appointment_date)
+          if (isNaN(date.getTime())) return acc
+          
+          const weekStart = new Date(date)
+          weekStart.setDate(date.getDate() - date.getDay())
+          const weekKey = weekStart.toISOString().slice(0, 10)
+          
+          if (!acc[weekKey]) {
+            acc[weekKey] = {
+              appointments: 0,
+              revenue: 0,
+              services: {}
+            }
+          }
+          
+          acc[weekKey].appointments += 1
+          
+          // Sum all service prices for this appointment - safely
+          if (Array.isArray(appointment.services)) {
+            const serviceRevenue = appointment.services.reduce((sum, service) => {
+              const price = Number(service?.price) || 0
+              return sum + price
+            }, 0)
+            acc[weekKey].revenue += serviceRevenue
+            
+            // Count all services for this appointment - safely
+            appointment.services.forEach(service => {
+              if (service?.name) {
+                acc[weekKey].services[service.name] = (acc[weekKey].services[service.name] || 0) + 1
+              }
+            })
+          }
+          
+          return acc
+        }, {} as Record<string, { appointments: number, revenue: number, services: Record<string, number> }>) || {}
+      } catch (error) {
+        console.error('Error processing weekly trends:', error)
+        return {}
       }
-      
-      acc[weekKey].appointments += 1
-      
-      // Sum all service prices for this appointment
-      const serviceRevenue = appointment.services?.reduce((sum, service) => sum + (service.price || 0), 0) || 0
-      acc[weekKey].revenue += serviceRevenue
-      
-      // Count all services for this appointment
-      appointment.services?.forEach(service => {
-        if (service.name) {
-          acc[weekKey].services[service.name] = (acc[weekKey].services[service.name] || 0) + 1
-        }
-      })
-      
-      return acc
-    }, {} as Record<string, { appointments: number, revenue: number, services: Record<string, number> }>) || {}
+    })()
 
     // Process Customer Behavior
     const customerSegments = customerBehavior?.reduce((acc, appointment) => {
@@ -315,8 +339,16 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Detailed analytics API error:', error)
+    
+    // Return more informative error
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
     return NextResponse.json(
-      { error: 'Failed to fetch detailed analytics data' },
+      { 
+        error: 'Failed to fetch detailed analytics data',
+        details: errorMessage,
+        timestamp: new Date().toISOString(),
+        suggestion: 'Check database connectivity and table relationships'
+      },
       { status: 500 }
     )
   }

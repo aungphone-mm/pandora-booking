@@ -2,6 +2,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function AccountPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()

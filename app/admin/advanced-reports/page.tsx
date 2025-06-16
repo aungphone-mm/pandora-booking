@@ -71,7 +71,7 @@ export default function EnhancedReportsPage() {
         endDate: dateRange.endDate
       })
       
-      const response = await fetch(`/api/analytics/detailed?${params}`)
+      const response = await fetch(`/api/analytics/detailed-fixed?${params}`)
       if (!response.ok) {
         throw new Error('Failed to fetch detailed analytics data')
       }
