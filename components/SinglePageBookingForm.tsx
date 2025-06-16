@@ -11,7 +11,7 @@ type Staff = {
   id: string
   full_name: string
   position: string
-  specializations: string[]
+  specializations: string[] | null
   bio: string
   is_active: boolean
 }
@@ -64,6 +64,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
+  const [dataLoading, setDataLoading] = useState(true) // Add loading state for data
   const [error, setError] = useState<string | null>(null)
   const [services, setServices] = useState<Service[]>([])
   const [staff, setStaff] = useState<Staff[]>([])
@@ -108,13 +109,14 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
     if (selectedServiceId && staff.length > 0) {
       // For now, show all active staff. In a full implementation,
       // you would filter based on staff_services table
-      setAvailableStaff(staff)
+      setAvailableStaff(staff.filter(s => s && s.id)) // Add null check
     } else {
       setAvailableStaff([])
     }
   }, [selectedServiceId, staff])
 
   const loadData = async () => {
+    setDataLoading(true) // Set loading state
     try {
       // Load services with categories
       const { data: servicesData, error: servicesError } = await supabase
@@ -129,6 +131,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
       if (servicesError) {
         console.error('Error loading services:', servicesError)
         setError('Failed to load services. Please refresh the page.')
+        return
       }
 
       // Load staff
@@ -140,6 +143,8 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
 
       if (staffError) {
         console.error('Error loading staff:', staffError)
+        setError('Failed to load staff. Please refresh the page.')
+        return
       }
 
       // Load products with categories
@@ -176,6 +181,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
       if (slotsError) {
         console.error('Error loading time slots:', slotsError)
         setError('Failed to load time slots. Please refresh the page.')
+        return
       }
 
       setServices(servicesData || [])
@@ -186,6 +192,8 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
     } catch (err) {
       console.error('Unexpected error loading data:', err)
       setError('An unexpected error occurred. Please refresh the page.')
+    } finally {
+      setDataLoading(false) // Clear loading state
     }
   }
   
@@ -204,7 +212,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
 
       const bookedSlots = data?.map(apt => apt.appointment_time) || []
       const available = timeSlots
-        .filter(slot => !bookedSlots.includes(slot.time))
+        .filter(slot => slot && !bookedSlots.includes(slot.time))
         .map(slot => slot.time)
       setAvailableSlots(available)
     } catch (err) {
@@ -213,11 +221,11 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
   }
 
   const calculateTotal = () => {
-    const selectedService = services.find(s => s.id === selectedServiceId)
+    const selectedService = services.find(s => s && s.id === selectedServiceId)
     const servicePrice = selectedService?.price || 0
     
     const productsPrice = Array.from(selectedProducts).reduce((sum, productId) => {
-      const product = products.find(p => p.id === productId)
+      const product = products.find(p => p && p.id === productId)
       return sum + (product?.price || 0)
     }, 0)
     
@@ -305,6 +313,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
 
   // Group services by category
   const servicesByCategory = services.reduce((acc, service) => {
+    if (!service) return acc
     const category = service.category?.name || 'Other'
     if (!acc[category]) acc[category] = []
     acc[category].push(service)
@@ -313,11 +322,49 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
 
   // Group products by category
   const productsByCategory = products.reduce((acc, product) => {
+    if (!product) return acc
     const categoryId = product.category_id
     if (!acc[categoryId]) acc[categoryId] = []
     acc[categoryId].push(product)
     return acc
   }, {} as Record<string, Product[]>)
+
+  // Add loading state
+  if (dataLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f9fafb',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          padding: '48px'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            border: '4px solid #e5e7eb',
+            borderTop: '4px solid #ec4899',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 24px'
+          }}></div>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            color: '#111827',
+            marginBottom: '8px'
+          }}>Loading Booking Form</h2>
+          <p style={{
+            color: '#6b7280'
+          }}>Please wait while we prepare your booking experience...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{
@@ -635,158 +682,6 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                 </div>
               </section>
 
-              {/* Staff Selection */}
-              {selectedServiceId && availableStaff.length > 0 && (
-                <section style={{ marginBottom: '40px' }}>
-                  <div style={{
-                    borderBottom: '1px solid #e5e7eb',
-                    paddingBottom: '16px',
-                    marginBottom: '24px'
-                  }}>
-                    <h2 style={{
-                      fontSize: '1.5rem',
-                      fontWeight: '600',
-                      color: '#111827'
-                    }}>Choose Your Stylist (Optional)</h2>
-                    <p style={{
-                      color: '#6b7280',
-                      marginTop: '4px'
-                    }}>Select a preferred staff member or leave blank for automatic assignment</p>
-                  </div>
-
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                    gap: '20px'
-                  }}>
-                    {/* No preference option */}
-                    <label style={{ cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        {...register('staffId')}
-                        value=""
-                        style={{ display: 'none' }}
-                      />
-                      <div style={{
-                        padding: '20px',
-                        border: !watch('staffId') ? '3px solid #ec4899' : '2px solid #e5e7eb',
-                        borderRadius: '12px',
-                        backgroundColor: !watch('staffId') ? '#fdf2f8' : 'white',
-                        boxShadow: !watch('staffId') ? '0 8px 25px rgba(236, 72, 153, 0.15)' : '0 4px 6px rgba(0, 0, 0, 0.05)',
-                        transform: !watch('staffId') ? 'translateY(-2px)' : 'none',
-                        transition: 'all 0.2s ease'
-                      }}>
-                        <h4 style={{
-                          fontWeight: '600',
-                          color: '#111827',
-                          fontSize: '1.125rem',
-                          marginBottom: '8px'
-                        }}>No Preference</h4>
-                        <p style={{
-                          color: '#6b7280',
-                          fontSize: '0.875rem'
-                        }}>We'll assign the best available stylist for your service</p>
-                        {!watch('staffId') && (
-                          <div style={{
-                            marginTop: '12px',
-                            padding: '8px',
-                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                            borderRadius: '6px',
-                            fontSize: '0.875rem',
-                            color: '#be185d',
-                            fontWeight: '500'
-                          }}>
-                            ✓ Selected
-                          </div>
-                        )}
-                      </div>
-                    </label>
-
-                    {/* Staff options */}
-                    {availableStaff.map(staffMember => (
-                      <label key={staffMember.id} style={{ cursor: 'pointer' }}>
-                        <input
-                          type="radio"
-                          {...register('staffId')}
-                          value={staffMember.id}
-                          style={{ display: 'none' }}
-                        />
-                        <div style={{
-                          padding: '20px',
-                          border: watch('staffId') === staffMember.id ? '3px solid #ec4899' : '2px solid #e5e7eb',
-                          borderRadius: '12px',
-                          backgroundColor: watch('staffId') === staffMember.id ? '#fdf2f8' : 'white',
-                          boxShadow: watch('staffId') === staffMember.id ? '0 8px 25px rgba(236, 72, 153, 0.15)' : '0 4px 6px rgba(0, 0, 0, 0.05)',
-                          transform: watch('staffId') === staffMember.id ? 'translateY(-2px)' : 'none',
-                          transition: 'all 0.2s ease'
-                        }}>
-                          <h4 style={{
-                            fontWeight: '600',
-                            color: '#111827',
-                            fontSize: '1.125rem',
-                            marginBottom: '4px'
-                          }}>{staffMember.full_name}</h4>
-                          <p style={{
-                            color: '#7c3aed',
-                            fontSize: '0.875rem',
-                            fontWeight: '500',
-                            marginBottom: '8px'
-                          }}>{staffMember.position}</p>
-                          {staffMember.specializations.length > 0 && (
-                            <div style={{ marginBottom: '8px' }}>
-                              <div style={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: '4px'
-                              }}>
-                                {staffMember.specializations.slice(0, 3).map(spec => (
-                                  <span key={spec} style={{
-                                    backgroundColor: '#dbeafe',
-                                    color: '#1e40af',
-                                    padding: '2px 6px',
-                                    borderRadius: '12px',
-                                    fontSize: '0.75rem',
-                                    fontWeight: '500'
-                                  }}>
-                                    {spec.replace('_', ' ')}
-                                  </span>
-                                ))}
-                                {staffMember.specializations.length > 3 && (
-                                  <span style={{
-                                    color: '#6b7280',
-                                    fontSize: '0.75rem'
-                                  }}>+{staffMember.specializations.length - 3} more</span>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          {staffMember.bio && (
-                            <p style={{
-                              color: '#6b7280',
-                              fontSize: '0.875rem',
-                              lineHeight: '1.4'
-                            }}>{staffMember.bio.slice(0, 80)}{staffMember.bio.length > 80 ? '...' : ''}</p>
-                          )}
-                          {watch('staffId') === staffMember.id && (
-                            <div style={{
-                              marginTop: '12px',
-                              padding: '8px',
-                              backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                              borderRadius: '6px',
-                              fontSize: '0.875rem',
-                              color: '#be185d',
-                              fontWeight: '500'
-                            }}>
-                              ✓ Selected
-                            </div>
-                          )}
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </section>
-              )}
-
               {/* Service Selection */}
               <section style={{ marginBottom: '40px' }}>
                 <div style={{
@@ -821,7 +716,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                         gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
                         gap: '20px' 
                       }}>
-                        {categoryServices.map(service => (
+                        {categoryServices.map(service => service && (
                           <label key={service.id} style={{ cursor: 'pointer' }}>
                             <input
                               type="radio"
@@ -905,6 +800,8 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                   )}
                 </div>
               </section>
+
+              
 
               {/* Date & Time Selection */}
               <section style={{ marginBottom: '40px' }}>
@@ -1026,7 +923,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                 </div>
 
                 <div style={{ marginBottom: '24px' }}>
-                  {productCategories.map(category => {
+                  {productCategories.filter(category => category && category.id).map(category => {
                     const categoryProducts = productsByCategory[category.id] || []
                     if (categoryProducts.length === 0) return null
                     
@@ -1039,7 +936,7 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                           marginBottom: '16px'
                         }}>{category.name}</h3>
                         <div style={{ display: 'grid', gap: '12px' }}>
-                          {categoryProducts.map(product => (
+                          {categoryProducts.filter(product => product && product.id).map(product => (
                             <label key={product.id} style={{ cursor: 'pointer' }}>
                               <div style={{
                                 padding: '16px',
@@ -1071,11 +968,11 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                                     <span style={{
                                       fontWeight: '500',
                                       color: '#111827'
-                                    }}>{product.name}</span>
+                                    }}>{product.name || 'Unknown Product'}</span>
                                     <span style={{
                                       color: '#7c3aed',
                                       fontWeight: '600'
-                                    }}>{product.price}Ks</span>
+                                    }}>{product.price || 0}Ks</span>
                                   </div>
                                 </div>
                               </div>

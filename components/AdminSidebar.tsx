@@ -7,8 +7,10 @@ import { usePathname } from 'next/navigation'
 export default function AdminSidebar() {
   const pathname = usePathname()
   
-  const links = [
+  const links: Array<{ href: string; label: string; badge?: string }> = [
     { href: '/admin', label: 'Dashboard' },
+    { href: '/admin/reports', label: '📊 Business Intelligence', badge: 'BI' },
+    { href: '/admin/advanced-reports', label: '🚀 Advanced Analytics', badge: 'NEW' },
     { href: '/admin/appointments', label: 'Appointments' },
     { href: '/admin/staff', label: 'Staff Management' },
     { href: '/admin/services', label: 'Services' },
@@ -16,7 +18,7 @@ export default function AdminSidebar() {
     { href: '/admin/products', label: 'Products' },
     { href: '/admin/product-categories', label: 'Product Categories' },
     { href: '/admin/timeslots', label: 'Time Slots' },
-    { href: '/admin/health-check', label: '🔍 Health Check', badge: 'NEW' }, 
+    { href: '/admin/health-check', label: '🔍 Health Check', badge: 'DIAG' }, 
   ]
 
   return (
@@ -29,11 +31,22 @@ export default function AdminSidebar() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`block px-4 py-2 rounded hover:bg-gray-700 ${
+                  className={`block px-4 py-2 rounded hover:bg-gray-700 relative ${
                     pathname === link.href ? 'bg-gray-700' : ''
                   }`}
                 >
-                  {link.label}
+                  <span>{link.label}</span>
+                  {link.badge && (
+                    <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                      link.badge === 'BI' 
+                        ? 'bg-purple-500 text-white' 
+                        : link.badge === 'NEW'
+                        ? 'bg-green-500 text-white'
+                        : 'bg-blue-500 text-white'
+                    }`}>
+                      {link.badge}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}

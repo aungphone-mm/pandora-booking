@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { format } from 'date-fns'
 
 type ServiceCategory = {
   id: string
@@ -14,12 +15,14 @@ export default function ServiceCategoryManager() {
   const supabase = createClient()
   const [categories, setCategories] = useState<ServiceCategory[]>([])
   const [editingCategory, setEditingCategory] = useState<ServiceCategory | null>(null)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
   const [newCategory, setNewCategory] = useState({
     name: '',
     display_order: 0
   })
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     loadCategories()
@@ -28,29 +31,31 @@ export default function ServiceCategoryManager() {
   const loadCategories = async () => {
     try {
       setLoading(true)
+      setError(null)
       const { data, error } = await supabase
         .from('service_categories')
         .select('*')
         .order('display_order')
 
-      if (error) {
-        console.error('Error loading service categories:', error)
-        return
-      }
-
+      if (error) throw error
       setCategories(data || [])
-    } catch (err) {
-      console.error('Unexpected error loading categories:', err)
+    } catch (err: any) {
+      console.error('Error loading service categories:', err)
+      setError(err.message || 'Failed to load categories')
     } finally {
       setLoading(false)
     }
   }
 
   const handleAddCategory = async () => {
-    if (!newCategory.name.trim()) return
+    if (!newCategory.name.trim()) {
+      setError('Category name is required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('service_categories')
         .insert([{
@@ -58,46 +63,44 @@ export default function ServiceCategoryManager() {
           display_order: newCategory.display_order
         }])
 
-      if (error) {
-        console.error('Error adding category:', error)
-        alert('Error adding category: ' + error.message)
-        return
-      }
+      if (error) throw error
 
       setNewCategory({ name: '', display_order: 0 })
+      setShowAddForm(false)
       loadCategories()
-    } catch (err) {
-      console.error('Unexpected error adding category:', err)
-      alert('Unexpected error occurred')
+    } catch (err: any) {
+      console.error('Error adding category:', err)
+      setError(err.message || 'Failed to add category')
     } finally {
       setSaving(false)
     }
   }
 
   const handleUpdateCategory = async (category: ServiceCategory) => {
-    if (!category.name.trim()) return
+    if (!category.name.trim()) {
+      setError('Category name is required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('service_categories')
         .update({
           name: category.name.trim(),
-          display_order: category.display_order
+          display_order: category.display_order,
+          updated_at: new Date().toISOString()
         })
         .eq('id', category.id)
 
-      if (error) {
-        console.error('Error updating category:', error)
-        alert('Error updating category: ' + error.message)
-        return
-      }
+      if (error) throw error
 
       setEditingCategory(null)
       loadCategories()
-    } catch (err) {
-      console.error('Unexpected error updating category:', err)
-      alert('Unexpected error occurred')
+    } catch (err: any) {
+      console.error('Error updating category:', err)
+      setError(err.message || 'Failed to update category')
     } finally {
       setSaving(false)
     }
@@ -110,21 +113,17 @@ export default function ServiceCategoryManager() {
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('service_categories')
         .delete()
         .eq('id', id)
 
-      if (error) {
-        console.error('Error deleting category:', error)
-        alert('Error deleting category: ' + error.message)
-        return
-      }
-
+      if (error) throw error
       loadCategories()
-    } catch (err) {
-      console.error('Unexpected error deleting category:', err)
-      alert('Unexpected error occurred')
+    } catch (err: any) {
+      console.error('Error deleting category:', err)
+      setError(err.message || 'Failed to delete category')
     } finally {
       setSaving(false)
     }
@@ -139,12 +138,12 @@ export default function ServiceCategoryManager() {
 
     try {
       setSaving(true)
+      setError(null)
       
       // Swap display orders
       const category1 = categories[categoryIndex]
       const category2 = categories[newIndex]
       
-      // Manual swap since RPC may not exist
       await supabase
         .from('service_categories')
         .update({ display_order: category2.display_order })
@@ -156,8 +155,9 @@ export default function ServiceCategoryManager() {
         .eq('id', category2.id)
 
       loadCategories()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error reordering categories:', err)
+      setError(err.message || 'Failed to reorder categories')
     } finally {
       setSaving(false)
     }
@@ -165,190 +165,464 @@ export default function ServiceCategoryManager() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        padding: '24px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '300px'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            border: '2px solid #ec4899',
+            borderTop: '2px solid transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-bold mb-6">Service Category Management</h2>
-      
-      {/* Add new category form */}
-      <div className="mb-8 p-4 border rounded">
-        <h3 className="text-lg font-semibold mb-4">Add New Service Category</h3>
-        <div className="flex gap-4 items-end">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category Name
-            </label>
-            <input
-              type="text"
-              value={newCategory.name}
-              onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-              className="px-3 py-2 border rounded w-full"
-              placeholder="Enter category name"
-            />
-          </div>
-          <div className="w-32">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Display Order
-            </label>
-            <input
-              type="number"
-              value={newCategory.display_order}
-              onChange={(e) => setNewCategory({ ...newCategory, display_order: parseInt(e.target.value) || 0 })}
-              className="px-3 py-2 border rounded w-full"
-              min="0"
-            />
-          </div>
-          <button
-            onClick={handleAddCategory}
-            disabled={saving || !newCategory.name.trim()}
-            className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? 'Adding...' : 'Add Category'}
-          </button>
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '24px'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '24px'
+      }}>
+        <h2 style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold'
+        }}>Service Category Management</h2>
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          style={{
+            backgroundColor: '#ec4899',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
+        >
+          {showAddForm ? 'Cancel' : 'Add Category'}
+        </button>
+      </div>
+
+      {error && (
+        <div style={{
+          marginBottom: '24px',
+          padding: '16px',
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '8px'
+        }}>
+          <p style={{ color: '#b91c1c', fontWeight: '500' }}>{error}</p>
+        </div>
+      )}
+
+      {/* Summary Stats */}
+      <div style={{
+        marginBottom: '24px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '16px'
+      }}>
+        <div style={{
+          backgroundColor: '#f9fafb',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#6b7280'
+          }}>Total Categories</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>{categories.length}</p>
+        </div>
+        <div style={{
+          backgroundColor: '#dbeafe',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#1e40af'
+          }}>Max Order</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#1e40af'
+          }}>
+            {Math.max(...categories.map(c => c.display_order), 0)}
+          </p>
+        </div>
+        <div style={{
+          backgroundColor: '#dcfce7',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#166534'
+          }}>Added This Week</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#166534'
+          }}>
+            {categories.filter(c => new Date(c.created_at) > new Date(Date.now() - 7*24*60*60*1000)).length}
+          </p>
         </div>
       </div>
 
-      {/* Categories list */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-2">Category Name</th>
-              <th className="text-left py-2">Display Order</th>
-              <th className="text-left py-2">Created</th>
-              <th className="text-left py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category, index) => (
-              <tr key={category.id} className="border-b">
-                <td className="py-2">
-                  {editingCategory?.id === category.id ? (
-                    <input
-                      type="text"
-                      value={editingCategory.name}
-                      onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
-                      className="px-2 py-1 border rounded w-full"
-                    />
-                  ) : (
-                    <span className="font-medium">{category.name}</span>
-                  )}
-                </td>
-                <td className="py-2">
-                  {editingCategory?.id === category.id ? (
-                    <input
-                      type="number"
-                      value={editingCategory.display_order}
-                      onChange={(e) => setEditingCategory({ ...editingCategory, display_order: parseInt(e.target.value) || 0 })}
-                      className="px-2 py-1 border rounded w-20"
-                      min="0"
-                    />
-                  ) : (
-                    <span>{category.display_order}</span>
-                  )}
-                </td>
-                <td className="py-2">
-                  <span className="text-sm text-gray-600">
-                    {new Date(category.created_at).toLocaleDateString()}
-                  </span>
-                </td>
-                <td className="py-2">
-                  <div className="flex gap-2">
-                    {editingCategory?.id === category.id ? (
-                      <>
-                        <button
-                          onClick={() => handleUpdateCategory(editingCategory)}
-                          disabled={saving}
-                          className="text-green-600 hover:text-green-800 disabled:opacity-50"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingCategory(null)}
-                          disabled={saving}
-                          className="text-gray-600 hover:text-gray-800"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => setEditingCategory(category)}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => moveCategory(category.id, 'up')}
-                          disabled={index === 0 || saving}
-                          className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          ↑
-                        </button>
-                        <button
-                          onClick={() => moveCategory(category.id, 'down')}
-                          disabled={index === categories.length - 1 || saving}
-                          className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          ↓
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCategory(category.id)}
-                          disabled={saving}
-                          className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
+      {/* Add Category Form */}
+      {showAddForm && (
+        <div style={{
+          marginBottom: '24px',
+          padding: '24px',
+          border: '2px solid #ec4899',
+          borderRadius: '8px',
+          backgroundColor: '#fef7ff'
+        }}>
+          <h3 style={{
+            fontSize: '1.25rem',
+            fontWeight: 'bold',
+            marginBottom: '16px',
+            color: '#a21caf'
+          }}>Add New Service Category</h3>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto',
+            gap: '16px',
+            alignItems: 'end'
+          }}>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '4px'
+              }}>
+                Category Name
+              </label>
+              <input
+                type="text"
+                value={newCategory.name}
+                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none'
+                }}
+                placeholder="Enter category name"
+              />
+            </div>
+            <div style={{ minWidth: '120px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '4px'
+              }}>
+                Display Order
+              </label>
+              <input
+                type="number"
+                value={newCategory.display_order}
+                onChange={(e) => setNewCategory({ ...newCategory, display_order: parseInt(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none'
+                }}
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+            <button
+              onClick={handleAddCategory}
+              disabled={saving || !newCategory.name.trim()}
+              style={{
+                backgroundColor: saving ? '#9ca3af' : '#ec4899',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                fontWeight: '600',
+                opacity: saving || !newCategory.name.trim() ? 0.6 : 1
+              }}
+            >
+              {saving ? 'Adding...' : 'Add Category'}
+            </button>
+            <button
+              onClick={() => setShowAddForm(false)}
+              style={{
+                backgroundColor: '#6b7280',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: '600'
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Categories List */}
+      {categories.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '48px 0'
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📂</div>
+          <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+            No service categories found. Add your first category to get started.
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {categories.map((category, index) => (
+            <div key={category.id} style={{
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '20px',
+              backgroundColor: 'white'
+            }}>
+              {editingCategory?.id === category.id ? (
+                // Edit Mode
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    gap: '16px',
+                    alignItems: 'end'
+                  }}>
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: '#374151',
+                        marginBottom: '4px'
+                      }}>
+                        Category Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editingCategory.name}
+                        onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+                    <div style={{ minWidth: '120px' }}>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: '#374151',
+                        marginBottom: '4px'
+                      }}>
+                        Display Order
+                      </label>
+                      <input
+                        type="number"
+                        value={editingCategory.display_order}
+                        onChange={(e) => setEditingCategory({ ...editingCategory, display_order: parseInt(e.target.value) || 0 })}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          outline: 'none'
+                        }}
+                        min="0"
+                      />
+                    </div>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        {categories.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No service categories found. Add one to get started.
-          </div>
-        )}
-      </div>
 
-      {/* Summary */}
-      <div className="mt-6 p-4 bg-gray-50 rounded">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-gray-900">{categories.length}</div>
-            <div className="text-sm text-gray-600">Total Categories</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-pink-600">
-              {Math.max(...categories.map(c => c.display_order), 0)}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => handleUpdateCategory(editingCategory)}
+                      disabled={saving}
+                      style={{
+                        backgroundColor: saving ? '#9ca3af' : '#16a34a',
+                        color: 'white',
+                        padding: '12px 24px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        cursor: saving ? 'not-allowed' : 'pointer',
+                        fontWeight: '600',
+                        opacity: saving ? 0.6 : 1
+                      }}
+                    >
+                      {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button
+                      onClick={() => setEditingCategory(null)}
+                      disabled={saving}
+                      style={{
+                        backgroundColor: '#6b7280',
+                        color: 'white',
+                        padding: '12px 24px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        cursor: saving ? 'not-allowed' : 'pointer',
+                        fontWeight: '600',
+                        opacity: saving ? 0.6 : 1
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // View Mode
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      marginBottom: '8px'
+                    }}>
+                      <h3 style={{
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold',
+                        color: '#111827'
+                      }}>
+                        {category.name}
+                      </h3>
+                      <span style={{
+                        fontSize: '0.75rem',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontWeight: '500',
+                        backgroundColor: '#dbeafe',
+                        color: '#1e40af'
+                      }}>
+                        Order: {category.display_order}
+                      </span>
+                    </div>
+                    
+                    <p style={{
+                      fontSize: '0.875rem',
+                      color: '#6b7280'
+                    }}>
+                      Created: {format(new Date(category.created_at), 'MMM d, yyyy')}
+                    </p>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'center',
+                    marginLeft: '16px'
+                  }}>
+                    <button
+                      onClick={() => setEditingCategory(category)}
+                      style={{
+                        color: '#3b82f6',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => moveCategory(category.id, 'up')}
+                      disabled={index === 0 || saving}
+                      style={{
+                        color: saving || index === 0 ? '#9ca3af' : '#8b5cf6',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: saving || index === 0 ? 'not-allowed' : 'pointer',
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold'
+                      }}
+                      title="Move up"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      onClick={() => moveCategory(category.id, 'down')}
+                      disabled={index === categories.length - 1 || saving}
+                      style={{
+                        color: saving || index === categories.length - 1 ? '#9ca3af' : '#8b5cf6',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: saving || index === categories.length - 1 ? 'not-allowed' : 'pointer',
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold'
+                      }}
+                      title="Move down"
+                    >
+                      ↓
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCategory(category.id)}
+                      disabled={saving}
+                      style={{
+                        color: saving ? '#9ca3af' : '#dc2626',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: saving ? 'not-allowed' : 'pointer',
+                        fontSize: '0.875rem',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="text-sm text-gray-600">Max Order</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-blue-600">
-              {categories.filter(c => new Date(c.created_at) > new Date(Date.now() - 7*24*60*60*1000)).length}
-            </div>
-            <div className="text-sm text-gray-600">Added This Week</div>
-          </div>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { format } from 'date-fns'
 
 type Staff = {
   id: string
@@ -31,6 +32,9 @@ export default function StaffManager() {
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [sortBy, setSortBy] = useState<'name' | 'position' | 'hire_date'>('name')
   const [newStaff, setNewStaff] = useState({
     full_name: '',
     email: '',
@@ -50,46 +54,44 @@ export default function StaffManager() {
 
   const loadData = async () => {
     try {
+      setLoading(true)
+      setError(null)
       await Promise.all([
         loadStaff(),
         loadPositions()
       ])
+    } catch (err: any) {
+      console.error('Error loading data:', err)
+      setError(err.message || 'Failed to load data')
     } finally {
       setLoading(false)
     }
   }
 
   const loadStaff = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('staff')
-        .select('*')
-        .order('created_at', { ascending: false })
+    const { data, error } = await supabase
+      .from('staff')
+      .select('*')
+      .order('created_at', { ascending: false })
 
-      if (error) throw error
-      setStaff(data || [])
-    } catch (error) {
-      console.error('Error loading staff:', error)
-    }
+    if (error) throw error
+    setStaff(data || [])
   }
 
   const loadPositions = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('staff_positions')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order')
+    const { data, error } = await supabase
+      .from('staff_positions')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order')
 
-      if (error) throw error
-      setPositions(data || [])
-    } catch (error) {
-      console.error('Error loading positions:', error)
-    }
+    if (error) throw error
+    setPositions(data || [])
   }
 
   const handleAddStaff = async () => {
     try {
+      setError(null)
       const specializationsArray = newStaff.specializations
         ? newStaff.specializations.split(',').map(s => s.trim()).filter(s => s)
         : []
@@ -125,14 +127,15 @@ export default function StaffManager() {
       })
       setShowAddForm(false)
       loadData()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding staff:', error)
-      alert('Failed to add staff member')
+      setError(error.message || 'Failed to add staff member')
     }
   }
 
   const handleUpdateStaff = async (staffMember: Staff) => {
     try {
+      setError(null)
       const specializationsArray = Array.isArray(staffMember.specializations)
         ? staffMember.specializations
         : (staffMember.specializations as string).split(',').map(s => s.trim()).filter(s => s)
@@ -158,14 +161,15 @@ export default function StaffManager() {
 
       setEditingStaff(null)
       loadData()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating staff:', error)
-      alert('Failed to update staff member')
+      setError(error.message || 'Failed to update staff member')
     }
   }
 
   const toggleStaffStatus = async (id: string, currentStatus: boolean) => {
     try {
+      setError(null)
       const { error } = await supabase
         .from('staff')
         .update({ is_active: !currentStatus })
@@ -173,76 +177,328 @@ export default function StaffManager() {
 
       if (error) throw error
       loadData()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating staff status:', error)
+      setError(error.message || 'Failed to update staff status')
     }
+  }
+
+  // Filter and sort staff
+  const filteredAndSortedStaff = staff
+    .filter(staffMember => {
+      if (filterStatus === 'all') return true
+      return filterStatus === 'active' ? staffMember.is_active : !staffMember.is_active
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.full_name.localeCompare(b.full_name)
+        case 'position':
+          return (a.job_position || '').localeCompare(b.job_position || '')
+        case 'hire_date':
+          return new Date(b.hire_date).getTime() - new Date(a.hire_date).getTime()
+        default:
+          return 0
+      }
+    })
+
+  const getStatusColor = (isActive: boolean) => {
+    return isActive
+      ? { backgroundColor: '#dcfce7', color: '#166534' }
+      : { backgroundColor: '#fee2e2', color: '#991b1b' }
   }
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-20 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        padding: '24px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '300px'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            border: '2px solid #ec4899',
+            borderTop: '2px solid transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Staff Management</h2>
-        <div className="flex gap-2">
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '24px'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '24px'
+      }}>
+        <h2 style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold'
+        }}>Staff Management</h2>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => window.open('/admin/staff-categories', '_blank')}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              padding: '12px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
           >
-            Add Position
+            Manage Positions
           </button>
           <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700"
+            onClick={() => setShowAddForm(!showAddForm)}
+            style={{
+              backgroundColor: '#ec4899',
+              color: 'white',
+              padding: '12px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
           >
-            Add Staff Member
+            {showAddForm ? 'Cancel' : 'Add Staff Member'}
           </button>
+        </div>
+      </div>
+
+      {error && (
+        <div style={{
+          marginBottom: '24px',
+          padding: '16px',
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '8px'
+        }}>
+          <p style={{ color: '#b91c1c', fontWeight: '500' }}>{error}</p>
+        </div>
+      )}
+
+      {/* Filters and Sorting */}
+      <div style={{
+        marginBottom: '24px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '16px',
+        alignItems: 'center'
+      }}>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '4px'
+          }}>Filter by Status</label>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            style={{
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              outline: 'none'
+            }}
+          >
+            <option value="all">All Staff</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Inactive Only</option>
+          </select>
+        </div>
+
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '4px'
+          }}>Sort by</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'name' | 'position' | 'hire_date')}
+            style={{
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              outline: 'none'
+            }}
+          >
+            <option value="name">Name</option>
+            <option value="position">Position</option>
+            <option value="hire_date">Hire Date</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Summary Stats */}
+      <div style={{
+        marginBottom: '24px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '16px'
+      }}>
+        <div style={{
+          backgroundColor: '#f9fafb',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#6b7280'
+          }}>Total Staff</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>{staff.length}</p>
+        </div>
+        <div style={{
+          backgroundColor: '#dcfce7',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#166534'
+          }}>Active</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#166534'
+          }}>
+            {staff.filter(s => s.is_active).length}
+          </p>
+        </div>
+        <div style={{
+          backgroundColor: '#fee2e2',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#991b1b'
+          }}>Inactive</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#991b1b'
+          }}>
+            {staff.filter(s => !s.is_active).length}
+          </p>
+        </div>
+        <div style={{
+          backgroundColor: '#dbeafe',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#1e40af'
+          }}>With Positions</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#1e40af'
+          }}>
+            {staff.filter(s => s.job_position).length}
+          </p>
         </div>
       </div>
 
       {/* Add Staff Form */}
       {showAddForm && (
-        <div className="mb-8 p-6 border-2 border-pink-200 rounded-lg bg-pink-50">
-          <h3 className="text-lg font-semibold mb-4">Add New Staff Member</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div style={{
+          marginBottom: '24px',
+          padding: '24px',
+          border: '2px solid #ec4899',
+          borderRadius: '8px',
+          backgroundColor: '#fef7ff'
+        }}>
+          <h3 style={{
+            fontSize: '1.25rem',
+            fontWeight: 'bold',
+            marginBottom: '16px',
+            color: '#a21caf'
+          }}>Add New Staff Member</h3>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '16px',
+            marginBottom: '16px'
+          }}>
             <input
               type="text"
               placeholder="Full Name"
               value={newStaff.full_name}
               onChange={(e) => setNewStaff({ ...newStaff, full_name: e.target.value })}
-              className="px-3 py-2 border rounded"
+              style={{
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             />
             <input
               type="email"
               placeholder="Email"
               value={newStaff.email}
               onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
-              className="px-3 py-2 border rounded"
+              style={{
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             />
             <input
               type="tel"
               placeholder="Phone"
               value={newStaff.phone}
               onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
-              className="px-3 py-2 border rounded"
+              style={{
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             />
             <select
               value={newStaff.job_position}
               onChange={(e) => setNewStaff({ ...newStaff, job_position: e.target.value })}
-              className="px-3 py-2 border rounded"
+              style={{
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             >
               <option value="">Select Position</option>
               {positions.map(position => (
@@ -255,7 +511,12 @@ export default function StaffManager() {
               step="0.01"
               value={newStaff.hourly_rate}
               onChange={(e) => setNewStaff({ ...newStaff, hourly_rate: parseFloat(e.target.value) || 0 })}
-              className="px-3 py-2 border rounded"
+              style={{
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             />
             <input
               type="number"
@@ -264,57 +525,108 @@ export default function StaffManager() {
               max="100"
               value={newStaff.commission_rate}
               onChange={(e) => setNewStaff({ ...newStaff, commission_rate: parseFloat(e.target.value) || 0 })}
-              className="px-3 py-2 border rounded"
+              style={{
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             />
             <input
               type="date"
               value={newStaff.hire_date}
               onChange={(e) => setNewStaff({ ...newStaff, hire_date: e.target.value })}
-              className="px-3 py-2 border rounded"
+              style={{
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             />
-            <div className="flex items-center">
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '12px'
+            }}>
               <input
                 type="checkbox"
                 id="active"
                 checked={newStaff.is_active}
                 onChange={(e) => setNewStaff({ ...newStaff, is_active: e.target.checked })}
-                className="mr-2"
+                style={{ marginRight: '8px' }}
               />
-              <label htmlFor="active" className="text-sm font-medium text-gray-700">
+              <label htmlFor="active" style={{
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
                 Active
               </label>
             </div>
           </div>
           
-          <div className="mt-4">
+          <div style={{ marginBottom: '16px' }}>
             <input
               type="text"
               placeholder="Specializations (comma separated)"
               value={newStaff.specializations}
               onChange={(e) => setNewStaff({ ...newStaff, specializations: e.target.value })}
-              className="w-full px-3 py-2 border rounded"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none'
+              }}
             />
-            <p className="text-xs text-gray-500 mt-1">Enter specializations separated by commas (e.g. Hair Cutting, Hair Coloring, Styling)</p>
+            <p style={{
+              fontSize: '0.75rem',
+              color: '#6b7280',
+              marginTop: '4px'
+            }}>Enter specializations separated by commas (e.g. Hair Cutting, Hair Coloring, Styling)</p>
           </div>
 
           <textarea
             placeholder="Bio"
             value={newStaff.bio}
             onChange={(e) => setNewStaff({ ...newStaff, bio: e.target.value })}
-            className="w-full px-3 py-2 border rounded mt-4"
-            rows={3}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              outline: 'none',
+              marginBottom: '16px',
+              minHeight: '80px'
+            }}
           />
 
-          <div className="flex gap-2 mt-4">
+          <div style={{ display: 'flex', gap: '8px' }}>
             <button
               onClick={handleAddStaff}
-              className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700"
+              style={{
+                backgroundColor: '#ec4899',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: '600'
+              }}
             >
               Add Staff Member
             </button>
             <button
               onClick={() => setShowAddForm(false)}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+              style={{
+                backgroundColor: '#6b7280',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: '600'
+              }}
             >
               Cancel
             </button>
@@ -323,222 +635,330 @@ export default function StaffManager() {
       )}
 
       {/* Staff List */}
-      <div className="grid gap-4">
-        {staff.map(staffMember => (
-          <div key={staffMember.id} className={`border rounded-lg p-4 ${staffMember.is_active ? 'bg-white' : 'bg-gray-100'}`}>
-            {editingStaff?.id === staffMember.id ? (
-              // Edit Mode
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    value={editingStaff.full_name}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, full_name: e.target.value })}
-                    className="px-3 py-2 border rounded"
-                    placeholder="Full Name"
-                  />
-                  <input
-                    type="email"
-                    value={editingStaff.email}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, email: e.target.value })}
-                    className="px-3 py-2 border rounded"
-                    placeholder="Email"
-                  />
-                  <input
-                    type="tel"
-                    value={editingStaff.phone}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, phone: e.target.value })}
-                    className="px-3 py-2 border rounded"
-                    placeholder="Phone"
-                  />
-                  <select
-                    value={editingStaff.job_position}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, job_position: e.target.value })}
-                    className="px-3 py-2 border rounded"
-                  >
-                    <option value="">Select Position</option>
-                    {positions.map(position => (
-                      <option key={position.id} value={position.name}>{position.name}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={editingStaff.hourly_rate}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, hourly_rate: parseFloat(e.target.value) || 0 })}
-                    className="px-3 py-2 border rounded"
-                    placeholder="Hourly Rate"
-                  />
-                  <input
-                    type="number"
-                    step="0.1"
-                    max="100"
-                    value={editingStaff.commission_rate}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, commission_rate: parseFloat(e.target.value) || 0 })}
-                    className="px-3 py-2 border rounded"
-                    placeholder="Commission Rate (%)"
-                  />
-                  <input
-                    type="date"
-                    value={editingStaff.hire_date}
-                    onChange={(e) => setEditingStaff({ ...editingStaff, hire_date: e.target.value })}
-                    className="px-3 py-2 border rounded"
-                  />
-                  <div className="flex items-center">
+      {filteredAndSortedStaff.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '48px 0'
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>👥</div>
+          <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+            {filterStatus === 'all' 
+              ? 'No staff members found. Add your first staff member to get started.' 
+              : `No ${filterStatus} staff members found.`
+            }
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {filteredAndSortedStaff.map(staffMember => (
+            <div key={staffMember.id} style={{
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '20px',
+              backgroundColor: staffMember.is_active ? 'white' : '#f9fafb'
+            }}>
+              {editingStaff?.id === staffMember.id ? (
+                // Edit Mode
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                    gap: '16px'
+                  }}>
                     <input
-                      type="checkbox"
-                      id={`active-${editingStaff.id}`}
-                      checked={editingStaff.is_active}
-                      onChange={(e) => setEditingStaff({ ...editingStaff, is_active: e.target.checked })}
-                      className="mr-2"
+                      type="text"
+                      value={editingStaff.full_name}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, full_name: e.target.value })}
+                      style={{
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                      placeholder="Full Name"
                     />
-                    <label htmlFor={`active-${editingStaff.id}`} className="text-sm font-medium text-gray-700">
-                      Active
-                    </label>
+                    <input
+                      type="email"
+                      value={editingStaff.email}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, email: e.target.value })}
+                      style={{
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                      placeholder="Email"
+                    />
+                    <input
+                      type="tel"
+                      value={editingStaff.phone}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, phone: e.target.value })}
+                      style={{
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                      placeholder="Phone"
+                    />
+                    <select
+                      value={editingStaff.job_position}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, job_position: e.target.value })}
+                      style={{
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                    >
+                      <option value="">Select Position</option>
+                      {positions.map(position => (
+                        <option key={position.id} value={position.name}>{position.name}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editingStaff.hourly_rate}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, hourly_rate: parseFloat(e.target.value) || 0 })}
+                      style={{
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                      placeholder="Hourly Rate"
+                    />
+                    <input
+                      type="number"
+                      step="0.1"
+                      max="100"
+                      value={editingStaff.commission_rate}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, commission_rate: parseFloat(e.target.value) || 0 })}
+                      style={{
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                      placeholder="Commission Rate (%)"
+                    />
+                    <input
+                      type="date"
+                      value={editingStaff.hire_date}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, hire_date: e.target.value })}
+                      style={{
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                    />
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '12px'
+                    }}>
+                      <input
+                        type="checkbox"
+                        id={`active-${editingStaff.id}`}
+                        checked={editingStaff.is_active}
+                        onChange={(e) => setEditingStaff({ ...editingStaff, is_active: e.target.checked })}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <label htmlFor={`active-${editingStaff.id}`} style={{
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: '#374151'
+                      }}>
+                        Active
+                      </label>
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <input
-                    type="text"
-                    value={Array.isArray(editingStaff.specializations) ? editingStaff.specializations.join(', ') : editingStaff.specializations}
-                    onChange={(e) => setEditingStaff({ 
-                      ...editingStaff, 
-                      specializations: e.target.value.split(',').map(s => s.trim()).filter(s => s)
-                    })}
-                    className="w-full px-3 py-2 border rounded"
-                    placeholder="Specializations (comma separated)"
+                  <div>
+                    <input
+                      type="text"
+                      value={Array.isArray(editingStaff.specializations) ? editingStaff.specializations.join(', ') : editingStaff.specializations}
+                      onChange={(e) => setEditingStaff({ 
+                        ...editingStaff, 
+                        specializations: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                      })}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none'
+                      }}
+                      placeholder="Specializations (comma separated)"
+                    />
+                  </div>
+
+                  <textarea
+                    value={editingStaff.bio}
+                    onChange={(e) => setEditingStaff({ ...editingStaff, bio: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      outline: 'none',
+                      minHeight: '80px'
+                    }}
+                    placeholder="Bio"
                   />
-                </div>
 
-                <textarea
-                  value={editingStaff.bio}
-                  onChange={(e) => setEditingStaff({ ...editingStaff, bio: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  rows={3}
-                  placeholder="Bio"
-                />
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleUpdateStaff(editingStaff)}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditingStaff(null)}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // View Mode
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-2">
-                    <h3 className={`text-lg font-semibold ${!staffMember.is_active ? 'text-gray-500' : ''}`}>
-                      {staffMember.full_name}
-                    </h3>
-                    <span className={`px-2 py-1 rounded text-sm font-medium ${
-                      staffMember.is_active 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {staffMember.is_active ? 'Active' : 'Inactive'}
-                    </span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => handleUpdateStaff(editingStaff)}
+                      style={{
+                        backgroundColor: '#16a34a',
+                        color: 'white',
+                        padding: '12px 24px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      onClick={() => setEditingStaff(null)}
+                      style={{
+                        backgroundColor: '#6b7280',
+                        color: 'white',
+                        padding: '12px 24px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                    >
+                      Cancel
+                    </button>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                    <div>
-                      <p><strong>Position:</strong> {staffMember.job_position || 'No position assigned'}</p>
-                      <p><strong>Email:</strong> {staffMember.email}</p>
-                      <p><strong>Phone:</strong> {staffMember.phone}</p>
+                </div>
+              ) : (
+                // View Mode
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      marginBottom: '12px'
+                    }}>
+                      <h3 style={{
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold',
+                        color: staffMember.is_active ? '#111827' : '#6b7280'
+                      }}>
+                        {staffMember.full_name}
+                      </h3>
+                      <span style={{
+                        fontSize: '0.75rem',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontWeight: '500',
+                        ...getStatusColor(staffMember.is_active)
+                      }}>
+                        {staffMember.is_active ? 'Active' : 'Inactive'}
+                      </span>
                     </div>
-                    <div>
-                      <p><strong>Hired:</strong> {new Date(staffMember.hire_date).toLocaleDateString()}</p>
-                      <p><strong>Rate:</strong> ${staffMember.hourly_rate}/hr</p>
-                      <p><strong>Commission:</strong> {staffMember.commission_rate}%</p>
-                    </div>
-                  </div>
-
-                  {staffMember.specializations && staffMember.specializations.length > 0 && (
-                    <div className="mt-2">
-                      <p className="text-sm font-medium text-gray-700">Specializations:</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {staffMember.specializations.map((spec, index) => (
-                          <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                            {spec}
-                          </span>
-                        ))}
+                    
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: '16px',
+                      fontSize: '0.875rem',
+                      color: '#6b7280',
+                      marginBottom: '12px'
+                    }}>
+                      <div>
+                        <p><strong>Position:</strong> {staffMember.job_position || 'No position assigned'}</p>
+                        <p><strong>Email:</strong> {staffMember.email}</p>
+                        <p><strong>Phone:</strong> {staffMember.phone}</p>
+                      </div>
+                      <div>
+                        <p><strong>Hired:</strong> {format(new Date(staffMember.hire_date), 'MMM d, yyyy')}</p>
+                        <p><strong>Rate:</strong> ${staffMember.hourly_rate}/hr</p>
+                        <p><strong>Commission:</strong> {staffMember.commission_rate}%</p>
                       </div>
                     </div>
-                  )}
 
-                  {staffMember.bio && (
-                    <p className="mt-2 text-sm text-gray-600">{staffMember.bio}</p>
-                  )}
+                    {staffMember.specializations && staffMember.specializations.length > 0 && (
+                      <div style={{ marginBottom: '12px' }}>
+                        <p style={{
+                          fontSize: '0.875rem',
+                          fontWeight: '500',
+                          color: '#374151',
+                          marginBottom: '4px'
+                        }}>Specializations:</p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          {staffMember.specializations.map((spec, index) => (
+                            <span key={index} style={{
+                              fontSize: '0.75rem',
+                              padding: '2px 8px',
+                              borderRadius: '12px',
+                              backgroundColor: '#dbeafe',
+                              color: '#1e40af'
+                            }}>
+                              {spec}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {staffMember.bio && (
+                      <p style={{
+                        fontSize: '0.875rem',
+                        color: '#6b7280',
+                        fontStyle: 'italic'
+                      }}>{staffMember.bio}</p>
+                    )}
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    gap: '8px',
+                    marginLeft: '16px'
+                  }}>
+                    <button
+                      onClick={() => setEditingStaff(staffMember)}
+                      style={{
+                        color: '#3b82f6',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => toggleStaffStatus(staffMember.id, staffMember.is_active)}
+                      style={{
+                        color: staffMember.is_active ? '#dc2626' : '#16a34a',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {staffMember.is_active ? 'Deactivate' : 'Activate'}
+                    </button>
+                  </div>
                 </div>
-
-                <div className="flex gap-2 ml-4">
-                  <button
-                    onClick={() => setEditingStaff(staffMember)}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => toggleStaffStatus(staffMember.id, staffMember.is_active)}
-                    className={`text-sm ${
-                      staffMember.is_active 
-                        ? 'text-red-600 hover:text-red-800' 
-                        : 'text-green-600 hover:text-green-800'
-                    }`}
-                  >
-                    {staffMember.is_active ? 'Deactivate' : 'Activate'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-        
-        {staff.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No staff members found. Add your first staff member to get started.
-          </div>
-        )}
-      </div>
-
-      {/* Summary Stats */}
-      <div className="mt-6 p-4 bg-gray-50 rounded">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-gray-900">{staff.length}</div>
-            <div className="text-sm text-gray-600">Total Staff</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-green-600">
-              {staff.filter(s => s.is_active).length}
+              )}
             </div>
-            <div className="text-sm text-gray-600">Active</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-red-600">
-              {staff.filter(s => !s.is_active).length}
-            </div>
-            <div className="text-sm text-gray-600">Inactive</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-blue-600">
-              {staff.filter(s => s.job_position).length}
-            </div>
-            <div className="text-sm text-gray-600">With Positions</div>
-          </div>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   )
 }

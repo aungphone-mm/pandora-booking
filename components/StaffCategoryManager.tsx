@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { format } from 'date-fns'
 
 type StaffCategory = {
   id: string
@@ -36,6 +37,7 @@ export default function StaffCategoryManager() {
   // Categories state
   const [categories, setCategories] = useState<StaffCategory[]>([])
   const [editingCategory, setEditingCategory] = useState<StaffCategory | null>(null)
+  const [showAddCategoryForm, setShowAddCategoryForm] = useState(false)
   const [newCategory, setNewCategory] = useState({
     name: '',
     description: '',
@@ -45,6 +47,7 @@ export default function StaffCategoryManager() {
   // Positions state
   const [positions, setPositions] = useState<StaffPosition[]>([])
   const [editingPosition, setEditingPosition] = useState<StaffPosition | null>(null)
+  const [showAddPositionForm, setShowAddPositionForm] = useState(false)
   const [newPosition, setNewPosition] = useState({
     category_id: '',
     name: '',
@@ -55,6 +58,7 @@ export default function StaffCategoryManager() {
   // Specializations state
   const [specializations, setSpecializations] = useState<StaffSpecialization[]>([])
   const [editingSpecialization, setEditingSpecialization] = useState<StaffSpecialization | null>(null)
+  const [showAddSpecializationForm, setShowAddSpecializationForm] = useState(false)
   const [newSpecialization, setNewSpecialization] = useState({
     category_id: '',
     name: '',
@@ -64,6 +68,7 @@ export default function StaffCategoryManager() {
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadAllData()
@@ -72,64 +77,60 @@ export default function StaffCategoryManager() {
   const loadAllData = async () => {
     try {
       setLoading(true)
+      setError(null)
       await Promise.all([
         loadCategories(),
         loadPositions(),
         loadSpecializations()
       ])
+    } catch (err: any) {
+      console.error('Error loading data:', err)
+      setError(err.message || 'Failed to load data')
     } finally {
       setLoading(false)
     }
   }
 
   const loadCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('staff_categories')
-        .select('*')
-        .order('display_order')
+    const { data, error } = await supabase
+      .from('staff_categories')
+      .select('*')
+      .order('display_order')
 
-      if (error) throw error
-      setCategories(data || [])
-    } catch (err) {
-      console.error('Error loading categories:', err)
-    }
+    if (error) throw error
+    setCategories(data || [])
   }
 
   const loadPositions = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('staff_positions')
-        .select('*')
-        .order('display_order')
+    const { data, error } = await supabase
+      .from('staff_positions')
+      .select('*')
+      .order('display_order')
 
-      if (error) throw error
-      setPositions(data || [])
-    } catch (err) {
-      console.error('Error loading positions:', err)
-    }
+    if (error) throw error
+    setPositions(data || [])
   }
 
   const loadSpecializations = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('staff_specializations')
-        .select('*')
-        .order('display_order')
+    const { data, error } = await supabase
+      .from('staff_specializations')
+      .select('*')
+      .order('display_order')
 
-      if (error) throw error
-      setSpecializations(data || [])
-    } catch (err) {
-      console.error('Error loading specializations:', err)
-    }
+    if (error) throw error
+    setSpecializations(data || [])
   }
 
   // Category functions
   const handleAddCategory = async () => {
-    if (!newCategory.name.trim()) return
+    if (!newCategory.name.trim()) {
+      setError('Category name is required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_categories')
         .insert([{
@@ -141,26 +142,32 @@ export default function StaffCategoryManager() {
       if (error) throw error
 
       setNewCategory({ name: '', description: '', display_order: 0 })
+      setShowAddCategoryForm(false)
       loadCategories()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error adding category:', err)
-      alert('Error adding category')
+      setError(err.message || 'Failed to add category')
     } finally {
       setSaving(false)
     }
   }
 
   const handleUpdateCategory = async (category: StaffCategory) => {
-    if (!category.name.trim()) return
+    if (!category.name.trim()) {
+      setError('Category name is required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_categories')
         .update({
           name: category.name.trim(),
           description: category.description.trim(),
-          display_order: category.display_order
+          display_order: category.display_order,
+          updated_at: new Date().toISOString()
         })
         .eq('id', category.id)
 
@@ -168,9 +175,9 @@ export default function StaffCategoryManager() {
 
       setEditingCategory(null)
       loadCategories()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating category:', err)
-      alert('Error updating category')
+      setError(err.message || 'Failed to update category')
     } finally {
       setSaving(false)
     }
@@ -183,6 +190,7 @@ export default function StaffCategoryManager() {
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_categories')
         .delete()
@@ -190,9 +198,9 @@ export default function StaffCategoryManager() {
 
       if (error) throw error
       loadAllData()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error deleting category:', err)
-      alert('Error deleting category')
+      setError(err.message || 'Failed to delete category')
     } finally {
       setSaving(false)
     }
@@ -200,10 +208,14 @@ export default function StaffCategoryManager() {
 
   // Position functions
   const handleAddPosition = async () => {
-    if (!newPosition.name.trim() || !newPosition.category_id) return
+    if (!newPosition.name.trim() || !newPosition.category_id) {
+      setError('Position name and category are required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_positions')
         .insert([{
@@ -216,27 +228,33 @@ export default function StaffCategoryManager() {
       if (error) throw error
 
       setNewPosition({ category_id: '', name: '', description: '', display_order: 0 })
+      setShowAddPositionForm(false)
       loadPositions()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error adding position:', err)
-      alert('Error adding position')
+      setError(err.message || 'Failed to add position')
     } finally {
       setSaving(false)
     }
   }
 
   const handleUpdatePosition = async (position: StaffPosition) => {
-    if (!position.name.trim()) return
+    if (!position.name.trim()) {
+      setError('Position name is required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_positions')
         .update({
           category_id: position.category_id,
           name: position.name.trim(),
           description: position.description.trim(),
-          display_order: position.display_order
+          display_order: position.display_order,
+          updated_at: new Date().toISOString()
         })
         .eq('id', position.id)
 
@@ -244,9 +262,9 @@ export default function StaffCategoryManager() {
 
       setEditingPosition(null)
       loadPositions()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating position:', err)
-      alert('Error updating position')
+      setError(err.message || 'Failed to update position')
     } finally {
       setSaving(false)
     }
@@ -257,6 +275,7 @@ export default function StaffCategoryManager() {
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_positions')
         .delete()
@@ -264,9 +283,9 @@ export default function StaffCategoryManager() {
 
       if (error) throw error
       loadPositions()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error deleting position:', err)
-      alert('Error deleting position')
+      setError(err.message || 'Failed to delete position')
     } finally {
       setSaving(false)
     }
@@ -274,10 +293,14 @@ export default function StaffCategoryManager() {
 
   // Specialization functions
   const handleAddSpecialization = async () => {
-    if (!newSpecialization.name.trim()) return
+    if (!newSpecialization.name.trim()) {
+      setError('Specialization name is required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_specializations')
         .insert([{
@@ -290,27 +313,33 @@ export default function StaffCategoryManager() {
       if (error) throw error
 
       setNewSpecialization({ category_id: '', name: '', description: '', display_order: 0 })
+      setShowAddSpecializationForm(false)
       loadSpecializations()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error adding specialization:', err)
-      alert('Error adding specialization')
+      setError(err.message || 'Failed to add specialization')
     } finally {
       setSaving(false)
     }
   }
 
   const handleUpdateSpecialization = async (specialization: StaffSpecialization) => {
-    if (!specialization.name.trim()) return
+    if (!specialization.name.trim()) {
+      setError('Specialization name is required')
+      return
+    }
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_specializations')
         .update({
           category_id: specialization.category_id || null,
           name: specialization.name.trim(),
           description: specialization.description.trim(),
-          display_order: specialization.display_order
+          display_order: specialization.display_order,
+          updated_at: new Date().toISOString()
         })
         .eq('id', specialization.id)
 
@@ -318,9 +347,9 @@ export default function StaffCategoryManager() {
 
       setEditingSpecialization(null)
       loadSpecializations()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating specialization:', err)
-      alert('Error updating specialization')
+      setError(err.message || 'Failed to update specialization')
     } finally {
       setSaving(false)
     }
@@ -331,6 +360,7 @@ export default function StaffCategoryManager() {
 
     try {
       setSaving(true)
+      setError(null)
       const { error } = await supabase
         .from('staff_specializations')
         .delete()
@@ -338,9 +368,9 @@ export default function StaffCategoryManager() {
 
       if (error) throw error
       loadSpecializations()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error deleting specialization:', err)
-      alert('Error deleting specialization')
+      setError(err.message || 'Failed to delete specialization')
     } finally {
       setSaving(false)
     }
@@ -352,28 +382,139 @@ export default function StaffCategoryManager() {
     return category ? category.name : 'Unknown Category'
   }
 
+  const getTabStyle = (isActive: boolean) => ({
+    padding: '12px 16px',
+    borderBottom: isActive ? '2px solid #ec4899' : '2px solid transparent',
+    fontWeight: '600',
+    fontSize: '0.875rem',
+    color: isActive ? '#ec4899' : '#6b7280',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  })
+
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        padding: '24px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '300px'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            border: '2px solid #8b5cf6',
+            borderTop: '2px solid transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-bold mb-6">Staff Structure Management</h2>
-      
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '24px'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '24px'
+      }}>
+        <h2 style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold'
+        }}>Staff Structure Management</h2>
+      </div>
+
+      {error && (
+        <div style={{
+          marginBottom: '24px',
+          padding: '16px',
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '8px'
+        }}>
+          <p style={{ color: '#b91c1c', fontWeight: '500' }}>{error}</p>
+        </div>
+      )}
+
+      {/* Summary Stats */}
+      <div style={{
+        marginBottom: '24px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '16px'
+      }}>
+        <div style={{
+          backgroundColor: '#fef7ff',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#a21caf'
+          }}>Categories</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#a21caf'
+          }}>{categories.length}</p>
+        </div>
+        <div style={{
+          backgroundColor: '#dbeafe',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#1e40af'
+          }}>Positions</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#1e40af'
+          }}>{positions.length}</p>
+        </div>
+        <div style={{
+          backgroundColor: '#dcfce7',
+          padding: '16px',
+          borderRadius: '8px'
+        }}>
+          <h3 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#166534'
+          }}>Specializations</h3>
+          <p style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            color: '#166534'
+          }}>{specializations.length}</p>
+        </div>
+      </div>
+
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
+      <div style={{
+        borderBottom: '1px solid #e5e7eb',
+        marginBottom: '24px'
+      }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           {[
             { key: 'categories', label: 'Categories', count: categories.length },
             { key: 'positions', label: 'Positions', count: positions.length },
@@ -382,502 +523,1047 @@ export default function StaffCategoryManager() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.key
-                  ? 'border-pink-500 text-pink-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              style={getTabStyle(activeTab === tab.key)}
             >
               {tab.label} ({tab.count})
             </button>
           ))}
-        </nav>
+        </div>
       </div>
 
       {/* Categories Tab */}
       {activeTab === 'categories' && (
         <div>
-          {/* Add new category form */}
-          <div className="mb-8 p-4 border rounded">
-            <h3 className="text-lg font-semibold mb-4">Add New Category</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <input
-                type="text"
-                value={newCategory.name}
-                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                className="px-3 py-2 border rounded"
-                placeholder="Category name"
-              />
-              <input
-                type="text"
-                value={newCategory.description}
-                onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-                className="px-3 py-2 border rounded"
-                placeholder="Description"
-              />
-              <input
-                type="number"
-                value={newCategory.display_order}
-                onChange={(e) => setNewCategory({ ...newCategory, display_order: parseInt(e.target.value) || 0 })}
-                className="px-3 py-2 border rounded"
-                placeholder="Order"
-                min="0"
-              />
-              <button
-                onClick={handleAddCategory}
-                disabled={saving || !newCategory.name.trim()}
-                className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 disabled:opacity-50"
-              >
-                {saving ? 'Adding...' : 'Add Category'}
-              </button>
-            </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px'
+          }}>
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: 'bold',
+              color: '#a21caf'
+            }}>Staff Categories</h3>
+            <button
+              onClick={() => setShowAddCategoryForm(!showAddCategoryForm)}
+              style={{
+                backgroundColor: '#a21caf',
+                color: 'white',
+                padding: '12px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: '600'
+              }}
+            >
+              {showAddCategoryForm ? 'Cancel' : 'Add Category'}
+            </button>
           </div>
 
-          {/* Categories list */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Name</th>
-                  <th className="text-left py-2">Description</th>
-                  <th className="text-left py-2">Order</th>
-                  <th className="text-left py-2">Positions</th>
-                  <th className="text-left py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.map((category) => (
-                  <tr key={category.id} className="border-b">
-                    <td className="py-2">
-                      {editingCategory?.id === category.id ? (
+          {/* Add Category Form */}
+          {showAddCategoryForm && (
+            <div style={{
+              marginBottom: '24px',
+              padding: '24px',
+              border: '2px solid #a21caf',
+              borderRadius: '8px',
+              backgroundColor: '#fef7ff'
+            }}>
+              <h4 style={{
+                fontSize: '1.125rem',
+                fontWeight: 'bold',
+                marginBottom: '16px',
+                color: '#a21caf'
+              }}>Add New Category</h4>
+              
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+                marginBottom: '16px'
+              }}>
+                <input
+                  type="text"
+                  value={newCategory.name}
+                  onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Category name"
+                />
+                <input
+                  type="text"
+                  value={newCategory.description}
+                  onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Description"
+                />
+                <input
+                  type="number"
+                  value={newCategory.display_order}
+                  onChange={(e) => setNewCategory({ ...newCategory, display_order: parseInt(e.target.value) || 0 })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Display order"
+                  min="0"
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={handleAddCategory}
+                  disabled={saving || !newCategory.name.trim()}
+                  style={{
+                    backgroundColor: saving ? '#9ca3af' : '#a21caf',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: saving || !newCategory.name.trim() ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    opacity: saving || !newCategory.name.trim() ? 0.6 : 1
+                  }}
+                >
+                  {saving ? 'Adding...' : 'Add Category'}
+                </button>
+                <button
+                  onClick={() => setShowAddCategoryForm(false)}
+                  style={{
+                    backgroundColor: '#6b7280',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Categories List */}
+          {categories.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '48px 0'
+            }}>
+              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📁</div>
+              <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+                No categories found. Add your first category to get started.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {categories.map((category) => (
+                <div key={category.id} style={{
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  backgroundColor: 'white'
+                }}>
+                  {editingCategory?.id === category.id ? (
+                    // Edit Mode
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '16px'
+                      }}>
                         <input
                           type="text"
                           value={editingCategory.name}
                           onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
-                          className="px-2 py-1 border rounded w-full"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Category name"
                         />
-                      ) : (
-                        <span className="font-medium">{category.name}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingCategory?.id === category.id ? (
                         <input
                           type="text"
                           value={editingCategory.description}
                           onChange={(e) => setEditingCategory({ ...editingCategory, description: e.target.value })}
-                          className="px-2 py-1 border rounded w-full"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Description"
                         />
-                      ) : (
-                        <span className="text-sm text-gray-600">{category.description}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingCategory?.id === category.id ? (
                         <input
                           type="number"
                           value={editingCategory.display_order}
                           onChange={(e) => setEditingCategory({ ...editingCategory, display_order: parseInt(e.target.value) || 0 })}
-                          className="px-2 py-1 border rounded w-20"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Display order"
                           min="0"
                         />
-                      ) : (
-                        <span>{category.display_order}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      <span className="text-sm text-blue-600">
-                        {positions.filter(p => p.category_id === category.id).length}
-                      </span>
-                    </td>
-                    <td className="py-2">
-                      <div className="flex gap-2">
-                        {editingCategory?.id === category.id ? (
-                          <>
-                            <button
-                              onClick={() => handleUpdateCategory(editingCategory)}
-                              disabled={saving}
-                              className="text-green-600 hover:text-green-800 disabled:opacity-50"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => setEditingCategory(null)}
-                              disabled={saving}
-                              className="text-gray-600 hover:text-gray-800"
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => setEditingCategory(category)}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCategory(category.id)}
-                              disabled={saving}
-                              className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => handleUpdateCategory(editingCategory)}
+                          disabled={saving}
+                          style={{
+                            backgroundColor: saving ? '#9ca3af' : '#16a34a',
+                            color: 'white',
+                            padding: '12px 24px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontWeight: '600',
+                            opacity: saving ? 0.6 : 1
+                          }}
+                        >
+                          {saving ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        <button
+                          onClick={() => setEditingCategory(null)}
+                          disabled={saving}
+                          style={{
+                            backgroundColor: '#6b7280',
+                            color: 'white',
+                            padding: '12px 24px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontWeight: '600',
+                            opacity: saving ? 0.6 : 1
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // View Mode
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          marginBottom: '8px'
+                        }}>
+                          <h4 style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 'bold',
+                            color: '#111827'
+                          }}>
+                            {category.name}
+                          </h4>
+                          <span style={{
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#dbeafe',
+                            color: '#1e40af'
+                          }}>
+                            Order: {category.display_order}
+                          </span>
+                          <span style={{
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#dcfce7',
+                            color: '#166534'
+                          }}>
+                            {positions.filter(p => p.category_id === category.id).length} positions
+                          </span>
+                        </div>
+                        
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280',
+                          marginBottom: '8px'
+                        }}>
+                          {category.description || 'No description'}
+                        </p>
+
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280'
+                        }}>
+                          Created: {format(new Date(category.created_at), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        gap: '8px',
+                        marginLeft: '16px'
+                      }}>
+                        <button
+                          onClick={() => setEditingCategory(category)}
+                          style={{
+                            color: '#3b82f6',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.875rem',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(category.id)}
+                          disabled={saving}
+                          style={{
+                            color: saving ? '#9ca3af' : '#dc2626',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontSize: '0.875rem',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Positions Tab */}
       {activeTab === 'positions' && (
         <div>
-          {/* Add new position form */}
-          <div className="mb-8 p-4 border rounded">
-            <h3 className="text-lg font-semibold mb-4">Add New Position</h3>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <select
-                value={newPosition.category_id}
-                onChange={(e) => setNewPosition({ ...newPosition, category_id: e.target.value })}
-                className="px-3 py-2 border rounded"
-              >
-                <option value="">Select Category</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-              <input
-                type="text"
-                value={newPosition.name}
-                onChange={(e) => setNewPosition({ ...newPosition, name: e.target.value })}
-                className="px-3 py-2 border rounded"
-                placeholder="Position name"
-              />
-              <input
-                type="text"
-                value={newPosition.description}
-                onChange={(e) => setNewPosition({ ...newPosition, description: e.target.value })}
-                className="px-3 py-2 border rounded"
-                placeholder="Description"
-              />
-              <input
-                type="number"
-                value={newPosition.display_order}
-                onChange={(e) => setNewPosition({ ...newPosition, display_order: parseInt(e.target.value) || 0 })}
-                className="px-3 py-2 border rounded"
-                placeholder="Order"
-                min="0"
-              />
-              <button
-                onClick={handleAddPosition}
-                disabled={saving || !newPosition.name.trim() || !newPosition.category_id}
-                className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 disabled:opacity-50"
-              >
-                {saving ? 'Adding...' : 'Add Position'}
-              </button>
-            </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px'
+          }}>
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: 'bold',
+              color: '#1e40af'
+            }}>Staff Positions</h3>
+            <button
+              onClick={() => setShowAddPositionForm(!showAddPositionForm)}
+              style={{
+                backgroundColor: '#1e40af',
+                color: 'white',
+                padding: '12px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: '600'
+              }}
+            >
+              {showAddPositionForm ? 'Cancel' : 'Add Position'}
+            </button>
           </div>
 
-          {/* Positions list */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Position</th>
-                  <th className="text-left py-2">Category</th>
-                  <th className="text-left py-2">Description</th>
-                  <th className="text-left py-2">Order</th>
-                  <th className="text-left py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {positions.map((position) => (
-                  <tr key={position.id} className="border-b">
-                    <td className="py-2">
-                      {editingPosition?.id === position.id ? (
-                        <input
-                          type="text"
-                          value={editingPosition.name}
-                          onChange={(e) => setEditingPosition({ ...editingPosition, name: e.target.value })}
-                          className="px-2 py-1 border rounded w-full"
-                        />
-                      ) : (
-                        <span className="font-medium">{position.name}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingPosition?.id === position.id ? (
+          {/* Add Position Form */}
+          {showAddPositionForm && (
+            <div style={{
+              marginBottom: '24px',
+              padding: '24px',
+              border: '2px solid #1e40af',
+              borderRadius: '8px',
+              backgroundColor: '#f0f9ff'
+            }}>
+              <h4 style={{
+                fontSize: '1.125rem',
+                fontWeight: 'bold',
+                marginBottom: '16px',
+                color: '#1e40af'
+              }}>Add New Position</h4>
+              
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+                marginBottom: '16px'
+              }}>
+                <select
+                  value={newPosition.category_id}
+                  onChange={(e) => setNewPosition({ ...newPosition, category_id: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  value={newPosition.name}
+                  onChange={(e) => setNewPosition({ ...newPosition, name: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Position name"
+                />
+                <input
+                  type="text"
+                  value={newPosition.description}
+                  onChange={(e) => setNewPosition({ ...newPosition, description: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Description"
+                />
+                <input
+                  type="number"
+                  value={newPosition.display_order}
+                  onChange={(e) => setNewPosition({ ...newPosition, display_order: parseInt(e.target.value) || 0 })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Display order"
+                  min="0"
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={handleAddPosition}
+                  disabled={saving || !newPosition.name.trim() || !newPosition.category_id}
+                  style={{
+                    backgroundColor: saving ? '#9ca3af' : '#1e40af',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: saving || !newPosition.name.trim() || !newPosition.category_id ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    opacity: saving || !newPosition.name.trim() || !newPosition.category_id ? 0.6 : 1
+                  }}
+                >
+                  {saving ? 'Adding...' : 'Add Position'}
+                </button>
+                <button
+                  onClick={() => setShowAddPositionForm(false)}
+                  style={{
+                    backgroundColor: '#6b7280',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Positions List */}
+          {positions.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '48px 0'
+            }}>
+              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>💼</div>
+              <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+                No positions found. Add your first position to get started.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {positions.map((position) => (
+                <div key={position.id} style={{
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  backgroundColor: 'white'
+                }}>
+                  {editingPosition?.id === position.id ? (
+                    // Edit Mode
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '16px'
+                      }}>
                         <select
                           value={editingPosition.category_id}
                           onChange={(e) => setEditingPosition({ ...editingPosition, category_id: e.target.value })}
-                          className="px-2 py-1 border rounded"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
                         >
                           {categories.map(cat => (
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                           ))}
                         </select>
-                      ) : (
-                        <span className="text-sm text-blue-600">{getCategoryName(position.category_id)}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingPosition?.id === position.id ? (
+                        <input
+                          type="text"
+                          value={editingPosition.name}
+                          onChange={(e) => setEditingPosition({ ...editingPosition, name: e.target.value })}
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Position name"
+                        />
                         <input
                           type="text"
                           value={editingPosition.description}
                           onChange={(e) => setEditingPosition({ ...editingPosition, description: e.target.value })}
-                          className="px-2 py-1 border rounded w-full"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Description"
                         />
-                      ) : (
-                        <span className="text-sm text-gray-600">{position.description}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingPosition?.id === position.id ? (
                         <input
                           type="number"
                           value={editingPosition.display_order}
                           onChange={(e) => setEditingPosition({ ...editingPosition, display_order: parseInt(e.target.value) || 0 })}
-                          className="px-2 py-1 border rounded w-20"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Display order"
                           min="0"
                         />
-                      ) : (
-                        <span>{position.display_order}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      <div className="flex gap-2">
-                        {editingPosition?.id === position.id ? (
-                          <>
-                            <button
-                              onClick={() => handleUpdatePosition(editingPosition)}
-                              disabled={saving}
-                              className="text-green-600 hover:text-green-800 disabled:opacity-50"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => setEditingPosition(null)}
-                              disabled={saving}
-                              className="text-gray-600 hover:text-gray-800"
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => setEditingPosition(position)}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeletePosition(position.id)}
-                              disabled={saving}
-                              className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => handleUpdatePosition(editingPosition)}
+                          disabled={saving}
+                          style={{
+                            backgroundColor: saving ? '#9ca3af' : '#16a34a',
+                            color: 'white',
+                            padding: '12px 24px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontWeight: '600',
+                            opacity: saving ? 0.6 : 1
+                          }}
+                        >
+                          {saving ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        <button
+                          onClick={() => setEditingPosition(null)}
+                          disabled={saving}
+                          style={{
+                            backgroundColor: '#6b7280',
+                            color: 'white',
+                            padding: '12px 24px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontWeight: '600',
+                            opacity: saving ? 0.6 : 1
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // View Mode
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          marginBottom: '8px'
+                        }}>
+                          <h4 style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 'bold',
+                            color: '#111827'
+                          }}>
+                            {position.name}
+                          </h4>
+                          <span style={{
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#fef7ff',
+                            color: '#a21caf'
+                          }}>
+                            {getCategoryName(position.category_id)}
+                          </span>
+                          <span style={{
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#dbeafe',
+                            color: '#1e40af'
+                          }}>
+                            Order: {position.display_order}
+                          </span>
+                        </div>
+                        
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280',
+                          marginBottom: '8px'
+                        }}>
+                          {position.description || 'No description'}
+                        </p>
+
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280'
+                        }}>
+                          Created: {format(new Date(position.created_at), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        gap: '8px',
+                        marginLeft: '16px'
+                      }}>
+                        <button
+                          onClick={() => setEditingPosition(position)}
+                          style={{
+                            color: '#3b82f6',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.875rem',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeletePosition(position.id)}
+                          disabled={saving}
+                          style={{
+                            color: saving ? '#9ca3af' : '#dc2626',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontSize: '0.875rem',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Specializations Tab */}
       {activeTab === 'specializations' && (
         <div>
-          {/* Add new specialization form */}
-          <div className="mb-8 p-4 border rounded">
-            <h3 className="text-lg font-semibold mb-4">Add New Specialization</h3>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <select
-                value={newSpecialization.category_id}
-                onChange={(e) => setNewSpecialization({ ...newSpecialization, category_id: e.target.value })}
-                className="px-3 py-2 border rounded"
-              >
-                <option value="">Select Category (Optional)</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-              <input
-                type="text"
-                value={newSpecialization.name}
-                onChange={(e) => setNewSpecialization({ ...newSpecialization, name: e.target.value })}
-                className="px-3 py-2 border rounded"
-                placeholder="Specialization name"
-              />
-              <input
-                type="text"
-                value={newSpecialization.description}
-                onChange={(e) => setNewSpecialization({ ...newSpecialization, description: e.target.value })}
-                className="px-3 py-2 border rounded"
-                placeholder="Description"
-              />
-              <input
-                type="number"
-                value={newSpecialization.display_order}
-                onChange={(e) => setNewSpecialization({ ...newSpecialization, display_order: parseInt(e.target.value) || 0 })}
-                className="px-3 py-2 border rounded"
-                placeholder="Order"
-                min="0"
-              />
-              <button
-                onClick={handleAddSpecialization}
-                disabled={saving || !newSpecialization.name.trim()}
-                className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 disabled:opacity-50"
-              >
-                {saving ? 'Adding...' : 'Add Specialization'}
-              </button>
-            </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px'
+          }}>
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: 'bold',
+              color: '#166534'
+            }}>Staff Specializations</h3>
+            <button
+              onClick={() => setShowAddSpecializationForm(!showAddSpecializationForm)}
+              style={{
+                backgroundColor: '#166534',
+                color: 'white',
+                padding: '12px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: '600'
+              }}
+            >
+              {showAddSpecializationForm ? 'Cancel' : 'Add Specialization'}
+            </button>
           </div>
 
-          {/* Specializations list */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Specialization</th>
-                  <th className="text-left py-2">Category</th>
-                  <th className="text-left py-2">Description</th>
-                  <th className="text-left py-2">Order</th>
-                  <th className="text-left py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {specializations.map((specialization) => (
-                  <tr key={specialization.id} className="border-b">
-                    <td className="py-2">
-                      {editingSpecialization?.id === specialization.id ? (
-                        <input
-                          type="text"
-                          value={editingSpecialization.name}
-                          onChange={(e) => setEditingSpecialization({ ...editingSpecialization, name: e.target.value })}
-                          className="px-2 py-1 border rounded w-full"
-                        />
-                      ) : (
-                        <span className="font-medium">{specialization.name}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingSpecialization?.id === specialization.id ? (
+          {/* Add Specialization Form */}
+          {showAddSpecializationForm && (
+            <div style={{
+              marginBottom: '24px',
+              padding: '24px',
+              border: '2px solid #166534',
+              borderRadius: '8px',
+              backgroundColor: '#f0fdf4'
+            }}>
+              <h4 style={{
+                fontSize: '1.125rem',
+                fontWeight: 'bold',
+                marginBottom: '16px',
+                color: '#166534'
+              }}>Add New Specialization</h4>
+              
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+                marginBottom: '16px'
+              }}>
+                <select
+                  value={newSpecialization.category_id}
+                  onChange={(e) => setNewSpecialization({ ...newSpecialization, category_id: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Select Category (Optional)</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  value={newSpecialization.name}
+                  onChange={(e) => setNewSpecialization({ ...newSpecialization, name: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Specialization name"
+                />
+                <input
+                  type="text"
+                  value={newSpecialization.description}
+                  onChange={(e) => setNewSpecialization({ ...newSpecialization, description: e.target.value })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Description"
+                />
+                <input
+                  type="number"
+                  value={newSpecialization.display_order}
+                  onChange={(e) => setNewSpecialization({ ...newSpecialization, display_order: parseInt(e.target.value) || 0 })}
+                  style={{
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    outline: 'none'
+                  }}
+                  placeholder="Display order"
+                  min="0"
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={handleAddSpecialization}
+                  disabled={saving || !newSpecialization.name.trim()}
+                  style={{
+                    backgroundColor: saving ? '#9ca3af' : '#166534',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: saving || !newSpecialization.name.trim() ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    opacity: saving || !newSpecialization.name.trim() ? 0.6 : 1
+                  }}
+                >
+                  {saving ? 'Adding...' : 'Add Specialization'}
+                </button>
+                <button
+                  onClick={() => setShowAddSpecializationForm(false)}
+                  style={{
+                    backgroundColor: '#6b7280',
+                    color: 'white',
+                    padding: '12px 24px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Specializations List */}
+          {specializations.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '48px 0'
+            }}>
+              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>⭐</div>
+              <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+                No specializations found. Add your first specialization to get started.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {specializations.map((specialization) => (
+                <div key={specialization.id} style={{
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  backgroundColor: 'white'
+                }}>
+                  {editingSpecialization?.id === specialization.id ? (
+                    // Edit Mode
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '16px'
+                      }}>
                         <select
                           value={editingSpecialization.category_id || ''}
                           onChange={(e) => setEditingSpecialization({ ...editingSpecialization, category_id: e.target.value || null })}
-                          className="px-2 py-1 border rounded"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
                         >
                           <option value="">No Category</option>
                           {categories.map(cat => (
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                           ))}
                         </select>
-                      ) : (
-                        <span className="text-sm text-blue-600">{getCategoryName(specialization.category_id)}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingSpecialization?.id === specialization.id ? (
+                        <input
+                          type="text"
+                          value={editingSpecialization.name}
+                          onChange={(e) => setEditingSpecialization({ ...editingSpecialization, name: e.target.value })}
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Specialization name"
+                        />
                         <input
                           type="text"
                           value={editingSpecialization.description}
                           onChange={(e) => setEditingSpecialization({ ...editingSpecialization, description: e.target.value })}
-                          className="px-2 py-1 border rounded w-full"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Description"
                         />
-                      ) : (
-                        <span className="text-sm text-gray-600">{specialization.description}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      {editingSpecialization?.id === specialization.id ? (
                         <input
                           type="number"
                           value={editingSpecialization.display_order}
                           onChange={(e) => setEditingSpecialization({ ...editingSpecialization, display_order: parseInt(e.target.value) || 0 })}
-                          className="px-2 py-1 border rounded w-20"
+                          style={{
+                            padding: '12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            outline: 'none'
+                          }}
+                          placeholder="Display order"
                           min="0"
                         />
-                      ) : (
-                        <span>{specialization.display_order}</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      <div className="flex gap-2">
-                        {editingSpecialization?.id === specialization.id ? (
-                          <>
-                            <button
-                              onClick={() => handleUpdateSpecialization(editingSpecialization)}
-                              disabled={saving}
-                              className="text-green-600 hover:text-green-800 disabled:opacity-50"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => setEditingSpecialization(null)}
-                              disabled={saving}
-                              className="text-gray-600 hover:text-gray-800"
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => setEditingSpecialization(specialization)}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteSpecialization(specialization.id)}
-                              disabled={saving}
-                              className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => handleUpdateSpecialization(editingSpecialization)}
+                          disabled={saving}
+                          style={{
+                            backgroundColor: saving ? '#9ca3af' : '#16a34a',
+                            color: 'white',
+                            padding: '12px 24px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontWeight: '600',
+                            opacity: saving ? 0.6 : 1
+                          }}
+                        >
+                          {saving ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        <button
+                          onClick={() => setEditingSpecialization(null)}
+                          disabled={saving}
+                          style={{
+                            backgroundColor: '#6b7280',
+                            color: 'white',
+                            padding: '12px 24px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontWeight: '600',
+                            opacity: saving ? 0.6 : 1
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // View Mode
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          marginBottom: '8px'
+                        }}>
+                          <h4 style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 'bold',
+                            color: '#111827'
+                          }}>
+                            {specialization.name}
+                          </h4>
+                          <span style={{
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#fef7ff',
+                            color: '#a21caf'
+                          }}>
+                            {getCategoryName(specialization.category_id)}
+                          </span>
+                          <span style={{
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#dcfce7',
+                            color: '#166534'
+                          }}>
+                            Order: {specialization.display_order}
+                          </span>
+                        </div>
+                        
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280',
+                          marginBottom: '8px'
+                        }}>
+                          {specialization.description || 'No description'}
+                        </p>
+
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280'
+                        }}>
+                          Created: {format(new Date(specialization.created_at), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        gap: '8px',
+                        marginLeft: '16px'
+                      }}>
+                        <button
+                          onClick={() => setEditingSpecialization(specialization)}
+                          style={{
+                            color: '#3b82f6',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.875rem',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteSpecialization(specialization.id)}
+                          disabled={saving}
+                          style={{
+                            color: saving ? '#9ca3af' : '#dc2626',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            fontSize: '0.875rem',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
-
-      {/* Summary */}
-      <div className="mt-6 p-4 bg-gray-50 rounded">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-pink-600">{categories.length}</div>
-            <div className="text-sm text-gray-600">Categories</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-blue-600">{positions.length}</div>
-            <div className="text-sm text-gray-600">Positions</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-green-600">{specializations.length}</div>
-            <div className="text-sm text-gray-600">Specializations</div>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
