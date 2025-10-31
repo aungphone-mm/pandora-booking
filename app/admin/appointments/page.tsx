@@ -2,8 +2,11 @@ import AppointmentManager from '@/components/AppointmentManager'
 
 export default function AdminAppointmentsPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Appointment Management</h1>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      padding: '24px'
+    }}>
       <AppointmentManager />
     </div>
   )
