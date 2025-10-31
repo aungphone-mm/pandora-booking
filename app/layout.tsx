@@ -10,6 +10,12 @@ export const metadata = {
   description: 'Book your beauty appointment at Pandora Salon',
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 async function getUser() {
   try {
     const supabase = createClient()

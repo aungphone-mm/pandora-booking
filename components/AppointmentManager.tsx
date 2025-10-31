@@ -6,8 +6,8 @@ import { format } from 'date-fns'
 
 type Appointment = {
   id: string
-  user_id?: string | null  // Added missing user_id field
-  staff_id?: string | null  // Added staff_id field
+  user_id?: string | null
+  staff_id?: string | null
   customer_name: string
   customer_email: string
   customer_phone: string
@@ -54,99 +54,179 @@ export default function AppointmentManager() {
 
   useEffect(() => {
     loadAppointments()
+    
+    // Add enhanced CSS animations
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      .appointment-card {
+        transition: all 0.3s ease-in-out;
+      }
+      .appointment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      }
+      .filter-select {
+        transition: all 0.2s ease-in-out;
+      }
+      .filter-select:focus {
+        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        border-color: #ec4899;
+      }
+      .status-select {
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+      }
+      .status-select:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .table-row {
+        transition: all 0.2s ease-in-out;
+      }
+      .table-row:hover {
+        background-color: #f8fafc;
+        transform: scale(1.005);
+      }
+      .action-button {
+        transition: all 0.2s ease-in-out;
+      }
+      .action-button:hover {
+        transform: translateY(-1px);
+      }
+      
+      /* Mobile responsiveness */
+      @media (max-width: 768px) {
+        .appointment-card:hover {
+          transform: none;
+        }
+        .table-row:hover {
+          transform: none;
+        }
+        .mobile-table {
+          display: block !important;
+        }
+        .desktop-table {
+          display: none !important;
+        }
+        .mobile-card {
+          background: white;
+          border-radius: 16px;
+          padding: 20px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          border: 1px solid #f1f5f9;
+        }
+      }
+      
+      @media (min-width: 769px) {
+        .mobile-table {
+          display: none !important;
+        }
+        .desktop-table {
+          display: block !important;
+        }
+      }
+    `
+    document.head.appendChild(style)
+    
+    return () => {
+      document.head.removeChild(style)
+    }
   }, [])
 
-  // Replace the loadAppointments function in components/AppointmentManager.tsx
+  const loadAppointments = async () => {
+    try {
+      setLoading(true)
+      setError(null)
 
-// Replace the loadAppointments function in components/AppointmentManager.tsx (around line 53)
+      const { data: appointmentsData, error: appointmentsError } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          service:services(id, name, price, duration),
+          appointment_products(
+            id,
+            quantity,
+            product:products(id, name, price)
+          )
+        `)
+        .order('created_at', { ascending: false })
 
-const loadAppointments = async () => {
-  try {
-    setLoading(true)
-    setError(null)
+      if (appointmentsError) {
+        throw appointmentsError
+      }
 
-    // First get appointments with services and products
-    const { data: appointmentsData, error: appointmentsError } = await supabase
-      .from('appointments')
-      .select(`
-        *,
-        service:services(id, name, price, duration),
-        appointment_products(
-          id,
-          quantity,
-          product:products(id, name, price)
-        )
-      `)
-      .order('created_at', { ascending: false })
+      const staffIds = appointmentsData?.map(apt => apt.staff_id).filter(id => id) || []
+      
+      let staffData: any[] = []
+      
+      if (staffIds.length > 0) {
+        const { data: staffInfo, error: staffError } = await supabase
+          .from('staff')
+          .select('id, full_name')
+          .in('id', staffIds)
+        
+        if (staffError) {
+          console.error('Error loading staff info:', staffError)
+        }
+        
+        staffData = staffInfo || []
+      }
 
-    if (appointmentsError) {
-      throw appointmentsError
-    }
+      const userIds = appointmentsData?.filter(apt => apt.user_id).map(apt => apt.user_id) || []
+      let profilesData: any[] = []
+      
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', userIds)
+        profilesData = profiles || []
+      }
 
-    // Check if staff_id column exists and has values
-    const staffIds = appointmentsData?.map(apt => apt.staff_id).filter(id => id) || []
-    
-    // Get staff information separately
-    let staffData: any[] = []
-    
-    if (staffIds.length > 0) {
-      const { data: staffInfo, error: staffError } = await supabase
+      const { data: allStaffData, error: allStaffError } = await supabase
         .from('staff')
         .select('id, full_name')
-        .in('id', staffIds)
-      
-      if (staffError) {
-        console.error('Error loading staff info:', staffError)
+        .eq('is_active', true)
+        .order('full_name')
+
+      if (allStaffError) {
+        console.error('Error loading all staff:', allStaffError)
       }
-      
-      staffData = staffInfo || []
+
+      setStaff(allStaffData || [])
+
+      const combinedData = appointmentsData?.map(appointment => {
+        const userProfile = profilesData.find(profile => profile.id === appointment.user_id)
+        const staffInfo = staffData.find(staff => staff.id === appointment.staff_id)
+        
+        return {
+          ...appointment,
+          user: userProfile || null,
+          staff: staffInfo || null
+        }
+      }) || []
+
+      setAppointments(combinedData)
+    } catch (err: any) {
+      console.error('Error loading appointments:', err)
+      setError(err.message || 'Failed to load appointments')
+    } finally {
+      setLoading(false)
     }
-
-    // Get user profiles separately for users who have accounts
-    const userIds = appointmentsData?.filter(apt => apt.user_id).map(apt => apt.user_id) || []
-    let profilesData: any[] = []
-    
-    if (userIds.length > 0) {
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .in('id', userIds)
-      profilesData = profiles || []
-    }
-
-    // Load all active staff for dropdown
-    const { data: allStaffData, error: allStaffError } = await supabase
-      .from('staff')
-      .select('id, full_name')
-      .eq('is_active', true)
-      .order('full_name')
-
-    if (allStaffError) {
-      console.error('Error loading all staff:', allStaffError)
-    }
-
-    setStaff(allStaffData || [])
-
-    // Combine appointments with user profiles and staff info
-    const combinedData = appointmentsData?.map(appointment => {
-      const userProfile = profilesData.find(profile => profile.id === appointment.user_id)
-      const staffInfo = staffData.find(staff => staff.id === appointment.staff_id)
-      
-      return {
-        ...appointment,
-        user: userProfile || null,
-        staff: staffInfo || null
-      }
-    }) || []
-
-    setAppointments(combinedData)
-  } catch (err: any) {
-    console.error('Error loading appointments:', err)
-    setError(err.message || 'Failed to load appointments')
-  } finally {
-    setLoading(false)
   }
-}
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
     try {
@@ -162,7 +242,6 @@ const loadAppointments = async () => {
         throw updateError
       }
 
-      // Update local state
       setAppointments(prev => 
         prev.map(apt => 
           apt.id === appointmentId 
@@ -193,7 +272,6 @@ const loadAppointments = async () => {
         throw updateError
       }
 
-      // Update local state
       const selectedStaff = staffId ? staff.find(s => s.id === staffId) : null
       setAppointments(prev => 
         prev.map(apt => 
@@ -219,7 +297,6 @@ const loadAppointments = async () => {
     try {
       setError(null)
 
-      // First delete appointment products
       const { error: productsError } = await supabase
         .from('appointment_products')
         .delete()
@@ -229,7 +306,6 @@ const loadAppointments = async () => {
         throw productsError
       }
 
-      // Then delete the appointment
       const { error: appointmentError } = await supabase
         .from('appointments')
         .delete()
@@ -239,7 +315,6 @@ const loadAppointments = async () => {
         throw appointmentError
       }
 
-      // Update local state
       setAppointments(prev => prev.filter(apt => apt.id !== appointmentId))
       
     } catch (err: any) {
@@ -248,7 +323,6 @@ const loadAppointments = async () => {
     }
   }
 
-  // Filter and sort appointments
   const filteredAndSortedAppointments = appointments
     .filter(apt => {
       if (filterStatus === 'all') return true
@@ -277,13 +351,29 @@ const loadAppointments = async () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return { backgroundColor: '#dcfce7', color: '#166534' }
+        return { 
+          background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)', 
+          color: '#166534',
+          border: '1px solid #16a34a'
+        }
       case 'cancelled':
-        return { backgroundColor: '#fee2e2', color: '#991b1b' }
+        return { 
+          background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)', 
+          color: '#991b1b',
+          border: '1px solid #dc2626'
+        }
       case 'pending':
-        return { backgroundColor: '#fef3c7', color: '#92400e' }
+        return { 
+          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', 
+          color: '#92400e',
+          border: '1px solid #f59e0b'
+        }
       default:
-        return { backgroundColor: '#f3f4f6', color: '#374151' }
+        return { 
+          background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', 
+          color: '#374151',
+          border: '1px solid #6b7280'
+        }
     }
   }
 
@@ -299,439 +389,778 @@ const loadAppointments = async () => {
     return (
       <div style={{
         backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        padding: '24px'
+        borderRadius: '20px',
+        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
+        padding: '48px',
+        textAlign: 'center',
+        border: '1px solid #f1f5f9'
       }}>
+        <div style={{
+          display: 'inline-block',
+          width: '48px',
+          height: '48px',
+          border: '4px solid #f1f5f9',
+          borderTop: '4px solid #ec4899',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          marginBottom: '20px'
+        }}></div>
         <h2 style={{
           fontSize: '1.5rem',
-          fontWeight: 'bold',
-          marginBottom: '24px'
-        }}>Appointment Management</h2>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          padding: '32px 0'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            border: '2px solid #ec4899',
-            borderTop: '2px solid transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
-        </div>
+          fontWeight: '700',
+          marginBottom: '8px',
+          color: '#1e293b'
+        }}>Loading Appointments</h2>
+        <p style={{
+          color: '#64748b',
+          fontSize: '1rem'
+        }}>Please wait while we fetch your appointment data...</p>
       </div>
     )
   }
 
   return (
     <div style={{
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '24px'
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '32px',
+      animation: 'fadeIn 0.6s ease-out'
     }}>
+      {/* Enhanced Header */}
       <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '24px'
-      }}>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold'
-        }}>Appointment Management</h2>
-        <button
-          onClick={loadAppointments}
-          style={{
-            backgroundColor: '#ec4899',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '600'
-          }}
-        >
-          Refresh
-        </button>
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        borderRadius: '20px',
+        boxShadow: '0 15px 35px rgba(102, 126, 234, 0.3)',
+        padding: window.innerWidth <= 768 ? '20px' : '32px',
+        color: 'white',
+        position: 'relative',
+        overflow: 'hidden'
+      }} className="appointment-card">
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          right: '-50%',
+          width: '200%',
+          height: '200%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+          pointerEvents: 'none'
+        }}></div>
+        <div style={{
+          display: 'flex',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: window.innerWidth <= 768 ? 'flex-start' : 'center',
+          gap: window.innerWidth <= 768 ? '16px' : '0',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          <div>
+            <h2 style={{
+              fontSize: window.innerWidth <= 768 ? '1.5rem' : '2.25rem',
+              fontWeight: '800',
+              margin: '0 0 8px 0',
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>📅 Appointment Management</h2>
+            <p style={{
+              fontSize: '1.1rem',
+              margin: '0',
+              opacity: '0.9'
+            }}>Manage all customer appointments and schedules</p>
+          </div>
+          <button
+            onClick={loadAppointments}
+            style={{
+              background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
+              color: 'white',
+              padding: '16px 24px',
+              borderRadius: '12px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '1rem',
+              boxShadow: '0 6px 20px rgba(236, 72, 153, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+            className="action-button"
+          >
+            🔄 Refresh Data
+          </button>
+        </div>
       </div>
 
       {error && (
         <div style={{
-          marginBottom: '24px',
-          padding: '16px',
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '8px'
-        }}>
-          <p style={{ color: '#b91c1c', fontWeight: '500' }}>{error}</p>
-          <details style={{ marginTop: '8px' }}>
+          background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+          border: '1px solid #f87171',
+          borderRadius: '16px',
+          padding: '24px',
+          boxShadow: '0 8px 25px rgba(248, 113, 113, 0.2)'
+        }} className="slideIn">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+            <h3 style={{ 
+              color: '#b91c1c', 
+              fontWeight: '700',
+              margin: '0',
+              fontSize: '1.2rem'
+            }}>Error Loading Appointments</h3>
+          </div>
+          <p style={{ color: '#dc2626', fontWeight: '500', margin: '0 0 16px 0' }}>{error}</p>
+          
+          <details style={{ 
+            background: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: '8px',
+            padding: '12px'
+          }}>
             <summary style={{
               fontSize: '0.875rem',
               color: '#dc2626',
-              cursor: 'pointer'
-            }}>Debug Information</summary>
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}>🔧 Troubleshooting Guide</summary>
             <div style={{
-              marginTop: '8px',
-              fontSize: '0.75rem',
-              color: '#dc2626'
+              marginTop: '12px',
+              fontSize: '0.875rem',
+              color: '#dc2626',
+              lineHeight: '1.6'
             }}>
-              <p>Try the following steps:</p>
+              <p><strong>Common solutions:</strong></p>
               <ol style={{
                 listStyle: 'decimal',
                 paddingLeft: '20px',
-                marginTop: '4px'
+                marginTop: '8px'
               }}>
-                <li>Make sure all database tables exist (appointments, services, profiles, products, appointment_products)</li>
-                <li>Check that the profiles table has proper relationships set up</li>
-                <li>Verify RLS policies allow reading from all tables</li>
+                <li>Verify database tables exist (appointments, services, profiles, products)</li>
+                <li>Check RLS policies allow reading from all tables</li>
+                <li>Ensure proper relationships are set up between tables</li>
                 <li>Check browser console for detailed error messages</li>
+                <li>Try refreshing the page or logging out and back in</li>
               </ol>
             </div>
           </details>
         </div>
       )}
 
-      {/* Filters and Sorting */}
+      {/* Enhanced Filters and Sorting */}
       <div style={{
-        marginBottom: '24px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '16px',
-        alignItems: 'center'
-      }}>
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '4px'
-          }}>Filter by Status</label>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            style={{
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+        backgroundColor: 'white',
+        borderRadius: '20px',
+        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.06)',
+        padding: window.innerWidth <= 768 ? '20px' : '32px',
+        border: '1px solid #f1f5f9'
+      }} className="appointment-card">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.2rem'
+          }}>🔍</div>
+          <h3 style={{
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            margin: '0',
+            color: '#1e293b'
+          }}>Filter & Sort Options</h3>
         </div>
 
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '4px'
-          }}>Sort by</label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'date' | 'created' | 'customer')}
-            style={{
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
-          >
-            <option value="date">Appointment Date</option>
-            <option value="created">Created Date</option>
-            <option value="customer">Customer Name</option>
-          </select>
-        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '24px'
+        }}>
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              color: '#475569',
+              marginBottom: '8px'
+            }}>📊 Filter by Status</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '12px',
+                outline: 'none',
+                fontSize: '1rem',
+                fontWeight: '500',
+                background: 'white',
+                color: '#1e293b'
+              }}
+              className="filter-select"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">⏳ Pending</option>
+              <option value="confirmed">✅ Confirmed</option>
+              <option value="cancelled">❌ Cancelled</option>
+            </select>
+          </div>
 
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '4px'
-          }}>Order</label>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
-            style={{
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
-          >
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
-          </select>
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              color: '#475569',
+              marginBottom: '8px'
+            }}>📋 Sort by</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'date' | 'created' | 'customer')}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '12px',
+                outline: 'none',
+                fontSize: '1rem',
+                fontWeight: '500',
+                background: 'white',
+                color: '#1e293b'
+              }}
+              className="filter-select"
+            >
+              <option value="date">📅 Appointment Date</option>
+              <option value="created">🕐 Created Date</option>
+              <option value="customer">👤 Customer Name</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              color: '#475569',
+              marginBottom: '8px'
+            }}>🔄 Order</label>
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '12px',
+                outline: 'none',
+                fontSize: '1rem',
+                fontWeight: '500',
+                background: 'white',
+                color: '#1e293b'
+              }}
+              className="filter-select"
+            >
+              <option value="desc">📉 Newest First</option>
+              <option value="asc">📈 Oldest First</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Summary Stats */}
+      {/* Enhanced Summary Stats */}
       <div style={{
-        marginBottom: '24px',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: '16px'
+        gridTemplateColumns: window.innerWidth <= 768 ? '1fr 1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: window.innerWidth <= 768 ? '12px' : '20px'
       }}>
         <div style={{
-          backgroundColor: '#f9fafb',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          padding: '24px',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.06)',
+          textAlign: 'center'
+        }} className="appointment-card">
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📊</div>
           <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#6b7280'
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            color: '#64748b',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            margin: '0 0 8px 0'
           }}>Total Appointments</h3>
           <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#111827'
+            fontSize: '2.5rem',
+            fontWeight: '800',
+            color: '#1e293b',
+            margin: '0'
           }}>{appointments.length}</p>
         </div>
+        
         <div style={{
-          backgroundColor: '#fef3c7',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
+          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+          padding: '24px',
+          borderRadius: '16px',
+          border: '1px solid #f59e0b',
+          boxShadow: '0 6px 20px rgba(245, 158, 11, 0.15)',
+          textAlign: 'center'
+        }} className="appointment-card">
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⏳</div>
           <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#92400e'
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            color: '#92400e',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            margin: '0 0 8px 0'
           }}>Pending</h3>
           <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#92400e'
+            fontSize: '2.5rem',
+            fontWeight: '800',
+            color: '#92400e',
+            margin: '0'
           }}>
             {appointments.filter(a => a.status === 'pending').length}
           </p>
         </div>
+        
         <div style={{
-          backgroundColor: '#dcfce7',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
+          background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+          padding: '24px',
+          borderRadius: '16px',
+          border: '1px solid #16a34a',
+          boxShadow: '0 6px 20px rgba(34, 197, 94, 0.15)',
+          textAlign: 'center'
+        }} className="appointment-card">
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✅</div>
           <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#166534'
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            color: '#166534',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            margin: '0 0 8px 0'
           }}>Confirmed</h3>
           <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#166534'
+            fontSize: '2.5rem',
+            fontWeight: '800',
+            color: '#166534',
+            margin: '0'
           }}>
             {appointments.filter(a => a.status === 'confirmed').length}
           </p>
         </div>
+        
         <div style={{
-          backgroundColor: '#fee2e2',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
+          background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+          padding: '24px',
+          borderRadius: '16px',
+          border: '1px solid #dc2626',
+          boxShadow: '0 6px 20px rgba(220, 38, 38, 0.15)',
+          textAlign: 'center'
+        }} className="appointment-card">
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>❌</div>
           <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#991b1b'
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            color: '#991b1b',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            margin: '0 0 8px 0'
           }}>Cancelled</h3>
           <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#991b1b'
+            fontSize: '2.5rem',
+            fontWeight: '800',
+            color: '#991b1b',
+            margin: '0'
           }}>
             {appointments.filter(a => a.status === 'cancelled').length}
           </p>
         </div>
       </div>
 
-      {/* Appointments Table */}
-      {filteredAndSortedAppointments.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '32px 0'
-        }}>
-          <p style={{ color: '#6b7280' }}>
-            {filterStatus === 'all' 
-              ? 'No appointments found.' 
-              : `No ${filterStatus} appointments found.`
-            }
-          </p>
-        </div>
-      ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse'
+      {/* Enhanced Appointments Table */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '20px',
+        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
+        padding: '0',
+        border: '1px solid #f1f5f9',
+        overflow: 'hidden'
+      }} className="appointment-card">
+        {filteredAndSortedAppointments.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '64px 32px',
+            color: '#64748b'
           }}>
-            <thead>
-              <tr style={{
-                borderBottom: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb'
+            <div style={{ fontSize: '4rem', marginBottom: '16px', opacity: '0.5' }}>📅</div>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '8px',
+              color: '#475569'
+            }}>
+              {filterStatus === 'all' ? 'No appointments found' : `No ${filterStatus} appointments found`}
+            </h3>
+            <p style={{ fontSize: '1rem', opacity: '0.8' }}>
+              {filterStatus === 'all' 
+                ? 'Start by creating your first appointment or check your filters.' 
+                : `Try changing the filter to see other appointments.`
+              }
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table */}
+            <div className="desktop-table" style={{ overflowX: 'auto' }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse'
               }}>
-                <th style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  fontWeight: '600'
-                }}>Customer</th>
-                <th style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  fontWeight: '600'
-                }}>Service</th>
-                <th style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  fontWeight: '600'
-                }}>Staff</th>
-                <th style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  fontWeight: '600'
-                }}>Date & Time</th>
-                <th style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  fontWeight: '600'
-                }}>Total</th>
-                <th style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  fontWeight: '600'
-                }}>Status</th>
-                <th style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  fontWeight: '600'
-                }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredAndSortedAppointments.map((appointment) => (
-                <tr key={appointment.id} style={{
-                  borderBottom: '1px solid #e5e7eb'
+                <thead>
+                <tr style={{
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                  borderBottom: '2px solid #e2e8f0'
                 }}>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div>
-                      <p style={{ fontWeight: '500' }}>{appointment.customer_name}</p>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280'
-                      }}>{appointment.customer_email}</p>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280'
-                      }}>{appointment.customer_phone}</p>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        backgroundColor: appointment.user_id ? '#dcfce7' : '#fef3c7',
-                        color: appointment.user_id ? '#166534' : '#92400e',
-                        fontWeight: '500'
-                      }}>
-                        {appointment.user_id ? '👤 Registered' : '👥 Guest'}
-                      </span>
-                      {appointment.user?.full_name && (
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>👤 Customer</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>✨ Service</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>👥 Staff</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>📅 Date & Time</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>💰 Total</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>📊 Status</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>⚡ Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredAndSortedAppointments.map((appointment, index) => (
+                  <tr key={appointment.id} style={{
+                    borderBottom: '1px solid #f1f5f9',
+                    backgroundColor: index % 2 === 0 ? 'white' : '#fafbfc'
+                  }} className="table-row">
+                    <td style={{ padding: '24px' }}>
+                      <div>
+                        <p style={{ 
+                          fontWeight: '600',
+                          fontSize: '1.1rem',
+                          color: '#1e293b',
+                          margin: '0 0 4px 0'
+                        }}>{appointment.customer_name}</p>
                         <p style={{
-                          fontSize: '0.75rem',
-                          color: '#2563eb'
-                        }}>Account: {appointment.user.full_name}</p>
-                      )}
-                    </div>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div>
-                      <p style={{ fontWeight: '500' }}>{appointment.service?.name}</p>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280'
-                      }}>
-                        {appointment.service?.price}Ks • {appointment.service?.duration} min
-                      </p>
-                      {appointment.appointment_products && appointment.appointment_products.length > 0 && (
-                        <div style={{
-                          fontSize: '0.75rem',
-                          color: '#6b7280',
-                          marginTop: '4px'
+                          fontSize: '0.9rem',
+                          color: '#64748b',
+                          margin: '0 0 2px 0'
+                        }}>📧 {appointment.customer_email}</p>
+                        <p style={{
+                          fontSize: '0.9rem',
+                          color: '#64748b',
+                          margin: '0 0 8px 0'
+                        }}>📞 {appointment.customer_phone}</p>
+                        <span style={{
+                          fontSize: '0.8rem',
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          backgroundColor: appointment.user_id ? '#dcfce7' : '#fef3c7',
+                          color: appointment.user_id ? '#166534' : '#92400e',
+                          fontWeight: '600',
+                          border: appointment.user_id ? '1px solid #16a34a' : '1px solid #f59e0b'
                         }}>
-                          <p>Add-ons:</p>
-                          {appointment.appointment_products.map((ap) => (
-                            <p key={ap.id}>
-                              {ap.product.name} x{ap.quantity} ({ap.product.price * ap.quantity}Ks)
-                            </p>
-                          ))}
+                          {appointment.user_id ? '👤 Registered User' : '👥 Guest Booking'}
+                        </span>
+                        {appointment.user?.full_name && (
+                          <p style={{
+                            fontSize: '0.8rem',
+                            color: '#3b82f6',
+                            margin: '4px 0 0 0',
+                            fontWeight: '500'
+                          }}>🔗 Account: {appointment.user.full_name}</p>
+                        )}
+                      </div>
+                    </td>
+                    <td style={{ padding: '24px' }}>
+                      <div>
+                        <p style={{ 
+                          fontWeight: '600',
+                          fontSize: '1.1rem',
+                          color: '#1e293b',
+                          margin: '0 0 4px 0'
+                        }}>💅 {appointment.service?.name}</p>
+                        <p style={{
+                          fontSize: '0.9rem',
+                          color: '#64748b',
+                          margin: '0 0 8px 0'
+                        }}>
+                          💰 {appointment.service?.price}Ks • ⏱️ {appointment.service?.duration} min
+                        </p>
+                        {appointment.appointment_products && appointment.appointment_products.length > 0 && (
+                          <div style={{
+                            fontSize: '0.8rem',
+                            color: '#6b7280',
+                            marginTop: '8px',
+                            padding: '8px 12px',
+                            backgroundColor: '#f8fafc',
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0'
+                          }}>
+                            <p style={{ fontWeight: '600', margin: '0 0 4px 0' }}>🛍️ Add-ons:</p>
+                            {appointment.appointment_products.map((ap) => (
+                              <p key={ap.id} style={{ margin: '2px 0' }}>
+                                • {ap.product.name} ×{ap.quantity} ({(ap.product.price * ap.quantity).toLocaleString()}Ks)
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td style={{ padding: '24px' }}>
+                      <select
+                        value={appointment.staff_id || ''}
+                        onChange={(e) => updateAppointmentStaff(
+                          appointment.id, 
+                          e.target.value || null
+                        )}
+                        disabled={updatingStaff === appointment.id}
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          borderRadius: '12px',
+                          fontSize: '0.9rem',
+                          border: '2px solid #e2e8f0',
+                          cursor: updatingStaff === appointment.id ? 'not-allowed' : 'pointer',
+                          opacity: updatingStaff === appointment.id ? 0.5 : 1,
+                          backgroundColor: 'white',
+                          color: '#1e293b',
+                          fontWeight: '500'
+                        }}
+                        className="filter-select"
+                      >
+                        <option value="">👤 No Staff Assigned</option>
+                        {staff.map((staffMember) => (
+                          <option key={staffMember.id} value={staffMember.id}>
+                            👨‍💼 {staffMember.full_name}
+                          </option>
+                        ))}
+                      </select>
+                      {appointment.staff && (
+                        <p style={{
+                          fontSize: '0.8rem',
+                          color: '#10b981',
+                          margin: '6px 0 0 0',
+                          fontWeight: '600'
+                        }}>
+                          ✅ Staff Assigned
+                        </p>
+                      )}
+                    </td>
+                    <td style={{ padding: '24px' }}>
+                      <div>
+                        <p style={{ 
+                          fontWeight: '600',
+                          fontSize: '1.1rem',
+                          color: '#1e293b',
+                          margin: '0 0 4px 0'
+                        }}>
+                          📅 {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
+                        </p>
+                        <p style={{
+                          fontSize: '0.95rem',
+                          color: '#3b82f6',
+                          margin: '0 0 8px 0',
+                          fontWeight: '600'
+                        }}>🕐 {appointment.appointment_time}</p>
+                        <p style={{
+                          fontSize: '0.8rem',
+                          color: '#94a3b8',
+                          margin: '0'
+                        }}>
+                          ➕ Created: {format(new Date(appointment.created_at), 'MMM d, h:mm a')}
+                        </p>
+                      </div>
+                    </td>
+                    <td style={{ padding: '24px' }}>
+                      <p style={{ 
+                        fontWeight: '700',
+                        fontSize: '1.2rem',
+                        color: '#059669',
+                        margin: '0'
+                      }}>💰 {calculateTotal(appointment).toLocaleString()}Ks</p>
+                    </td>
+                    <td style={{ padding: '24px' }}>
+                      <select
+                        value={appointment.status}
+                        onChange={(e) => updateAppointmentStatus(
+                          appointment.id, 
+                          e.target.value as 'pending' | 'confirmed' | 'cancelled'
+                        )}
+                        disabled={updatingStatus === appointment.id}
+                        style={{
+                          padding: '8px 16px',
+                          borderRadius: '12px',
+                          fontSize: '0.9rem',
+                          fontWeight: '600',
+                          cursor: updatingStatus === appointment.id ? 'not-allowed' : 'pointer',
+                          opacity: updatingStatus === appointment.id ? 0.5 : 1,
+                          minWidth: '120px',
+                          ...getStatusColor(appointment.status)
+                        }}
+                        className="status-select"
+                      >
+                        <option value="pending">⏳ Pending</option>
+                        <option value="confirmed">✅ Confirmed</option>
+                        <option value="cancelled">❌ Cancelled</option>
+                      </select>
+                    </td>
+                    <td style={{ padding: '24px' }}>
+                      <button
+                        onClick={() => deleteAppointment(appointment.id)}
+                        style={{
+                          background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+                          color: '#dc2626',
+                          border: '1px solid #dc2626',
+                          borderRadius: '8px',
+                          padding: '8px 16px',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem',
+                          fontWeight: '600'
+                        }}
+                        className="action-button"
+                      >
+                        🗑️ Delete
+                      </button>
+                      {appointment.notes && (
+                        <div style={{
+                          marginTop: '8px',
+                          padding: '8px 12px',
+                          backgroundColor: '#fffbeb',
+                          borderRadius: '8px',
+                          border: '1px solid #fbbf24'
+                        }}>
+                          <p style={{
+                            fontSize: '0.8rem',
+                            color: '#92400e',
+                            margin: '0',
+                            fontStyle: 'italic',
+                            fontWeight: '500'
+                          }}>
+                            📝 Note: {appointment.notes}
+                          </p>
                         </div>
                       )}
-                    </div>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <select
-                      value={appointment.staff_id || ''}
-                      onChange={(e) => updateAppointmentStaff(
-                        appointment.id, 
-                        e.target.value || null
-                      )}
-                      disabled={updatingStaff === appointment.id}
-                      style={{
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        fontSize: '0.875rem',
-                        border: '1px solid #d1d5db',
-                        cursor: updatingStaff === appointment.id ? 'not-allowed' : 'pointer',
-                        opacity: updatingStaff === appointment.id ? 0.5 : 1,
-                        backgroundColor: 'white',
-                        minWidth: '150px'
-                      }}
-                    >
-                      <option value="">No Staff Assigned</option>
-                      {staff.map((staffMember) => (
-                        <option key={staffMember.id} value={staffMember.id}>
-                          {staffMember.full_name}
-                        </option>
-                      ))}
-                    </select>
-                    {appointment.staff && (
-                      <p style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginTop: '4px'
-                      }}>
-                        Assigned
-                      </p>
-                    )}
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div>
-                      <p style={{ fontWeight: '500' }}>
-                        {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
-                      </p>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280'
-                      }}>{appointment.appointment_time}</p>
-                      <p style={{
-                        fontSize: '0.75rem',
-                        color: '#9ca3af'
-                      }}>
-                        Created: {format(new Date(appointment.created_at), 'MMM d, h:mm a')}
-                      </p>
-                    </div>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <p style={{ fontWeight: '500' }}>{calculateTotal(appointment).toFixed(2)}Ks</p>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
+                    </td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Mobile Cards */}
+            <div className="mobile-table">
+              {filteredAndSortedAppointments.map((appointment) => (
+                <div key={appointment.id} className="mobile-card">
+                  <div style={{ marginBottom: '16px' }}>
+                    <h3 style={{ 
+                      fontWeight: '600',
+                      fontSize: '1.1rem',
+                      color: '#1e293b',
+                      margin: '0 0 8px 0'
+                    }}>{appointment.customer_name}</h3>
+                    <p style={{ fontSize: '0.9rem', color: '#64748b', margin: '4px 0' }}>
+                      📧 {appointment.customer_email}
+                    </p>
+                    <p style={{ fontSize: '0.9rem', color: '#64748b', margin: '4px 0' }}>
+                      📞 {appointment.customer_phone}
+                    </p>
+                  </div>
+                  
+                  <div style={{
+                    borderTop: '1px solid #e2e8f0',
+                    paddingTop: '16px',
+                    marginBottom: '16px'
+                  }}>
+                    <p style={{ fontWeight: '600', marginBottom: '8px' }}>
+                      💅 {appointment.service?.name}
+                    </p>
+                    <p style={{ fontSize: '0.9rem', color: '#64748b' }}>
+                      💰 {appointment.service?.price}Ks • ⏱️ {appointment.service?.duration} min
+                    </p>
+                  </div>
+                  
+                  <div style={{
+                    borderTop: '1px solid #e2e8f0',
+                    paddingTop: '16px',
+                    marginBottom: '16px'
+                  }}>
+                    <p style={{ fontWeight: '600', marginBottom: '8px' }}>
+                      📅 {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
+                    </p>
+                    <p style={{ fontSize: '0.95rem', color: '#3b82f6', fontWeight: '600' }}>
+                      🕐 {appointment.appointment_time}
+                    </p>
+                  </div>
+                  
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '12px', 
+                    marginBottom: '16px',
+                    flexWrap: 'wrap'
+                  }}>
                     <select
                       value={appointment.status}
                       onChange={(e) => updateAppointmentStatus(
@@ -740,53 +1169,93 @@ const loadAppointments = async () => {
                       )}
                       disabled={updatingStatus === appointment.id}
                       style={{
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        border: 'none',
-                        cursor: updatingStatus === appointment.id ? 'not-allowed' : 'pointer',
-                        opacity: updatingStatus === appointment.id ? 0.5 : 1,
+                        padding: '8px 16px',
+                        borderRadius: '12px',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        flex: '1',
+                        minWidth: '120px',
                         ...getStatusColor(appointment.status)
                       }}
                     >
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="cancelled">Cancelled</option>
+                      <option value="pending">⏳ Pending</option>
+                      <option value="confirmed">✅ Confirmed</option>
+                      <option value="cancelled">❌ Cancelled</option>
                     </select>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        onClick={() => deleteAppointment(appointment.id)}
-                        style={{
-                          color: '#dc2626',
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontSize: '0.875rem'
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                    {appointment.notes && (
-                      <p style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginTop: '4px',
-                        fontStyle: 'italic'
-                      }}>
-                        Note: {appointment.notes}
-                      </p>
-                    )}
-                  </td>
-                </tr>
+                    
+                    <button
+                      onClick={() => deleteAppointment(appointment.id)}
+                      style={{
+                        background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+                        color: '#dc2626',
+                        border: '1px solid #dc2626',
+                        borderRadius: '8px',
+                        padding: '8px 16px',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem',
+                        fontWeight: '600'
+                      }}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                  
+                  <div style={{
+                    borderTop: '1px solid #e2e8f0',
+                    paddingTop: '16px'
+                  }}>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      marginBottom: '8px'
+                    }}>Assign Staff:</label>
+                    <select
+                      value={appointment.staff_id || ''}
+                      onChange={(e) => updateAppointmentStaff(
+                        appointment.id, 
+                        e.target.value || null
+                      )}
+                      disabled={updatingStaff === appointment.id}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        fontSize: '0.9rem',
+                        border: '2px solid #e2e8f0'
+                      }}
+                    >
+                      <option value="">👤 No Staff Assigned</option>
+                      {staff.map((staffMember) => (
+                        <option key={staffMember.id} value={staffMember.id}>
+                          👨‍💼 {staffMember.full_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div style={{
+                    marginTop: '16px',
+                    padding: '12px',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <p style={{ 
+                      fontWeight: '700',
+                      fontSize: '1.1rem',
+                      color: '#059669',
+                      margin: '0'
+                    }}>
+                      Total: 💰 {calculateTotal(appointment).toLocaleString()}Ks
+                    </p>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
