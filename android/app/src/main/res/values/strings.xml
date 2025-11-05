@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pandora Beauty Salon</string>
+    <string name="title_activity_main">Pandora Beauty Salon</string>
+    <string name="package_name">com.pandora.booking</string>
+    <string name="custom_url_scheme">com.pandora.booking</string>
+</resources>

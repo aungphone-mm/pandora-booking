@@ -1,9 +1,9 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 
-const inter = Inter({ subsets: ['latin'] })
+// Removed Google Fonts for mobile build compatibility
+// Using system fonts instead
 
 export const metadata = {
   title: 'Pandora Beauty Salon',
@@ -58,7 +58,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'}}>
         <header style={{
           backgroundColor: '#ec4899',
           color: 'white'
