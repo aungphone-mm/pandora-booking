@@ -1,19 +1,31 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-
-const inter = Inter({ subsets: ['latin'] })
+import InstallPWA from '@/components/InstallPWA'
 
 export const metadata = {
   title: 'Pandora Beauty Salon',
   description: 'Book your beauty appointment at Pandora Salon',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Pandora Salon',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: '/icons/icon-192x192.png',
+    apple: '/icons/icon-192x192.png',
+  },
 }
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  themeColor: '#8b5cf6',
 }
 
 async function getUser() {
@@ -58,7 +70,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
         <header style={{
           backgroundColor: '#ec4899',
           color: 'white'
@@ -191,6 +203,7 @@ export default async function RootLayout({
         }}>
           {children}
         </main>
+        <InstallPWA />
       </body>
     </html>
   )
