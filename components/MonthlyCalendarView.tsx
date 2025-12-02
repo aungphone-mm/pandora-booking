@@ -13,7 +13,7 @@ type Appointment = {
   service: {
     name: string
     price: number
-  }
+  } | null
 }
 
 export default function MonthlyCalendarView() {
@@ -52,7 +52,13 @@ export default function MonthlyCalendarView() {
 
       if (fetchError) throw fetchError
 
-      setAppointments(data || [])
+      // Transform data: Supabase returns service as array, unwrap it
+      const transformedData = (data || []).map((apt: any) => ({
+        ...apt,
+        service: Array.isArray(apt.service) ? apt.service[0] : apt.service
+      }))
+
+      setAppointments(transformedData)
     } catch (err: any) {
       console.error('Error loading appointments:', err)
       setError(err.message || 'Failed to load appointments')
@@ -460,7 +466,7 @@ export default function MonthlyCalendarView() {
                         color: '#64748b',
                         margin: '0'
                       }}>
-                        💅 {apt.service.name}
+                        💅 {apt.service?.name || 'Service N/A'}
                       </p>
                     </div>
                     <span style={{
@@ -483,7 +489,7 @@ export default function MonthlyCalendarView() {
                     color: '#475569'
                   }}>
                     <span>🕐 {apt.appointment_time}</span>
-                    <span>💰 {apt.service.price.toLocaleString()}Ks</span>
+                    <span>💰 {apt.service?.price?.toLocaleString() || '0'}Ks</span>
                   </div>
                 </div>
               ))}
