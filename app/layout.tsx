@@ -2,6 +2,7 @@ import './globals.css'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import InstallPWA from '@/components/InstallPWA'
+import SessionTrackingProvider from '@/components/SessionTrackingProvider'
 
 export const metadata = {
   title: 'Pandora Beauty Salon',
@@ -201,7 +202,9 @@ export default async function RootLayout({
           minHeight: '100vh',
           backgroundColor: '#f9fafb'
         }}>
-          {children}
+          <SessionTrackingProvider>
+            {children}
+          </SessionTrackingProvider>
         </main>
         <InstallPWA />
       </body>
