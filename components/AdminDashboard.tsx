@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
+import MonthlyCalendarView from './MonthlyCalendarView'
 
 type DashboardStats = {
   totalAppointments: number
@@ -1012,6 +1013,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Monthly Calendar View - Full Width */}
+      <MonthlyCalendarView />
+
       {/* Enhanced Two Column Layout - Mobile Responsive */}
       <div style={{
         display: 'grid',
@@ -1044,24 +1048,24 @@ export default function AdminDashboard() {
               color: '#1e293b'
             }}>Recent Appointments</h3>
           </div>
-          
+
           {recentAppointments.length === 0 ? (
             <div style={{
               textAlign: 'center',
               padding: '48px 0',
               color: '#64748b'
             }}>
-              <div style={{ 
-                fontSize: '3rem', 
+              <div style={{
+                fontSize: '3rem',
                 marginBottom: '16px',
                 filter: 'grayscale(0.3)'
               }}>📅</div>
-              <p style={{ 
+              <p style={{
                 fontSize: '1.1rem',
                 fontWeight: '500',
                 margin: '0'
               }}>No appointments yet</p>
-              <p style={{ 
+              <p style={{
                 fontSize: '0.9rem',
                 margin: '8px 0 0 0',
                 opacity: '0.7'
@@ -1076,7 +1080,7 @@ export default function AdminDashboard() {
                   backgroundColor: '#f8fafc',
                   border: '1px solid #e2e8f0',
                   position: 'relative'
-                }} className="appointment-item slide-in" 
+                }} className="appointment-item slide-in"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#f1f5f9'
                 }}
@@ -1089,7 +1093,7 @@ export default function AdminDashboard() {
                     alignItems: 'flex-start',
                     marginBottom: '8px'
                   }}>
-                    <span style={{ 
+                    <span style={{
                       fontWeight: '600',
                       fontSize: '1.1rem',
                       color: '#1e293b'
