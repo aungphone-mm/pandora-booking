@@ -556,8 +556,127 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
             <div style={{
               padding: '32px'
             }}>
-              
-              {/* Personal Information Section */}
+
+              {/* Service Selection - MOVED TO FIRST */}
+              <section style={{ marginBottom: '40px' }}>
+                <div style={{
+                  borderBottom: '1px solid #e5e7eb',
+                  paddingBottom: '16px',
+                  marginBottom: '24px'
+                }}>
+                  <h2 style={{
+                    fontSize: '1.5rem',
+                    fontWeight: '600',
+                    color: '#111827'
+                  }}>Choose Your Service</h2>
+                  <p style={{
+                    color: '#6b7280',
+                    marginTop: '4px'
+                  }}>Select the service you'd like to book</p>
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
+                  {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
+                    <div key={category} style={{ marginBottom: '32px' }}>
+                      <h3 style={{
+                        fontSize: '1.25rem',
+                        fontWeight: '600',
+                        color: '#111827',
+                        marginBottom: '20px',
+                        paddingBottom: '8px',
+                        borderBottom: '2px solid #ec4899'
+                      }}>{category}</h3>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                        gap: '20px'
+                      }}>
+                        {categoryServices.map(service => service && (
+                          <label key={service.id} style={{ cursor: 'pointer' }}>
+                            <input
+                              type="radio"
+                              {...register('serviceId', { required: 'Please select a service' })}
+                              value={service.id}
+                              style={{ display: 'none' }}
+                            />
+                            <div style={{
+                              padding: '24px',
+                              border: selectedServiceId === service.id
+                                ? '3px solid #ec4899'
+                                : '2px solid #e5e7eb',
+                              borderRadius: '12px',
+                              backgroundColor: selectedServiceId === service.id
+                                ? '#fdf2f8'
+                                : 'white',
+                              boxShadow: selectedServiceId === service.id
+                                ? '0 8px 25px rgba(236, 72, 153, 0.15)'
+                                : '0 4px 6px rgba(0, 0, 0, 0.05)',
+                              transform: selectedServiceId === service.id ? 'translateY(-2px)' : 'none',
+                              transition: 'all 0.2s ease'
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                marginBottom: '12px'
+                              }}>
+                                <h4 style={{
+                                  fontWeight: '700',
+                                  color: '#111827',
+                                  fontSize: '1.125rem',
+                                  marginBottom: '4px'
+                                }}>{service.name}</h4>
+                                <div style={{
+                                  backgroundColor: selectedServiceId === service.id ? '#ec4899' : '#f3f4f6',
+                                  color: selectedServiceId === service.id ? 'white' : '#111827',
+                                  padding: '8px 12px',
+                                  borderRadius: '20px',
+                                  fontSize: '1.25rem',
+                                  fontWeight: 'bold',
+                                  minWidth: '80px',
+                                  textAlign: 'center'
+                                }}>{service.price}Ks</div>
+                              </div>
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                color: '#6b7280',
+                                fontSize: '0.95rem'
+                              }}>
+                                <span>⏱️</span>
+                                <span>{service.duration} minutes</span>
+                              </div>
+                              {selectedServiceId === service.id && (
+                                <div style={{
+                                  marginTop: '12px',
+                                  padding: '8px',
+                                  backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                                  borderRadius: '6px',
+                                  fontSize: '0.875rem',
+                                  color: '#be185d',
+                                  fontWeight: '500'
+                                }}>
+                                  ✓ Selected
+                                </div>
+                              )}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {errors.serviceId && (
+                    <p style={{
+                      color: '#dc2626',
+                      fontSize: '0.875rem',
+                      marginTop: '8px'
+                    }}>{errors.serviceId.message}</p>
+                  )}
+                </div>
+              </section>
+
+              {/* Personal Information Section - MOVED TO SECOND */}
               <section style={{ marginBottom: '40px' }}>
                 <div style={{
                   borderBottom: '1px solid #e5e7eb',
@@ -681,127 +800,6 @@ export default function SinglePageBookingForm({ user }: { user: any }) {
                   </div>
                 </div>
               </section>
-
-              {/* Service Selection */}
-              <section style={{ marginBottom: '40px' }}>
-                <div style={{
-                  borderBottom: '1px solid #e5e7eb',
-                  paddingBottom: '16px',
-                  marginBottom: '24px'
-                }}>
-                  <h2 style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '600',
-                    color: '#111827'
-                  }}>Choose Your Service</h2>
-                  <p style={{
-                    color: '#6b7280',
-                    marginTop: '4px'
-                  }}>Select the service you'd like to book</p>
-                </div>
-
-                <div style={{ marginBottom: '24px' }}>
-                  {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
-                    <div key={category} style={{ marginBottom: '32px' }}>
-                      <h3 style={{
-                        fontSize: '1.25rem',
-                        fontWeight: '600',
-                        color: '#111827',
-                        marginBottom: '20px',
-                        paddingBottom: '8px',
-                        borderBottom: '2px solid #ec4899'
-                      }}>{category}</h3>
-                      <div style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                        gap: '20px' 
-                      }}>
-                        {categoryServices.map(service => service && (
-                          <label key={service.id} style={{ cursor: 'pointer' }}>
-                            <input
-                              type="radio"
-                              {...register('serviceId', { required: 'Please select a service' })}
-                              value={service.id}
-                              style={{ display: 'none' }}
-                            />
-                            <div style={{
-                              padding: '24px',
-                              border: selectedServiceId === service.id 
-                                ? '3px solid #ec4899' 
-                                : '2px solid #e5e7eb',
-                              borderRadius: '12px',
-                              backgroundColor: selectedServiceId === service.id 
-                                ? '#fdf2f8' 
-                                : 'white',
-                              boxShadow: selectedServiceId === service.id 
-                                ? '0 8px 25px rgba(236, 72, 153, 0.15)' 
-                                : '0 4px 6px rgba(0, 0, 0, 0.05)',
-                              transform: selectedServiceId === service.id ? 'translateY(-2px)' : 'none',
-                              transition: 'all 0.2s ease'
-                            }}>
-                              <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'flex-start',
-                                marginBottom: '12px'
-                              }}>
-                                <h4 style={{
-                                  fontWeight: '700',
-                                  color: '#111827',
-                                  fontSize: '1.125rem',
-                                  marginBottom: '4px'
-                                }}>{service.name}</h4>
-                                <div style={{
-                                  backgroundColor: selectedServiceId === service.id ? '#ec4899' : '#f3f4f6',
-                                  color: selectedServiceId === service.id ? 'white' : '#111827',
-                                  padding: '8px 12px',
-                                  borderRadius: '20px',
-                                  fontSize: '1.25rem',
-                                  fontWeight: 'bold',
-                                  minWidth: '80px',
-                                  textAlign: 'center'
-                                }}>{service.price}Ks</div>
-                              </div>
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                color: '#6b7280',
-                                fontSize: '0.95rem'
-                              }}>
-                                <span>⏱️</span>
-                                <span>{service.duration} minutes</span>
-                              </div>
-                              {selectedServiceId === service.id && (
-                                <div style={{
-                                  marginTop: '12px',
-                                  padding: '8px',
-                                  backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                                  borderRadius: '6px',
-                                  fontSize: '0.875rem',
-                                  color: '#be185d',
-                                  fontWeight: '500'
-                                }}>
-                                  ✓ Selected
-                                </div>
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                  {errors.serviceId && (
-                    <p style={{
-                      color: '#dc2626',
-                      fontSize: '0.875rem',
-                      marginTop: '8px'
-                    }}>{errors.serviceId.message}</p>
-                  )}
-                </div>
-              </section>
-
-              
 
               {/* Date & Time Selection */}
               <section style={{ marginBottom: '40px' }}>
