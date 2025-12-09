@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import SinglePageBookingForm from '@/components/SinglePageBookingForm'
+import Link from 'next/link'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -17,8 +18,8 @@ export default async function BookingPage() {
           margin: '0 auto',
           padding: '16px'
         }}>
-          <a 
-            href="/" 
+          <a
+            href="/"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -32,10 +33,10 @@ export default async function BookingPage() {
           </a>
         </div>
       </div>
-      
+
       {/* Single Page Booking Form */}
       <SinglePageBookingForm user={user} />
-      
+
       {/* Contact Information */}
       <div style={{
         backgroundColor: '#f9fafb',
@@ -71,8 +72,8 @@ export default async function BookingPage() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
               gap: '24px'
             }}>
-              <a 
-                href="tel:+1234567890" 
+              <a
+                href="tel:+1234567890"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -87,8 +88,8 @@ export default async function BookingPage() {
               >
                 Call (123) 456-7890
               </a>
-              <a 
-                href="mailto:info@pandorabeauty.com" 
+              <a
+                href="mailto:info@pandorabeauty.com"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -107,6 +108,129 @@ export default async function BookingPage() {
           </div>
         </div>
       </div>
+
+      {/* Get More with a Free Account - Only show for non-logged-in users */}
+      {!user && (
+        <div style={{
+          backgroundColor: '#f9fafb',
+          padding: '0 0 48px 0'
+        }}>
+          <div style={{
+            maxWidth: '1024px',
+            margin: '0 auto',
+            padding: '0 16px'
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '20px',
+                color: 'white',
+                position: 'relative'
+              }}>
+                <h3 style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '600',
+                  marginBottom: '8px'
+                }}>
+                  💫 Get More with a Free Account!
+                </h3>
+                <p style={{
+                  opacity: 0.9,
+                  fontSize: '0.9rem',
+                  lineHeight: '1.5'
+                }}>
+                  You're booking as a guest. Create a free account to unlock exclusive benefits!
+                </p>
+              </div>
+              <div style={{ padding: '20px' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📅</div>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+                      Appointment History
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                      View & manage all bookings
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📧</div>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+                      Email Confirmations
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                      Automatic booking updates
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⚡</div>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+                      Quick Rebooking
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                      One-click repeat visits
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🎁</div>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+                      Member Perks
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                      Exclusive offers & discounts
+                    </p>
+                  </div>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap'
+                }}>
+                  <Link
+                    href="/auth/register"
+                    style={{
+                      backgroundColor: '#ec4899',
+                      color: 'white',
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      fontWeight: '600',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Create Free Account
+                  </Link>
+                  <Link
+                    href="/auth/login"
+                    style={{
+                      backgroundColor: '#6b7280',
+                      color: 'white',
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      fontWeight: '600',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Login
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

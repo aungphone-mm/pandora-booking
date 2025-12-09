@@ -4,6 +4,9 @@ import Link from 'next/link'
 import InstallPWA from '@/components/InstallPWA'
 import SessionTrackingProvider from '@/components/SessionTrackingProvider'
 
+// Force dynamic rendering since we use cookies for auth
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Pandora Beauty Salon',
   description: 'Book your beauty appointment at Pandora Salon',
