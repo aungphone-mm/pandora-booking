@@ -34,10 +34,64 @@ export default function SessionAnalyticsDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [timeframe, setTimeframe] = useState<'today' | '7days' | '30days' | 'all'>('7days')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(20)
+  const [groupSessions, setGroupSessions] = useState(false)
 
   useEffect(() => {
     loadSessionData()
+    setCurrentPage(1) // Reset to first page when timeframe changes
   }, [timeframe])
+
+  // Group sessions by identical data
+  const getGroupedSessions = () => {
+    if (!groupSessions) return sessions
+
+    const grouped = new Map<string, {
+      session: Session
+      count: number
+      users: Set<string>
+      latestDate: string
+    }>()
+
+    sessions.forEach(session => {
+      // Create a key based on matching fields
+      const key = `${session.device_type}|${session.device_model}|${session.browser_name}|${session.os_name}|${session.timezone}`
+
+      if (grouped.has(key)) {
+        const existing = grouped.get(key)!
+        existing.count++
+        if (session.user_name || session.user_email) {
+          existing.users.add(session.user_name || session.user_email || 'Guest')
+        }
+        // Keep the latest date
+        if (new Date(session.created_at) > new Date(existing.latestDate)) {
+          existing.latestDate = session.created_at
+        }
+      } else {
+        const users = new Set<string>()
+        if (session.user_name || session.user_email) {
+          users.add(session.user_name || session.user_email || 'Guest')
+        }
+        grouped.set(key, {
+          session,
+          count: 1,
+          users,
+          latestDate: session.created_at
+        })
+      }
+    })
+
+    // Convert back to array format
+    return Array.from(grouped.values()).map(group => ({
+      ...group.session,
+      sessionCount: group.count,
+      usersList: Array.from(group.users),
+      created_at: group.latestDate
+    }))
+  }
+
+  const displaySessions = getGroupedSessions()
 
   const getTimeframeDate = () => {
     const now = new Date()
@@ -420,19 +474,53 @@ export default function SessionAnalyticsDashboard() {
             padding: '32px',
             border: '1px solid #f1f5f9'
           }}>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              margin: '0 0 20px 0',
-              color: '#1e293b'
-            }}>📋 Recent Sessions</h3>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              flexWrap: 'wrap',
+              gap: '16px'
+            }}>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                margin: '0',
+                color: '#1e293b'
+              }}>📋 Recent Sessions</h3>
+
+              <button
+                onClick={() => {
+                  setGroupSessions(!groupSessions)
+                  setCurrentPage(1)
+                }}
+                style={{
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  border: '2px solid',
+                  borderColor: groupSessions ? '#ec4899' : '#e2e8f0',
+                  backgroundColor: groupSessions ? '#fdf2f8' : 'white',
+                  color: groupSessions ? '#ec4899' : '#64748b',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '0.95rem',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {groupSessions ? '✓ Grouped View' : '○ Group Similar Sessions'}
+              </button>
+            </div>
 
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                    {groupSessions && (
+                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Count</th>
+                    )}
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>User</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Device</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Phone/Device</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Browser</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>OS</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Location</th>
@@ -440,20 +528,49 @@ export default function SessionAnalyticsDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sessions.slice(0, 20).map((session, idx) => (
+                  {displaySessions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((session, idx) => (
                     <tr key={session.id} style={{
                       borderBottom: '1px solid #f1f5f9',
                       backgroundColor: idx % 2 === 0 ? 'white' : '#fafbfc'
                     }}>
+                      {groupSessions && (
+                        <td style={{ padding: '16px' }}>
+                          <div style={{
+                            display: 'inline-block',
+                            backgroundColor: '#ec4899',
+                            color: 'white',
+                            padding: '6px 12px',
+                            borderRadius: '20px',
+                            fontWeight: '700',
+                            fontSize: '1rem'
+                          }}>
+                            {(session as any).sessionCount}×
+                          </div>
+                        </td>
+                      )}
                       <td style={{ padding: '16px' }}>
                         <div>
-                          <p style={{ margin: '0', fontWeight: '600', color: '#1e293b' }}>
-                            {session.user_name || session.user_email || 'Guest'}
-                          </p>
-                          {session.user_id && (
-                            <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>
-                              🔐 Registered
-                            </p>
+                          {groupSessions && (session as any).usersList?.length > 0 ? (
+                            <>
+                              <p style={{ margin: '0', fontWeight: '600', color: '#1e293b' }}>
+                                {(session as any).usersList.length} user{(session as any).usersList.length > 1 ? 's' : ''}
+                              </p>
+                              <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                                {(session as any).usersList.slice(0, 2).join(', ')}
+                                {(session as any).usersList.length > 2 && ` +${(session as any).usersList.length - 2} more`}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ margin: '0', fontWeight: '600', color: '#1e293b' }}>
+                                {session.user_name || session.user_email || 'Guest'}
+                              </p>
+                              {session.user_id && (
+                                <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>
+                                  🔐 Registered
+                                </p>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>
@@ -469,6 +586,9 @@ export default function SessionAnalyticsDashboard() {
                           {session.device_type}
                         </span>
                       </td>
+                      <td style={{ padding: '16px', color: '#475569', fontWeight: '600' }}>
+                        {session.device_model || '-'}
+                      </td>
                       <td style={{ padding: '16px', color: '#475569' }}>{session.browser_name || 'Unknown'}</td>
                       <td style={{ padding: '16px', color: '#475569' }}>{session.os_name || 'Unknown'}</td>
                       <td style={{ padding: '16px', fontSize: '0.875rem', color: '#64748b' }}>
@@ -481,6 +601,125 @@ export default function SessionAnalyticsDashboard() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '24px',
+              flexWrap: 'wrap',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <label style={{ color: '#64748b', fontWeight: '600' }}>Rows per page:</label>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value))
+                    setCurrentPage(1)
+                  }}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: '2px solid #e2e8f0',
+                    backgroundColor: 'white',
+                    color: '#1e293b',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <span style={{ color: '#64748b', fontWeight: '600' }}>
+                  Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, displaySessions.length)} of {displaySessions.length}
+                  {groupSessions && ` (${sessions.length} total sessions)`}
+                </span>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '2px solid #e2e8f0',
+                      backgroundColor: currentPage === 1 ? '#f1f5f9' : 'white',
+                      color: currentPage === 1 ? '#94a3b8' : '#1e293b',
+                      fontWeight: '600',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    ⏮️ First
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '2px solid #e2e8f0',
+                      backgroundColor: currentPage === 1 ? '#f1f5f9' : 'white',
+                      color: currentPage === 1 ? '#94a3b8' : '#1e293b',
+                      fontWeight: '600',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    ◀️ Previous
+                  </button>
+
+                  <span style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: '2px solid #ec4899',
+                    backgroundColor: '#fdf2f8',
+                    color: '#ec4899',
+                    fontWeight: '700'
+                  }}>
+                    Page {currentPage} of {Math.ceil(displaySessions.length / itemsPerPage)}
+                  </span>
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(Math.ceil(displaySessions.length / itemsPerPage), prev + 1))}
+                    disabled={currentPage >= Math.ceil(displaySessions.length / itemsPerPage)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '2px solid #e2e8f0',
+                      backgroundColor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#f1f5f9' : 'white',
+                      color: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#94a3b8' : '#1e293b',
+                      fontWeight: '600',
+                      cursor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    Next ▶️
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPage(Math.ceil(displaySessions.length / itemsPerPage))}
+                    disabled={currentPage >= Math.ceil(displaySessions.length / itemsPerPage)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '2px solid #e2e8f0',
+                      backgroundColor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#f1f5f9' : 'white',
+                      color: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#94a3b8' : '#1e293b',
+                      fontWeight: '600',
+                      cursor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    Last ⏭️
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </>
