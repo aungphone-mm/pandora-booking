@@ -88,15 +88,172 @@ function parseOS(ua: string): { name: string; version: string } {
 }
 
 /**
- * Parse device model from user agent
+ * Detect specific iPhone model based on screen resolution and pixel ratio
  */
-function parseDevice(ua: string): string {
+function detectiPhoneModel(screenWidth: number, screenHeight: number, pixelRatio: number): string {
+  const width = Math.min(screenWidth, screenHeight)
+  const height = Math.max(screenWidth, screenHeight)
+
+  // iPhone models by screen specs (physical pixels)
+  const physicalWidth = width * pixelRatio
+  const physicalHeight = height * pixelRatio
+
+  // iPhone 15 Pro Max / 14 Pro Max / 13 Pro Max / 12 Pro Max
+  if (physicalWidth === 1290 && physicalHeight === 2796) return 'iPhone 15 Pro Max'
+  if (physicalWidth === 1284 && physicalHeight === 2778) return 'iPhone 14 Pro Max'
+
+  // iPhone 15 Pro / 15 / 14 Pro / 13 Pro / 12 Pro
+  if (physicalWidth === 1179 && physicalHeight === 2556) return 'iPhone 15 Pro'
+  if (physicalWidth === 1170 && physicalHeight === 2532) {
+    return 'iPhone 14 Pro/13 Pro/12 Pro'
+  }
+
+  // iPhone 15 Plus / 14 Plus
+  if (physicalWidth === 1284 && physicalHeight === 2778) return 'iPhone 15 Plus'
+
+  // iPhone 14 / 13 / 12 / 11
+  if (physicalWidth === 828 && physicalHeight === 1792) return 'iPhone 14/13/12/11'
+
+  // iPhone SE (3rd gen) / SE (2nd gen) / 8 / 7 / 6s
+  if (physicalWidth === 750 && physicalHeight === 1334) return 'iPhone SE/8/7/6s'
+
+  // iPhone 13 mini / 12 mini
+  if (physicalWidth === 1080 && physicalHeight === 2340) return 'iPhone 13/12 mini'
+
+  // iPhone 11 Pro Max / XS Max
+  if (physicalWidth === 1242 && physicalHeight === 2688) return 'iPhone 11 Pro Max/XS Max'
+
+  // iPhone X / XS / 11 Pro
+  if (physicalWidth === 1125 && physicalHeight === 2436) return 'iPhone X/XS/11 Pro'
+
+  // iPhone XR
+  if (physicalWidth === 828 && physicalHeight === 1792) return 'iPhone XR'
+
+  // iPhone Plus models (6+, 7+, 8+)
+  if (physicalWidth === 1080 && physicalHeight === 1920 ||
+      physicalWidth === 1242 && physicalHeight === 2208) return 'iPhone Plus (6/7/8)'
+
+  return 'iPhone (Unknown Model)'
+}
+
+/**
+ * Detect specific iPad model based on screen resolution
+ */
+function detectiPadModel(screenWidth: number, screenHeight: number, pixelRatio: number): string {
+  const width = Math.min(screenWidth, screenHeight)
+  const height = Math.max(screenWidth, screenHeight)
+
+  const physicalWidth = width * pixelRatio
+  const physicalHeight = height * pixelRatio
+
+  // iPad Pro 12.9" (all generations)
+  if (physicalWidth === 2048 && physicalHeight === 2732) return 'iPad Pro 12.9"'
+
+  // iPad Pro 11" / iPad Air (4th/5th gen)
+  if (physicalWidth === 1668 && physicalHeight === 2388) return 'iPad Pro 11"/Air'
+
+  // iPad Pro 10.5" / iPad Air (3rd gen)
+  if (physicalWidth === 1668 && physicalHeight === 2224) return 'iPad Pro 10.5"/Air'
+
+  // iPad (10th gen)
+  if (physicalWidth === 1640 && physicalHeight === 2360) return 'iPad (10th gen)'
+
+  // iPad (9th gen and earlier) / iPad mini
+  if (physicalWidth === 1536 && physicalHeight === 2048) return 'iPad/iPad mini'
+
+  return 'iPad (Unknown Model)'
+}
+
+/**
+ * Parse device model from user agent and screen specs
+ */
+function parseDevice(ua: string, screenWidth?: number, screenHeight?: number, pixelRatio?: number): string {
+  if (ua.includes('iPhone') && screenWidth && screenHeight && pixelRatio) {
+    return detectiPhoneModel(screenWidth, screenHeight, pixelRatio)
+  }
+
+  if (ua.includes('iPad') && screenWidth && screenHeight && pixelRatio) {
+    return detectiPadModel(screenWidth, screenHeight, pixelRatio)
+  }
+
   if (ua.includes('iPhone')) return 'iPhone'
   if (ua.includes('iPad')) return 'iPad'
+
   if (ua.includes('Android')) {
-    const match = ua.match(/Android.*;\s*([^;)]+)/)
-    return match ? match[1].trim() : 'Android Device'
+    // Try multiple patterns to extract device name
+    let deviceName = ''
+
+    // Samsung-specific detection (highest priority)
+    if (ua.includes('Samsung') || ua.includes('SM-')) {
+      // Try to find Samsung model number (SM-XXXX format)
+      const samsungMatch = ua.match(/SM-[A-Z0-9]+/i)
+      if (samsungMatch) {
+        deviceName = samsungMatch[0]
+      } else {
+        // Try alternative Samsung format
+        const samsungAlt = ua.match(/SAMSUNG[\s-]?([A-Z0-9-]+)/i)
+        if (samsungAlt) {
+          deviceName = `Samsung ${samsungAlt[1]}`
+        }
+      }
+    }
+
+    // Google Pixel detection
+    if (!deviceName && ua.includes('Pixel')) {
+      const pixelMatch = ua.match(/Pixel[\s]?([0-9]+[a-zA-Z]*)/i)
+      deviceName = pixelMatch ? `Pixel ${pixelMatch[1]}` : 'Google Pixel'
+    }
+
+    // OnePlus detection
+    if (!deviceName && ua.includes('OnePlus')) {
+      const onePlusMatch = ua.match(/OnePlus[\s]?([A-Z0-9]+)/i)
+      deviceName = onePlusMatch ? onePlusMatch[0] : 'OnePlus'
+    }
+
+    // Xiaomi/Redmi detection
+    if (!deviceName && (ua.includes('Xiaomi') || ua.includes('Redmi') || ua.includes('POCO'))) {
+      const xiaomiMatch = ua.match(/(Redmi|POCO|Mi)[\s]?([A-Z0-9\s]+)/i)
+      if (xiaomiMatch) {
+        deviceName = xiaomiMatch[0].trim()
+      }
+    }
+
+    // Pattern 1: Standard Android format (Android X.X; DeviceName)
+    if (!deviceName) {
+      const match1 = ua.match(/Android[^;]+;\s*([^;)]+)/)
+      if (match1) {
+        deviceName = match1[1].trim()
+      }
+    }
+
+    // Pattern 2: Build/MODEL format
+    if (!deviceName || deviceName.length <= 2) {
+      const match2 = ua.match(/Build\/([A-Z0-9]+)/)
+      if (match2) {
+        deviceName = match2[1]
+      }
+    }
+
+    // Pattern 3: Generic brand detection (last resort)
+    if (!deviceName || deviceName.length <= 2) {
+      if (ua.includes('Samsung')) deviceName = 'Samsung Device'
+      else if (ua.includes('Huawei')) deviceName = 'Huawei Device'
+      else if (ua.includes('Xiaomi')) deviceName = 'Xiaomi Device'
+      else if (ua.includes('OnePlus')) deviceName = 'OnePlus Device'
+      else if (ua.includes('OPPO')) deviceName = 'OPPO Device'
+      else if (ua.includes('Vivo')) deviceName = 'Vivo Device'
+      else if (ua.includes('Pixel')) deviceName = 'Google Pixel'
+      else if (ua.includes('Motorola')) deviceName = 'Motorola Device'
+      else if (ua.includes('LG-')) {
+        const lgMatch = ua.match(/LG-([A-Z0-9]+)/)
+        deviceName = lgMatch ? `LG ${lgMatch[1]}` : 'LG Device'
+      }
+    }
+
+    // If still too short or empty, use generic
+    return (deviceName && deviceName.length > 2) ? deviceName : 'Android Device'
   }
+
   return ''
 }
 
@@ -129,7 +286,7 @@ export function getDeviceInfo(): DeviceInfo {
   const ua = navigator.userAgent
   const browser = parseBrowser(ua)
   const os = parseOS(ua)
-  const deviceModel = parseDevice(ua)
+  const deviceModel = parseDevice(ua, window.screen.width, window.screen.height, window.devicePixelRatio)
 
   const isMobile = /mobile/i.test(ua) || window.innerWidth <= 768
   const isTablet = /tablet|ipad/i.test(ua) || (window.innerWidth > 768 && window.innerWidth <= 1024)

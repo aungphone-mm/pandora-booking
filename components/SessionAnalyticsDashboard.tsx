@@ -15,16 +15,42 @@ type Session = {
   duration_seconds: number | null
   device_type: string
   browser_name: string
+  browser_version: string
   os_name: string
+  os_version: string
   device_model: string
   screen_resolution: string
+  viewport_size: string
   timezone: string
   language: string
   page_url: string
+  referrer: string
+  landing_page: string
   is_mobile: boolean
   is_tablet: boolean
   is_desktop: boolean
+  is_bot: boolean
   created_at: string
+}
+
+// Helper functions
+const safeGetHostname = (url: string | null): string => {
+  if (!url) return 'Direct'
+  try {
+    return new URL(url).hostname
+  } catch {
+    return url.substring(0, 30) + (url.length > 30 ? '...' : '')
+  }
+}
+
+const safeGetPathname = (url: string | null): string => {
+  if (!url) return '-'
+  try {
+    const pathname = new URL(url).pathname
+    return pathname === '/' ? '🏠 Home' : pathname
+  } catch {
+    return url.substring(0, 30) + (url.length > 30 ? '...' : '')
+  }
 }
 
 export default function SessionAnalyticsDashboard() {
@@ -516,15 +542,20 @@ export default function SessionAnalyticsDashboard() {
                 <thead>
                   <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
                     {groupSessions && (
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Count</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Count</th>
                     )}
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>User</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Device</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Phone/Device</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Browser</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>OS</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Location</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Time</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>User</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Device Type</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Phone/Device</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Browser</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>OS</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Screen</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Language</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Duration</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Referrer</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Landing Page</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Bot</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Time</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -586,15 +617,144 @@ export default function SessionAnalyticsDashboard() {
                           {session.device_type}
                         </span>
                       </td>
-                      <td style={{ padding: '16px', color: '#475569', fontWeight: '600' }}>
+                      <td style={{ padding: '16px', color: '#475569', fontWeight: '600', fontSize: '0.875rem' }}>
                         {session.device_model || '-'}
                       </td>
-                      <td style={{ padding: '16px', color: '#475569' }}>{session.browser_name || 'Unknown'}</td>
-                      <td style={{ padding: '16px', color: '#475569' }}>{session.os_name || 'Unknown'}</td>
-                      <td style={{ padding: '16px', fontSize: '0.875rem', color: '#64748b' }}>
-                        {session.timezone || 'Unknown'}
+
+                      {/* Browser with version */}
+                      <td style={{ padding: '16px', color: '#475569', fontSize: '0.875rem' }}>
+                        <div>
+                          <p style={{ margin: '0', fontWeight: '600' }}>{session.browser_name || 'Unknown'}</p>
+                          {session.browser_version && (
+                            <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                              v{session.browser_version}
+                            </p>
+                          )}
+                        </div>
                       </td>
-                      <td style={{ padding: '16px', fontSize: '0.875rem', color: '#64748b' }}>
+
+                      {/* OS with version */}
+                      <td style={{ padding: '16px', color: '#475569', fontSize: '0.875rem' }}>
+                        <div>
+                          <p style={{ margin: '0', fontWeight: '600' }}>{session.os_name || 'Unknown'}</p>
+                          {session.os_version && (
+                            <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                              v{session.os_version}
+                            </p>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Screen Resolution */}
+                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b' }}>
+                        <div>
+                          <p style={{ margin: '0', fontWeight: '600' }}>{session.screen_resolution || '-'}</p>
+                          {session.viewport_size && session.viewport_size !== session.screen_resolution && (
+                            <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#94a3b8' }}>
+                              View: {session.viewport_size}
+                            </p>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Language */}
+                      <td style={{ padding: '16px', fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>
+                        {session.language ? session.language.split('-')[0].toUpperCase() : '-'}
+                      </td>
+
+                      {/* Duration */}
+                      <td style={{ padding: '16px', fontSize: '0.85rem' }}>
+                        {(() => {
+                          let durationSeconds = session.duration_seconds
+
+                          // If no duration but has session_start, calculate duration
+                          if (!durationSeconds && session.session_start) {
+                            const startTime = new Date(session.session_start).getTime()
+                            const endTime = session.session_end ? new Date(session.session_end).getTime() : Date.now()
+                            durationSeconds = Math.floor((endTime - startTime) / 1000)
+                          }
+
+                          if (durationSeconds && durationSeconds > 0) {
+                            const minutes = Math.floor(durationSeconds / 60)
+                            const seconds = durationSeconds % 60
+                            const isActive = !session.session_end
+
+                            return (
+                              <span style={{
+                                backgroundColor: durationSeconds > 300 ? '#dcfce7' : durationSeconds > 60 ? '#fef3c7' : '#fee2e2',
+                                color: durationSeconds > 300 ? '#166534' : durationSeconds > 60 ? '#92400e' : '#991b1b',
+                                padding: '4px 8px',
+                                borderRadius: '6px',
+                                fontWeight: '600',
+                                fontSize: '0.75rem',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}>
+                                {minutes}m {seconds}s
+                                {isActive && <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>●</span>}
+                              </span>
+                            )
+                          }
+
+                          return (
+                            <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>-</span>
+                          )
+                        })()}
+                      </td>
+
+                      {/* Referrer */}
+                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b', maxWidth: '200px' }}>
+                        {session.referrer ? (
+                          <div style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontWeight: '500'
+                          }}>
+                            {session.referrer.includes('google') ? '🔍 Google' :
+                             session.referrer.includes('facebook') ? '👥 Facebook' :
+                             session.referrer.includes('instagram') ? '📸 Instagram' :
+                             session.referrer.includes('twitter') ? '🐦 Twitter' :
+                             safeGetHostname(session.referrer)}
+                          </div>
+                        ) : (
+                          <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Direct</span>
+                        )}
+                      </td>
+
+                      {/* Landing Page */}
+                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b', maxWidth: '150px' }}>
+                        <div style={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          fontWeight: '500'
+                        }}>
+                          {safeGetPathname(session.landing_page)}
+                        </div>
+                      </td>
+
+                      {/* Bot Flag */}
+                      <td style={{ padding: '16px', textAlign: 'center' }}>
+                        {session.is_bot ? (
+                          <span style={{
+                            backgroundColor: '#fee2e2',
+                            color: '#991b1b',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            fontWeight: '700',
+                            fontSize: '0.7rem'
+                          }}>
+                            🤖 BOT
+                          </span>
+                        ) : (
+                          <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>-</span>
+                        )}
+                      </td>
+
+                      {/* Time */}
+                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
                         {format(new Date(session.created_at), 'MMM d, h:mm a')}
                       </td>
                     </tr>

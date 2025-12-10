@@ -11,6 +11,7 @@ export function useSessionTracking() {
 
   useEffect(() => {
     let mounted = true
+    let updateInterval: NodeJS.Timeout | null = null
 
     async function initializeTracking() {
       if (isTracking) return
@@ -42,6 +43,11 @@ export function useSessionTracking() {
         if (mounted && id) {
           setSessionId(id)
           sessionStorage.setItem('session_start_time', new Date().toISOString())
+
+          // Update session duration every 30 seconds while user is active
+          updateInterval = setInterval(() => {
+            endSession(id)
+          }, 30000) // Update every 30 seconds
         }
       } catch (error) {
         console.error('Error initializing session tracking:', error)
@@ -50,14 +56,30 @@ export function useSessionTracking() {
 
     initializeTracking()
 
-    // Track when user leaves the page
+    // Track when user leaves the page (use synchronous beacon)
     const handleBeforeUnload = () => {
-      if (sessionId) {
-        endSession(sessionId)
+      const id = sessionStorage.getItem('current_session_id')
+      if (id) {
+        // Use sendBeacon for reliable tracking on page unload
+        const sessionStart = sessionStorage.getItem('session_start_time')
+        const startTime = sessionStart ? new Date(sessionStart) : new Date()
+        const endTime = new Date()
+        const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
+
+        const data = JSON.stringify({
+          session_id: id,
+          session_end: endTime.toISOString(),
+          duration_seconds: durationSeconds
+        })
+
+        // Try to send with beacon (works even when page is closing)
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/api/sessions/end', data)
+        }
       }
     }
 
-    // Track when page visibility changes (user switches tabs)
+    // Track when page visibility changes (user switches tabs or minimizes)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden' && sessionId) {
         endSession(sessionId)
@@ -69,6 +91,9 @@ export function useSessionTracking() {
 
     return () => {
       mounted = false
+      if (updateInterval) {
+        clearInterval(updateInterval)
+      }
       window.removeEventListener('beforeunload', handleBeforeUnload)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
 
