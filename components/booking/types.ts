@@ -47,7 +47,7 @@ export type BookingFormData = {
   customerName: string
   customerEmail?: string
   customerPhone: string
-  serviceId: string
+  serviceIds: string[] // Changed from serviceId to serviceIds (array)
   appointmentDate: string
   appointmentTime: string
   products: string[]

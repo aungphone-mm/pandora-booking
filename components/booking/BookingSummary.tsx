@@ -6,7 +6,7 @@
 import type { Service, Product } from './types'
 
 interface BookingSummaryProps {
-  selectedService: Service | undefined
+  selectedServices: Service[]
   selectedProducts: Set<string>
   products: Product[]
   totalPrice: number
@@ -14,7 +14,7 @@ interface BookingSummaryProps {
 }
 
 export default function BookingSummary({
-  selectedService,
+  selectedServices,
   selectedProducts,
   products,
   totalPrice,
@@ -60,8 +60,8 @@ export default function BookingSummary({
         padding: '24px',
         border: '2px solid #e5e7eb'
       }}>
-        {/* Service */}
-        {selectedService && (
+        {/* Services */}
+        {selectedServices.length > 0 && (
           <div style={{
             marginBottom: '16px',
             paddingBottom: '16px',
@@ -73,38 +73,47 @@ export default function BookingSummary({
               color: '#6b7280',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
-              marginBottom: '8px'
+              marginBottom: '12px'
             }}>
-              Service
+              Services ({selectedServices.length})
             </div>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
+            {selectedServices.map((service) => (
+              <div
+                key={service.id}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '10px',
+                  padding: '8px',
+                  backgroundColor: '#fdf2f8',
+                  borderRadius: '6px'
+                }}
+              >
+                <div>
+                  <div style={{
+                    fontWeight: '600',
+                    color: '#111827',
+                    fontSize: '0.9rem'
+                  }}>
+                    {service.name}
+                  </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: '#6b7280'
+                  }}>
+                    {service.duration} minutes
+                  </div>
+                </div>
                 <div style={{
                   fontWeight: '600',
                   color: '#111827',
                   fontSize: '1rem'
                 }}>
-                  {selectedService.name}
-                </div>
-                <div style={{
-                  fontSize: '0.875rem',
-                  color: '#6b7280'
-                }}>
-                  {selectedService.duration} minutes
+                  ${service.price}
                 </div>
               </div>
-              <div style={{
-                fontWeight: '600',
-                color: '#111827',
-                fontSize: '1.125rem'
-              }}>
-                ${selectedService.price}
-              </div>
-            </div>
+            ))}
           </div>
         )}
 

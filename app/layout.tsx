@@ -108,8 +108,8 @@ export default async function RootLayout({
                 alignItems: 'center',
                 flexWrap: 'wrap'
               }}>
-                <Link 
-                  href="/booking" 
+                <Link
+                  href="/booking"
                   style={{
                     color: 'white',
                     textDecoration: 'none',
@@ -118,6 +118,20 @@ export default async function RootLayout({
                   }}
                 >
                   Book Now
+                </Link>
+                <Link
+                  href="/confirmation"
+                  style={{
+                    color: 'white',
+                    textDecoration: 'none',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  🔍 Search Booking
                 </Link>
                 {user ? (
                   <>

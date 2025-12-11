@@ -35,12 +35,19 @@ export interface AppointmentProduct {
   product: Product
 }
 
+export interface AppointmentService {
+  service_id: string
+  quantity: number
+  price: number
+  service: Service
+}
+
 export interface Appointment {
   id: string
   customer_name: string
   customer_email: string
   customer_phone: string
-  service_id: string
+  service_id?: string | null // Kept for backward compatibility but now optional
   staff_id: string
   appointment_date: string
   appointment_time: string
@@ -50,13 +57,15 @@ export interface Appointment {
   user_id?: string | null
   created_at: string
   updated_at?: string
-  service?: Service
+  service?: Service // Single service (backward compatibility)
   staff?: Staff
   appointment_products?: AppointmentProduct[]
+  appointment_services?: AppointmentService[] // Multiple services (new)
 }
 
 export interface AppointmentWithRelations extends Appointment {
-  service: Service
+  service?: Service
   staff: Staff
   appointment_products: AppointmentProduct[]
+  appointment_services: AppointmentService[]
 }

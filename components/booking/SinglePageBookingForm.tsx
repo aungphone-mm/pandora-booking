@@ -36,6 +36,7 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState('')
+  const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set())
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set())
   const [totalPrice, setTotalPrice] = useState(0)
 
@@ -54,11 +55,11 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
       customerName: user?.user_metadata?.full_name || '',
       customerEmail: user?.email || '',
       customerPhone: user?.user_metadata?.phone || '',
+      serviceIds: [],
       products: []
     }
   })
 
-  const selectedServiceId = watch('serviceId')
   const selectedTime = watch('appointmentTime')
 
   // Check availability when date changes
@@ -71,18 +72,32 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
   // Calculate total price
   useEffect(() => {
     calculateTotal()
-  }, [selectedServiceId, selectedProducts])
+  }, [selectedServices, selectedProducts])
 
   const calculateTotal = () => {
-    const selectedService = services.find(s => s?.id === selectedServiceId)
-    const servicePrice = selectedService?.price || 0
+    // Calculate total price from all selected services
+    const servicesPrice = Array.from(selectedServices).reduce((sum, serviceId) => {
+      const service = services.find(s => s?.id === serviceId)
+      return sum + (service?.price || 0)
+    }, 0)
 
     const productsPrice = Array.from(selectedProducts).reduce((sum, productId) => {
       const product = products.find(p => p?.id === productId)
       return sum + (product?.price || 0)
     }, 0)
 
-    setTotalPrice(servicePrice + productsPrice)
+    setTotalPrice(servicesPrice + productsPrice)
+  }
+
+  const handleServiceToggle = (serviceId: string) => {
+    const newSelected = new Set(selectedServices)
+    if (newSelected.has(serviceId)) {
+      newSelected.delete(serviceId)
+    } else {
+      newSelected.add(serviceId)
+    }
+    setSelectedServices(newSelected)
+    setValue('serviceIds', Array.from(newSelected))
   }
 
   const handleProductToggle = (productId: string) => {
@@ -101,6 +116,13 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
       setLoading(true)
       setError(null)
 
+      // Validate that at least one service is selected
+      if (!data.serviceIds || data.serviceIds.length === 0) {
+        setError('Please select at least one service')
+        setLoading(false)
+        return
+      }
+
       // Create appointment
       const { data: appointment, error: appointmentError } = await supabase
         .from('appointments')
@@ -108,7 +130,7 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
           customer_name: data.customerName,
           customer_email: data.customerEmail || null,
           customer_phone: data.customerPhone,
-          service_id: data.serviceId,
+          service_id: null, // No longer using single service_id
           staff_id: null, // Staff selection removed
           appointment_date: data.appointmentDate,
           appointment_time: data.appointmentTime,
@@ -121,6 +143,25 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
         .single()
 
       if (appointmentError) throw appointmentError
+
+      // Insert service associations (NEW: multiple services)
+      if (data.serviceIds && data.serviceIds.length > 0 && appointment) {
+        const serviceInserts = data.serviceIds.map(serviceId => {
+          const service = services.find(s => s.id === serviceId)
+          return {
+            appointment_id: appointment.id,
+            service_id: serviceId,
+            quantity: 1,
+            price: service?.price || 0
+          }
+        })
+
+        const { error: servicesError } = await supabase
+          .from('appointment_services')
+          .insert(serviceInserts)
+
+        if (servicesError) throw servicesError
+      }
 
       // Insert product associations
       if (data.products && data.products.length > 0 && appointment) {
@@ -137,7 +178,23 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
         if (productsError) throw productsError
       }
 
-      router.push('/account?booking=success')
+      // Store booking details in sessionStorage for the confirmation page
+      if (appointment) {
+        sessionStorage.setItem('lastBooking', JSON.stringify({
+          id: appointment.id,
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          customerPhone: data.customerPhone,
+          appointmentDate: data.appointmentDate,
+          appointmentTime: data.appointmentTime,
+          totalPrice: totalPrice,
+          serviceIds: data.serviceIds, // Store array of service IDs
+          productIds: data.products || [] // Store array of product IDs
+        }))
+      }
+
+      // Redirect to confirmation page for both guests and logged-in users
+      router.push('/confirmation')
     } catch (err: any) {
       console.error('Error creating booking:', err)
       setError(err.message || 'Failed to create booking. Please try again.')
@@ -146,7 +203,8 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
     }
   }
 
-  const selectedService = services.find(s => s?.id === selectedServiceId)
+  // Get all selected services for display
+  const selectedServicesData = services.filter(s => selectedServices.has(s?.id))
 
   if (dataLoading) {
     return (
@@ -229,9 +287,10 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
             {/* Service Selection */}
             <ServiceSelector
               services={services}
-              selectedServiceId={selectedServiceId}
+              selectedServiceIds={Array.from(selectedServices)}
               errors={errors}
               register={register}
+              onServiceToggle={handleServiceToggle}
             />
 
             {/* Product Selection */}
@@ -264,7 +323,7 @@ export default function SinglePageBookingForm({ user }: SinglePageBookingFormPro
 
             {/* Booking Summary */}
             <BookingSummary
-              selectedService={selectedService}
+              selectedServices={selectedServicesData}
               selectedProducts={selectedProducts}
               products={products}
               totalPrice={totalPrice}

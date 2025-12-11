@@ -841,6 +841,15 @@ export default function AppointmentManager() {
                     color: '#374151',
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
+                  }}>🔖 Booking ID</th>
+                  <th style={{
+                    textAlign: 'left',
+                    padding: '20px 24px',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    color: '#374151',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
                   }}>✨ Service</th>
                   <th style={{
                     textAlign: 'left',
@@ -936,7 +945,42 @@ export default function AppointmentManager() {
                     </td>
                     <td style={{ padding: '24px' }}>
                       <div>
-                        <p style={{ 
+                        <div style={{
+                          fontFamily: 'monospace',
+                          fontSize: '0.7rem',
+                          color: '#6b7280',
+                          backgroundColor: '#f9fafb',
+                          padding: '6px 8px',
+                          borderRadius: '4px',
+                          border: '1px solid #e5e7eb',
+                          wordBreak: 'break-all',
+                          marginBottom: '6px'
+                        }}>
+                          {appointment.id}
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(appointment.id)
+                            alert('Booking ID copied!')
+                          }}
+                          style={{
+                            padding: '4px 8px',
+                            fontSize: '0.65rem',
+                            backgroundColor: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: '600'
+                          }}
+                        >
+                          📋 Copy
+                        </button>
+                      </div>
+                    </td>
+                    <td style={{ padding: '24px' }}>
+                      <div>
+                        <p style={{
                           fontWeight: '600',
                           fontSize: '1.1rem',
                           color: '#1e293b',
