@@ -112,8 +112,7 @@ export default function ProductManager() {
           description: product.description,
           category_id: product.category_id,
           price: product.price,
-          is_active: product.is_active,
-          updated_at: new Date().toISOString()
+          is_active: product.is_active
         })
         .eq('id', product.id)
 

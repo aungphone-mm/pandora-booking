@@ -201,8 +201,7 @@ export default function StaffManager() {
           hourly_rate: staffMember.hourly_rate,
           commission_rate: staffMember.commission_rate,
           hire_date: staffMember.hire_date,
-          is_active: staffMember.is_active,
-          updated_at: new Date().toISOString()
+          is_active: staffMember.is_active
         })
         .eq('id', staffMember.id)
 

@@ -96,8 +96,7 @@ export default function TimeSlotManager() {
         .from('time_slots')
         .update({
           time: timeSlot.time,
-          is_active: timeSlot.is_active,
-          updated_at: new Date().toISOString()
+          is_active: timeSlot.is_active
         })
         .eq('id', timeSlot.id)
 

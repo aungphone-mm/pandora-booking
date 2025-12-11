@@ -148,8 +148,7 @@ export default function ServiceCategoryManager() {
         .from('service_categories')
         .update({
           name: category.name.trim(),
-          display_order: category.display_order,
-          updated_at: new Date().toISOString()
+          display_order: category.display_order
         })
         .eq('id', category.id)
 

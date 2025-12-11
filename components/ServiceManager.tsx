@@ -182,6 +182,22 @@ export default function ServiceManager() {
     }
   }
 
+  const toggleServiceStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      setError(null)
+      const { error } = await supabase
+        .from('services')
+        .update({ is_active: !currentStatus })
+        .eq('id', id)
+
+      if (error) throw error
+      loadData()
+    } catch (err: any) {
+      console.error('Error toggling service status:', err)
+      setError(err.message || 'Failed to toggle service status')
+    }
+  }
+
   // Filter and sort services
   const filteredAndSortedServices = services
     .filter(service => {
@@ -683,7 +699,7 @@ export default function ServiceManager() {
               borderRadius: '12px',
               outline: 'none',
               marginTop: '20px',
-              marginBottom: '24px',
+              marginBottom: '16px',
               minHeight: '100px',
               fontSize: '1rem',
               fontWeight: '500',
@@ -692,7 +708,41 @@ export default function ServiceManager() {
             }}
             className="form-input"
           />
-          
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '24px',
+            padding: '16px',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            border: '2px solid #16a34a'
+          }}>
+            <input
+              type="checkbox"
+              id="active-new-service"
+              checked={newService.is_active}
+              onChange={(e) => setNewService({ ...newService, is_active: e.target.checked })}
+              style={{
+                width: '20px',
+                height: '20px',
+                cursor: 'pointer'
+              }}
+            />
+            <label
+              htmlFor="active-new-service"
+              style={{
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: newService.is_active ? '#166534' : '#991b1b',
+                cursor: 'pointer'
+              }}
+            >
+              {newService.is_active ? '✅ Active (Service will be immediately available)' : '❌ Inactive (Service will be hidden)'}
+            </label>
+          </div>
+
           <div style={{ display: 'flex', gap: '16px' }}>
             <button
               onClick={handleAddService}
@@ -873,17 +923,39 @@ export default function ServiceManager() {
                       )}
                     </td>
                     <td style={{ padding: '20px 24px' }}>
-                      <span style={{
-                        fontSize: '0.9rem',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        backgroundColor: '#f0fdf4',
-                        color: '#166534',
-                        fontWeight: '600',
-                        border: '1px solid #bbf7d0'
-                      }}>
-                        {service.category?.name || 'No Category'}
-                      </span>
+                      {editingService?.id === service.id ? (
+                        <select
+                          value={editingService.category_id}
+                          onChange={(e) => setEditingService({ ...editingService, category_id: e.target.value })}
+                          style={{
+                            padding: '8px 12px',
+                            border: '2px solid #22c55e',
+                            borderRadius: '8px',
+                            outline: 'none',
+                            fontSize: '1rem',
+                            fontWeight: '500',
+                            width: '180px'
+                          }}
+                          className="form-input"
+                        >
+                          <option value="">Select category</option>
+                          {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span style={{
+                          fontSize: '0.9rem',
+                          padding: '6px 12px',
+                          borderRadius: '20px',
+                          backgroundColor: '#f0fdf4',
+                          color: '#166534',
+                          fontWeight: '600',
+                          border: '1px solid #bbf7d0'
+                        }}>
+                          {service.category?.name || 'No Category'}
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '20px 24px' }}>
                       {editingService?.id === service.id ? (
@@ -941,17 +1013,48 @@ export default function ServiceManager() {
                       )}
                     </td>
                     <td style={{ padding: '20px 24px' }}>
-                      <span style={{
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        fontSize: '0.85rem',
-                        fontWeight: '600',
-                        backgroundColor: service.is_active ? '#dcfce7' : '#fee2e2',
-                        color: service.is_active ? '#166534' : '#991b1b',
-                        border: service.is_active ? '1px solid #16a34a' : '1px solid #dc2626'
-                      }}>
-                        {service.is_active ? '✅ Active' : '❌ Inactive'}
-                      </span>
+                      {editingService?.id === service.id ? (
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}>
+                          <input
+                            type="checkbox"
+                            id={`active-${editingService.id}`}
+                            checked={editingService.is_active}
+                            onChange={(e) => setEditingService({ ...editingService, is_active: e.target.checked })}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              cursor: 'pointer'
+                            }}
+                          />
+                          <label
+                            htmlFor={`active-${editingService.id}`}
+                            style={{
+                              fontSize: '0.9rem',
+                              fontWeight: '600',
+                              color: editingService.is_active ? '#166534' : '#991b1b',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {editingService.is_active ? '✅ Active' : '❌ Inactive'}
+                          </label>
+                        </div>
+                      ) : (
+                        <span style={{
+                          padding: '6px 12px',
+                          borderRadius: '20px',
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
+                          backgroundColor: service.is_active ? '#dcfce7' : '#fee2e2',
+                          color: service.is_active ? '#166534' : '#991b1b',
+                          border: service.is_active ? '1px solid #16a34a' : '1px solid #dc2626'
+                        }}>
+                          {service.is_active ? '✅ Active' : '❌ Inactive'}
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '20px 24px' }}>
                       {editingService?.id === service.id ? (
@@ -992,7 +1095,7 @@ export default function ServiceManager() {
                           </button>
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                           <button
                             onClick={() => setEditingService(service)}
                             style={{
@@ -1009,6 +1112,27 @@ export default function ServiceManager() {
                             className="action-button"
                           >
                             ✏️ Edit
+                          </button>
+                          <button
+                            onClick={() => toggleServiceStatus(service.id, service.is_active)}
+                            style={{
+                              background: service.is_active
+                                ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                                : 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '8px 16px',
+                              cursor: 'pointer',
+                              fontSize: '0.875rem',
+                              fontWeight: '600',
+                              boxShadow: service.is_active
+                                ? '0 4px 12px rgba(245, 158, 11, 0.3)'
+                                : '0 4px 12px rgba(22, 163, 74, 0.3)'
+                            }}
+                            className="action-button"
+                          >
+                            {service.is_active ? '⏸️ Deactivate' : '▶️ Activate'}
                           </button>
                           <button
                             onClick={() => handleDeleteService(service.id)}

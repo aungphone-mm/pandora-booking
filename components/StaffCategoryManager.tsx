@@ -166,8 +166,7 @@ export default function StaffCategoryManager() {
         .update({
           name: category.name.trim(),
           description: category.description.trim(),
-          display_order: category.display_order,
-          updated_at: new Date().toISOString()
+          display_order: category.display_order
         })
         .eq('id', category.id)
 
@@ -253,8 +252,7 @@ export default function StaffCategoryManager() {
           category_id: position.category_id,
           name: position.name.trim(),
           description: position.description.trim(),
-          display_order: position.display_order,
-          updated_at: new Date().toISOString()
+          display_order: position.display_order
         })
         .eq('id', position.id)
 
@@ -338,8 +336,7 @@ export default function StaffCategoryManager() {
           category_id: specialization.category_id || null,
           name: specialization.name.trim(),
           description: specialization.description.trim(),
-          display_order: specialization.display_order,
-          updated_at: new Date().toISOString()
+          display_order: specialization.display_order
         })
         .eq('id', specialization.id)
 
