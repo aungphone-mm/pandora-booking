@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import HomeGallery from '@/components/HomeGallery'
 
 export default function HomePage() {
   return (
@@ -397,6 +398,9 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Photo Gallery Section */}
+      <HomeGallery />
     </div>
   )
 }

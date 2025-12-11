@@ -1,6 +1,7 @@
 // ACCOUNT PAGE
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import type { AppointmentWithRelations, AppointmentProduct } from '@/lib/types'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -29,10 +30,10 @@ const { data: appointments } = await supabase
   .order('appointment_date', { ascending: false })
 
   // Helper function to calculate total
-  const calculateTotal = (appointment: any) => {
+  const calculateTotal = (appointment: AppointmentWithRelations) => {
     const servicePrice = appointment.service?.price || 0
     const productsTotal = appointment.appointment_products?.reduce(
-      (sum: number, ap: any) => sum + (ap.product.price * ap.quantity), 0
+      (sum: number, ap: AppointmentProduct) => sum + (ap.product.price * ap.quantity), 0
     ) || 0
     return servicePrice + productsTotal
   }
@@ -117,8 +118,8 @@ const { data: appointments } = await supabase
                     {appointment.appointment_products && appointment.appointment_products.length > 0 && (
                       <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '8px' }}>
                         <p style={{ fontWeight: '500' }}>Add-ons:</p>
-                        {appointment.appointment_products.map((ap: any) => (
-                          <p key={ap.id} style={{ marginLeft: '12px' }}>
+                        {appointment.appointment_products.map((ap: AppointmentProduct) => (
+                          <p key={ap.product.id} style={{ marginLeft: '12px' }}>
                             • {ap.product.name} x{ap.quantity} ({ap.product.price * ap.quantity}Ks)
                           </p>
                         ))}

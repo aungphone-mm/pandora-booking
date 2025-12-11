@@ -20,6 +20,7 @@ export default function AdminSidebar() {
     { href: '/admin/products', label: 'Products', icon: '🛍️' },
     { href: '/admin/product-categories', label: 'Product Categories', icon: '📦' },
     { href: '/admin/timeslots', label: 'Time Slots', icon: '🕐' },
+    { href: '/admin/gallery', label: 'Photo Gallery', icon: '🖼️' },
     { href: '/admin/health-check', label: 'Health Check', badge: 'DIAG', icon: '🔍' }, 
   ]
 

@@ -4,8 +4,8 @@ import Link from 'next/link'
 import InstallPWA from '@/components/InstallPWA'
 import SessionTrackingProvider from '@/components/SessionTrackingProvider'
 
-// Force dynamic rendering since we use cookies for auth
-export const dynamic = 'force-dynamic'
+// Layout is automatically dynamic due to cookie usage in createClient()
+// Individual pages can opt into static generation if they don't need auth
 
 export const metadata = {
   title: 'Pandora Beauty Salon',

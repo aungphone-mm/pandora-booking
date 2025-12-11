@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import MonthlyCalendarView from './MonthlyCalendarView'
+import type { Appointment } from '@/lib/types'
 
 type DashboardStats = {
   totalAppointments: number
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
     totalStaff: 0,
     todayRevenue: 0
   })
-  const [recentAppointments, setRecentAppointments] = useState<any[]>([])
+  const [recentAppointments, setRecentAppointments] = useState<Appointment[]>([])
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -322,7 +323,7 @@ export default function AdminDashboard() {
       setRecentAppointments(recentAppointmentsResult.data || [])
 
       // Generate recent activity
-      const activities: RecentActivity[] = recentAppointmentsResult.data?.slice(0, 5).map((apt: any) => ({
+      const activities: RecentActivity[] = recentAppointmentsResult.data?.slice(0, 5).map((apt: Appointment) => ({
         id: apt.id,
         type: 'appointment' as const,
         title: `New appointment: ${apt.customer_name}`,
@@ -330,12 +331,12 @@ export default function AdminDashboard() {
         time: format(new Date(apt.created_at), 'h:mm a'),
         status: apt.status
       })) || []
-      
+
       setRecentActivity(activities)
-      
-    } catch (err: any) {
+
+    } catch (err) {
       console.error('Error loading dashboard data:', err)
-      setError(err.message || 'Failed to load dashboard data')
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard data')
     } finally {
       setLoading(false)
     }

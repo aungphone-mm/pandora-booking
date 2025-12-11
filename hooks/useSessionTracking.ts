@@ -1,21 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { trackSession, endSession, trackPageView } from '@/lib/tracking/sessionTracker'
 
 export function useSessionTracking() {
   const [sessionId, setSessionId] = useState<string | null>(null)
-  const [isTracking, setIsTracking] = useState(false)
-  const supabase = createClient()
+  const sessionIdRef = useRef<string | null>(null) // ✅ Ref for event handlers
+  const isTrackingRef = useRef(false) // ✅ Ref to prevent double-initialization
 
   useEffect(() => {
     let mounted = true
     let updateInterval: NodeJS.Timeout | null = null
+    const supabase = createClient() // ✅ Moved inside useEffect
 
     async function initializeTracking() {
-      if (isTracking) return
-      setIsTracking(true)
+      if (isTrackingRef.current) return // ✅ Use ref instead of state
+      isTrackingRef.current = true
 
       try {
         // Get current user if logged in
@@ -41,7 +42,8 @@ export function useSessionTracking() {
         })
 
         if (mounted && id) {
-          setSessionId(id)
+          sessionIdRef.current = id // ✅ Update ref for event handlers
+          setSessionId(id) // Update state for component
           sessionStorage.setItem('session_start_time', new Date().toISOString())
 
           // Update session duration every 30 seconds while user is active
@@ -81,8 +83,8 @@ export function useSessionTracking() {
 
     // Track when page visibility changes (user switches tabs or minimizes)
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && sessionId) {
-        endSession(sessionId)
+      if (document.visibilityState === 'hidden' && sessionIdRef.current) {
+        endSession(sessionIdRef.current) // ✅ Use ref to get latest sessionId
       }
     }
 
@@ -97,8 +99,8 @@ export function useSessionTracking() {
       window.removeEventListener('beforeunload', handleBeforeUnload)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
 
-      if (sessionId) {
-        endSession(sessionId)
+      if (sessionIdRef.current) {
+        endSession(sessionIdRef.current) // ✅ Use ref to get latest sessionId
       }
     }
   }, [])
