@@ -31,108 +31,47 @@ export default function ServiceSelector({
   }, {} as Record<string, Service[]>)
 
   return (
-    <div style={{ padding: '32px' }}>
-      <h2 style={{
-        fontSize: '1.5rem',
-        fontWeight: '600',
-        color: '#111827',
-        marginBottom: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
-      }}>
-        <span style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '50%',
-          backgroundColor: '#ec4899',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '0.875rem',
-          fontWeight: 'bold'
-        }}>1</span>
+    <div className="p-8">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-3">
+        <span className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center text-sm font-bold">1</span>
         Choose Your Services
       </h2>
-      <p style={{
-        color: '#6b7280',
-        marginBottom: '16px',
-        fontSize: '0.875rem'
-      }}>
+      <p className="text-gray-500 mb-4 text-sm">
         Select one or more services for your appointment
       </p>
 
-      <div style={{ marginBottom: '24px' }}>
+      <div className="mb-6">
         {Object.entries(servicesByCategory).map(([category, categoryServices]) => (
-          <div key={category} style={{ marginBottom: '24px' }}>
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '12px',
-              borderBottom: '2px solid #e5e7eb',
-              paddingBottom: '8px'
-            }}>
+          <div key={category} className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b-2 border-gray-200 pb-2">
               {category}
             </h3>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '16px'
-            }}>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
               {categoryServices.map((service) => {
                 const isSelected = selectedServiceIds.includes(service.id)
                 return (
                   <div
                     key={service.id}
                     onClick={() => onServiceToggle(service.id)}
-                    style={{
-                      position: 'relative',
-                      padding: '16px',
-                      border: `2px solid ${isSelected ? '#ec4899' : '#e5e7eb'}`,
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      backgroundColor: isSelected ? '#fdf2f8' : 'white',
-                      transition: 'all 0.2s'
-                    }}
+                    className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      isSelected
+                        ? 'border-pink-600 bg-pink-50'
+                        : 'border-gray-200 bg-white hover:border-pink-300 hover:bg-pink-25'
+                    }`}
                   >
                     {/* Checkbox indicator */}
-                    <div style={{
-                      position: 'absolute',
-                      top: '12px',
-                      right: '12px',
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '4px',
-                      border: `2px solid ${isSelected ? '#ec4899' : '#d1d5db'}`,
-                      backgroundColor: isSelected ? '#ec4899' : 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.75rem',
-                      color: 'white',
-                      fontWeight: 'bold'
-                    }}>
+                    <div className={`absolute top-3 right-3 w-6 h-6 rounded border-2 flex items-center justify-center text-xs text-white font-bold ${
+                      isSelected
+                        ? 'border-pink-600 bg-pink-600'
+                        : 'border-gray-300 bg-white'
+                    }`}>
                       {isSelected ? '✓' : ''}
                     </div>
 
-                    <div style={{
-                      fontWeight: '600',
-                      color: '#111827',
-                      marginBottom: '8px',
-                      fontSize: '1rem',
-                      paddingRight: '32px'
-                    }}>
+                    <div className="font-semibold text-gray-900 mb-2 text-base pr-8">
                       {service.name}
                     </div>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      fontSize: '0.875rem',
-                      color: '#6b7280'
-                    }}>
+                    <div className="flex justify-between items-center text-sm text-gray-500">
                       <span>${service.price}</span>
                       <span>{service.duration} min</span>
                     </div>
@@ -145,21 +84,13 @@ export default function ServiceSelector({
       </div>
 
       {errors.serviceIds && (
-        <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '8px' }}>
+        <p className="text-red-500 text-sm mt-2">
           {errors.serviceIds.message as string}
         </p>
       )}
 
       {selectedServiceIds.length > 0 && (
-        <div style={{
-          marginTop: '16px',
-          padding: '12px',
-          backgroundColor: '#dcfce7',
-          borderRadius: '8px',
-          fontSize: '0.875rem',
-          color: '#166534',
-          fontWeight: '500'
-        }}>
+        <div className="mt-4 p-3 bg-green-100 rounded-lg text-sm text-green-800 font-medium">
           ✓ {selectedServiceIds.length} service{selectedServiceIds.length > 1 ? 's' : ''} selected
         </div>
       )}

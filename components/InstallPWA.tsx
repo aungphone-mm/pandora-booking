@@ -81,22 +81,7 @@ export default function InstallPWA() {
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
-        padding: '20px',
-        maxWidth: '400px',
-        width: 'calc(100% - 40px)',
-        zIndex: 1000,
-        animation: 'slideUp 0.3s ease-out'
-      }}
-    >
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-2xl p-5 max-w-md w-[calc(100%-40px)] z-[1000] animate-[slideUp_0.3s_ease-out]">
       <style>{`
         @keyframes slideUp {
           from {
@@ -112,91 +97,35 @@ export default function InstallPWA() {
 
       <button
         onClick={handleDismiss}
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          background: 'none',
-          border: 'none',
-          fontSize: '20px',
-          cursor: 'pointer',
-          color: '#9ca3af',
-          padding: '5px',
-          lineHeight: 1
-        }}
+        className="absolute top-2.5 right-2.5 bg-none border-none text-xl cursor-pointer text-gray-400 p-1.5 leading-none hover:text-gray-600 transition-colors duration-200"
         aria-label="Dismiss"
       >
         ×
       </button>
 
-      <div style={{ display: 'flex', alignItems: 'start', gap: '15px' }}>
-        <div
-          style={{
-            width: '60px',
-            height: '60px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '30px',
-            flexShrink: 0
-          }}
-        >
+      <div className="flex items-start gap-4">
+        <div className="w-15 h-15 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl flex-shrink-0">
           💆
         </div>
 
-        <div style={{ flex: 1 }}>
-          <h3
-            style={{
-              margin: '0 0 5px 0',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#1f2937'
-            }}
-          >
+        <div className="flex-1">
+          <h3 className="m-0 mb-1.5 text-base font-semibold text-gray-800">
             Install Pandora Salon App
           </h3>
-          <p
-            style={{
-              margin: '0 0 15px 0',
-              fontSize: '14px',
-              color: '#6b7280',
-              lineHeight: '1.5'
-            }}
-          >
+          <p className="m-0 mb-4 text-sm text-gray-500 leading-relaxed">
             Get quick access to book appointments and manage your bookings!
           </p>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="flex gap-2.5">
             <button
               onClick={handleInstallClick}
-              style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                flex: 1
-              }}
+              className="bg-gradient-to-br from-purple-500 to-pink-500 text-white border-none py-2.5 px-5 rounded-lg text-sm font-semibold cursor-pointer flex-1 hover:from-purple-600 hover:to-pink-600 transition-all duration-200 hover:shadow-lg"
             >
               Install
             </button>
             <button
               onClick={handleDismiss}
-              style={{
-                background: '#f3f4f6',
-                color: '#6b7280',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
+              className="bg-gray-100 text-gray-500 border-none py-2.5 px-5 rounded-lg text-sm font-semibold cursor-pointer hover:bg-gray-200 transition-all duration-200"
             >
               Not Now
             </button>

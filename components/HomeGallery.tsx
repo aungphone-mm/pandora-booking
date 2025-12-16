@@ -57,146 +57,47 @@ export default function HomeGallery() {
   return (
     <>
       {/* Gallery Section */}
-      <section style={{
-        padding: '80px 24px',
-        background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(236,72,153,0.05) 100%)'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
+      <section className="py-20 px-6 bg-gradient-to-b from-transparent to-pink-500/5">
+        <div className="max-w-6xl mx-auto">
           {/* Section Header */}
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <span style={{
-              display: 'inline-block',
-              background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-              color: 'white',
-              padding: '8px 20px',
-              borderRadius: '30px',
-              fontSize: '0.875rem',
-              fontWeight: '600',
-              marginBottom: '16px',
-              letterSpacing: '0.5px'
-            }}>
+          <div className="text-center mb-12">
+            <span className="inline-block bg-gradient-to-r from-pink-500 to-purple-500 text-white px-5 py-2 rounded-full text-sm font-semibold mb-4 tracking-wide">
               Our Gallery
             </span>
-            <h2 style={{
-              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-              fontWeight: '800',
-              background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              margin: '0 0 16px 0'
-            }}>
+            <h2 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent mb-4">
               Our Beautiful Work
             </h2>
-            <p style={{
-              color: '#64748b',
-              fontSize: '1.1rem',
-              maxWidth: '600px',
-              margin: '0 auto',
-              lineHeight: '1.6'
-            }}>
+            <p className="text-slate-500 text-lg max-w-2xl mx-auto leading-relaxed">
               Take a glimpse at our salon and the beautiful transformations we create for our valued customers
             </p>
           </div>
 
           {/* Photo Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px'
-          }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {photos.map((photo, index) => (
               <div
                 key={photo.id}
                 onClick={() => setSelectedPhoto(photo)}
-                style={{
-                  position: 'relative',
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease-in-out',
-                  aspectRatio: '4/3'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)'
-                  e.currentTarget.style.boxShadow = '0 20px 60px rgba(236,72,153,0.2)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 10px 40px rgba(0,0,0,0.1)'
-                }}
+                className="group relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-pink-500/20 aspect-[4/3]"
               >
                 <img
                   src={photo.image_url}
                   alt={photo.alt_text || 'Pandora Beauty Salon'}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    transition: 'transform 0.5s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)'
-                  }}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
                 {/* Caption Overlay */}
                 {photo.caption && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: '20px',
-                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                    color: 'white'
-                  }}>
-                    <p style={{
-                      margin: 0,
-                      fontSize: '0.95rem',
-                      fontWeight: '500'
-                    }}>
+                  <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/70 to-transparent text-white">
+                    <p className="m-0 text-base font-medium">
                       {photo.caption}
                     </p>
                   </div>
                 )}
 
                 {/* Hover Overlay */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(135deg, rgba(236,72,153,0.3) 0%, rgba(139,92,246,0.3) 100%)',
-                  opacity: 0,
-                  transition: 'opacity 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = '1'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = '0'
-                }}
-                >
-                  <span style={{
-                    background: 'white',
-                    borderRadius: '50%',
-                    width: '50px',
-                    height: '50px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.5rem',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-                  }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/30 to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span className="bg-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-2xl">
                     🔍
                   </span>
                 </div>
@@ -213,46 +114,21 @@ export default function HomeGallery() {
           aria-modal="true"
           aria-labelledby="lightbox-caption"
           onClick={() => setSelectedPhoto(null)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.9)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '24px',
-            cursor: 'pointer'
-          }}
+          className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-6 cursor-pointer"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'relative',
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              cursor: 'default'
-            }}
+            className="relative max-w-[90vw] max-h-[90vh] cursor-default"
           >
             <img
               src={selectedPhoto.image_url}
               alt={selectedPhoto.alt_text || 'Pandora Beauty Salon'}
-              style={{
-                maxWidth: '100%',
-                maxHeight: '85vh',
-                borderRadius: '16px',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
-              }}
+              className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl"
             />
             {selectedPhoto.caption && (
               <p
                 id="lightbox-caption"
-                style={{
-                  color: 'white',
-                  textAlign: 'center',
-                  marginTop: '16px',
-                  fontSize: '1.1rem'
-                }}
+                className="text-white text-center mt-4 text-lg"
               >
                 {selectedPhoto.caption}
               </p>
@@ -263,23 +139,7 @@ export default function HomeGallery() {
               onClick={() => setSelectedPhoto(null)}
               aria-label="Close lightbox"
               title="Close (or press ESC)"
-              style={{
-                position: 'absolute',
-                top: '-16px',
-                right: '-16px',
-                background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '50%',
-                width: '48px',
-                height: '48px',
-                fontSize: '1.5rem',
-                cursor: 'pointer',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              className="absolute -top-4 -right-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white border-none rounded-full w-12 h-12 text-2xl cursor-pointer shadow-2xl flex items-center justify-center hover:scale-110 transition-transform duration-200"
             >
               ✕
             </button>

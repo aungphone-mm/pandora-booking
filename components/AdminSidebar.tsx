@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 export default function AdminSidebar() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  
+
   const links: Array<{ href: string; label: string; badge?: string; icon: string }> = [
     { href: '/admin', label: 'Dashboard', icon: '🏠' },
     { href: '/admin/reports', label: 'Business Intelligence', badge: 'BI', icon: '📊' },
@@ -21,7 +21,7 @@ export default function AdminSidebar() {
     { href: '/admin/product-categories', label: 'Product Categories', icon: '📦' },
     { href: '/admin/timeslots', label: 'Time Slots', icon: '🕐' },
     { href: '/admin/gallery', label: 'Photo Gallery', icon: '🖼️' },
-    { href: '/admin/health-check', label: 'Health Check', badge: 'DIAG', icon: '🔍' }, 
+    { href: '/admin/health-check', label: 'Health Check', badge: 'DIAG', icon: '🔍' },
   ]
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function AdminSidebar() {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.8; }
       }
-      
+
       /* Mobile responsiveness */
       .mobile-menu-btn {
         display: none;
@@ -98,24 +98,24 @@ export default function AdminSidebar() {
         cursor: pointer;
         box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
       }
-      
+
       .desktop-sidebar {
         display: block;
       }
-      
+
       .mobile-sidebar {
         display: none;
       }
-      
+
       @media (max-width: 768px) {
         .mobile-menu-btn {
           display: block !important;
         }
-        
+
         .desktop-sidebar {
           display: none !important;
         }
-        
+
         .mobile-sidebar {
           display: block !important;
           position: fixed;
@@ -131,15 +131,15 @@ export default function AdminSidebar() {
           box-shadow: 8px 0 30px rgba(0, 0, 0, 0.2);
           overflow: auto;
         }
-        
+
         .mobile-sidebar.open {
           transform: translateX(0);
         }
-        
+
         .sidebar-link:hover {
           transform: none;
         }
-        
+
         .mobile-overlay {
           position: fixed;
           top: 0;
@@ -153,7 +153,7 @@ export default function AdminSidebar() {
       }
     `
     document.head.appendChild(style)
-    
+
     return () => {
       if (document.head.contains(style)) {
         document.head.removeChild(style)
@@ -169,136 +169,53 @@ export default function AdminSidebar() {
   const sidebarContent = (
     <>
       {/* Decorative background elements */}
-      <div style={{
-        position: 'absolute',
-        top: '20%',
-        right: '-10%',
-        width: '200px',
-        height: '200px',
-        background: 'radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%)',
-        borderRadius: '50%'
-      }}></div>
-      <div style={{
-        position: 'absolute',
-        bottom: '10%',
-        left: '-5%',
-        width: '150px',
-        height: '150px',
-        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
-        borderRadius: '50%'
-      }}></div>
-      
-      <div style={{ padding: '32px 24px', position: 'relative', zIndex: 1 }}>
+      <div className="absolute top-[20%] -right-[10%] w-[200px] h-[200px] bg-[radial-gradient(circle,_rgba(236,72,153,0.1)_0%,_transparent_70%)] rounded-full"></div>
+      <div className="absolute bottom-[10%] -left-[5%] w-[150px] h-[150px] bg-[radial-gradient(circle,_rgba(59,130,246,0.1)_0%,_transparent_70%)] rounded-full"></div>
+
+      <div className="p-8 px-6 relative z-10">
         {/* Enhanced Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-          borderRadius: '20px',
-          padding: '24px',
-          marginBottom: '32px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(10px)',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            fontSize: '2rem',
-            marginBottom: '8px'
-          }}>💅</div>
-          <h2 style={{
-            fontSize: '1.5rem',
-            fontWeight: '800',
-            margin: '0',
-            background: 'linear-gradient(135deg, #ec4899 0%, #f9a8d4 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
+        <div className="bg-gradient-to-br from-white/10 to-white/5 rounded-3xl p-6 mb-8 border border-white/10 backdrop-blur-sm text-center">
+          <div className="text-3xl mb-2">💅</div>
+          <h2 className="text-2xl font-extrabold m-0 bg-gradient-to-r from-pink-500 to-pink-300 bg-clip-text text-transparent">
             Pandora Beauty
           </h2>
-          <div style={{
-            fontSize: '0.9rem',
-            color: '#94a3b8',
-            fontWeight: '500',
-            marginTop: '4px'
-          }}>
+          <div className="text-sm text-slate-400 font-medium mt-1">
             Admin Control Panel
           </div>
         </div>
 
         {/* Navigation */}
         <nav>
-          <div style={{
-            fontSize: '0.75rem',
-            fontWeight: '600',
-            color: '#64748b',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            marginBottom: '16px',
-            paddingLeft: '16px'
-          }}>
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4 pl-4">
             Navigation
           </div>
-          <ul style={{
-            listStyle: 'none',
-            padding: '0',
-            margin: '0',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px'
-          }}>
+          <ul className="list-none p-0 m-0 flex flex-col gap-2">
             {links.map(link => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   onClick={handleLinkClick}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    padding: '16px 20px',
-                    borderRadius: '16px',
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    fontSize: '1rem',
-                    fontWeight: '500',
-                    position: 'relative',
-                    border: pathname === link.href ? '1px solid rgba(236, 72, 153, 0.3)' : '1px solid transparent'
-                  }}
-                  className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
+                  className={`sidebar-link flex items-center gap-4 py-4 px-5 rounded-2xl no-underline text-inherit text-base font-medium relative ${
+                    pathname === link.href
+                      ? 'active border border-pink-500/30'
+                      : 'border border-transparent'
+                  }`}
                 >
-                  <span 
-                    style={{ 
-                      fontSize: '1.2rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '24px',
-                      height: '24px'
-                    }}
-                    className="sidebar-icon"
-                  >
+                  <span className="sidebar-icon text-xl flex items-center justify-center w-6 h-6">
                     {link.icon}
                   </span>
-                  
-                  <span style={{ flex: 1 }}>{link.label}</span>
-                  
+
+                  <span className="flex-1">{link.label}</span>
+
                   {link.badge && (
-                    <span 
-                      style={{
-                        padding: '4px 10px',
-                        fontSize: '0.7rem',
-                        borderRadius: '12px',
-                        fontWeight: '700',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        background: link.badge === 'BI' 
-                          ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' 
+                    <span
+                      className={`sidebar-badge px-2.5 py-1 text-xs rounded-xl font-bold uppercase tracking-wide text-white shadow-lg ${
+                        link.badge === 'BI'
+                          ? 'bg-gradient-to-r from-purple-500 to-purple-700'
                           : link.badge === 'NEW'
-                          ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                          : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                        color: 'white',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
-                      }}
-                      className="sidebar-badge"
+                          ? 'bg-gradient-to-r from-emerald-500 to-emerald-700'
+                          : 'bg-gradient-to-r from-blue-500 to-blue-800'
+                      }`}
                     >
                       {link.badge}
                     </span>
@@ -310,63 +227,29 @@ export default function AdminSidebar() {
         </nav>
 
         {/* Enhanced Footer Section */}
-        <div style={{
-          marginTop: '40px',
-          padding: '20px',
-          background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(190, 24, 93, 0.1) 100%)',
-          borderRadius: '16px',
-          border: '1px solid rgba(236, 72, 153, 0.2)',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            fontSize: '1.5rem',
-            marginBottom: '8px'
-          }}>✨</div>
-          <div style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#f1f5f9',
-            marginBottom: '4px'
-          }}>
+        <div className="mt-10 p-5 bg-gradient-to-br from-pink-500/10 to-pink-800/10 rounded-2xl border border-pink-500/20 text-center">
+          <div className="text-2xl mb-2">✨</div>
+          <div className="text-sm font-semibold text-slate-100 mb-1">
             Admin Dashboard
           </div>
-          <div style={{
-            fontSize: '0.75rem',
-            color: '#94a3b8'
-          }}>
+          <div className="text-xs text-slate-400">
             Manage your salon efficiently
           </div>
         </div>
 
         {/* Quick Stats Mini Widget */}
-        <div style={{
-          marginTop: '24px',
-          padding: '16px',
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
-          borderRadius: '16px',
-          border: '1px solid rgba(59, 130, 246, 0.2)'
-        }}>
-          <div style={{
-            fontSize: '0.8rem',
-            color: '#94a3b8',
-            marginBottom: '8px',
-            textAlign: 'center'
-          }}>
+        <div className="mt-6 p-4 bg-gradient-to-br from-blue-500/10 to-blue-800/10 rounded-2xl border border-blue-500/20">
+          <div className="text-xs text-slate-400 mb-2 text-center">
             Quick Status
           </div>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '8px',
-            fontSize: '0.75rem'
-          }}>
-            <div style={{ textAlign: 'center', color: '#10b981' }}>
-              <div style={{ fontWeight: '700' }}>Online</div>
-              <div style={{ color: '#94a3b8' }}>System</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="text-center text-emerald-500">
+              <div className="font-bold">Online</div>
+              <div className="text-slate-400">System</div>
             </div>
-            <div style={{ textAlign: 'center', color: '#ec4899' }}>
-              <div style={{ fontWeight: '700' }}>Active</div>
-              <div style={{ color: '#94a3b8' }}>Admin</div>
+            <div className="text-center text-pink-500">
+              <div className="font-bold">Active</div>
+              <div className="text-slate-400">Admin</div>
             </div>
           </div>
         </div>
@@ -386,30 +269,21 @@ export default function AdminSidebar() {
 
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="mobile-overlay"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Desktop Sidebar */}
-      <aside 
-        className="desktop-sidebar"
-        style={{
-          width: '280px',
-          background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
-          color: 'white',
-          minHeight: '100vh',
-          boxShadow: '8px 0 30px rgba(0, 0, 0, 0.2)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
+      <aside
+        className="desktop-sidebar w-[280px] bg-gradient-to-b from-slate-800 to-slate-950 text-white min-h-screen shadow-2xl relative overflow-hidden"
       >
         {sidebarContent}
       </aside>
 
       {/* Mobile Sidebar */}
-      <aside 
+      <aside
         className={`mobile-sidebar ${isMobileMenuOpen ? 'open' : ''}`}
       >
         {sidebarContent}

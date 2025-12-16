@@ -17,54 +17,21 @@ export default function CustomerInfoForm({
   register
 }: CustomerInfoFormProps) {
   return (
-    <div style={{ padding: '32px' }}>
-      <h2 style={{
-        fontSize: '1.5rem',
-        fontWeight: '600',
-        color: '#111827',
-        marginBottom: '8px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
-      }}>
-        <span style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '50%',
-          backgroundColor: '#3b82f6',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '0.875rem',
-          fontWeight: 'bold'
-        }}>4</span>
+    <div className="p-8">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-2 flex items-center gap-3">
+        <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">4</span>
         Your Information
       </h2>
-      <p style={{
-        color: '#6b7280',
-        marginBottom: '24px',
-        fontSize: '0.875rem'
-      }}>
+      <p className="text-gray-500 mb-6 text-sm">
         {isLoggedIn
           ? 'Review and update your contact information if needed'
           : 'Please provide your contact information'}
       </p>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '20px'
-      }}>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5">
         {/* Customer Name */}
         <div>
-          <label style={{
-            display: 'block',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px',
-            fontSize: '0.875rem'
-          }}>
+          <label className="block font-semibold text-gray-700 mb-2 text-sm">
             Full Name *
           </label>
           <input
@@ -74,16 +41,12 @@ export default function CustomerInfoForm({
               minLength: { value: 2, message: 'Name must be at least 2 characters' }
             })}
             placeholder="John Doe"
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              border: `2px solid ${errors.customerName ? '#ef4444' : '#e5e7eb'}`,
-              borderRadius: '8px',
-              fontSize: '1rem'
-            }}
+            className={`w-full px-4 py-3 border-2 rounded-lg text-base ${
+              errors.customerName ? 'border-red-500' : 'border-gray-200'
+            }`}
           />
           {errors.customerName && (
-            <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '4px' }}>
+            <p className="text-red-500 text-sm mt-1">
               {errors.customerName.message as string}
             </p>
           )}
@@ -91,13 +54,7 @@ export default function CustomerInfoForm({
 
         {/* Customer Email */}
         <div>
-          <label style={{
-            display: 'block',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px',
-            fontSize: '0.875rem'
-          }}>
+          <label className="block font-semibold text-gray-700 mb-2 text-sm">
             Email Address (Optional)
           </label>
           <input
@@ -109,16 +66,12 @@ export default function CustomerInfoForm({
               }
             })}
             placeholder="john@example.com"
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              border: `2px solid ${errors.customerEmail ? '#ef4444' : '#e5e7eb'}`,
-              borderRadius: '8px',
-              fontSize: '1rem'
-            }}
+            className={`w-full px-4 py-3 border-2 rounded-lg text-base ${
+              errors.customerEmail ? 'border-red-500' : 'border-gray-200'
+            }`}
           />
           {errors.customerEmail && (
-            <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '4px' }}>
+            <p className="text-red-500 text-sm mt-1">
               {errors.customerEmail.message as string}
             </p>
           )}
@@ -126,13 +79,7 @@ export default function CustomerInfoForm({
 
         {/* Customer Phone */}
         <div>
-          <label style={{
-            display: 'block',
-            fontWeight: '600',
-            color: '#374151',
-            marginBottom: '8px',
-            fontSize: '0.875rem'
-          }}>
+          <label className="block font-semibold text-gray-700 mb-2 text-sm">
             Phone Number *
           </label>
           <input
@@ -145,16 +92,12 @@ export default function CustomerInfoForm({
               }
             })}
             placeholder="+1 234 567 8900"
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              border: `2px solid ${errors.customerPhone ? '#ef4444' : '#e5e7eb'}`,
-              borderRadius: '8px',
-              fontSize: '1rem'
-            }}
+            className={`w-full px-4 py-3 border-2 rounded-lg text-base ${
+              errors.customerPhone ? 'border-red-500' : 'border-gray-200'
+            }`}
           />
           {errors.customerPhone && (
-            <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '4px' }}>
+            <p className="text-red-500 text-sm mt-1">
               {errors.customerPhone.message as string}
             </p>
           )}
@@ -162,29 +105,15 @@ export default function CustomerInfoForm({
       </div>
 
       {/* Special Requests / Notes */}
-      <div style={{ marginTop: '20px' }}>
-        <label style={{
-          display: 'block',
-          fontWeight: '600',
-          color: '#374151',
-          marginBottom: '8px',
-          fontSize: '0.875rem'
-        }}>
+      <div className="mt-5">
+        <label className="block font-semibold text-gray-700 mb-2 text-sm">
           Special Requests or Notes (Optional)
         </label>
         <textarea
           {...register('notes')}
           placeholder="Any special requests, allergies, or preferences..."
           rows={4}
-          style={{
-            width: '100%',
-            padding: '12px 16px',
-            border: '2px solid #e5e7eb',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            resize: 'vertical',
-            fontFamily: 'inherit'
-          }}
+          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base resize-y font-sans"
         />
       </div>
     </div>

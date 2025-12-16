@@ -2,11 +2,7 @@ import StaffManager from '@/components/StaffManager'
 
 export default function AdminStaffPage() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      padding: '24px'
-    }}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 p-6">
       <StaffManager />
     </div>
   )

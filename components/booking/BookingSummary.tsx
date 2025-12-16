@@ -25,91 +25,33 @@ export default function BookingSummary({
     .filter((p): p is Product => p !== undefined)
 
   return (
-    <div style={{
-      padding: '32px',
-      backgroundColor: '#f9fafb',
-      borderTop: '1px solid #e5e7eb'
-    }}>
-      <h2 style={{
-        fontSize: '1.5rem',
-        fontWeight: '600',
-        color: '#111827',
-        marginBottom: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
-      }}>
-        <span style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '50%',
-          backgroundColor: '#6366f1',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '0.875rem',
-          fontWeight: 'bold'
-        }}>5</span>
+    <div className="p-8 bg-gray-50 border-t border-gray-200">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-3">
+        <span className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">5</span>
         Booking Summary
       </h2>
 
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        border: '2px solid #e5e7eb'
-      }}>
+      <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
         {/* Services */}
         {selectedServices.length > 0 && (
-          <div style={{
-            marginBottom: '16px',
-            paddingBottom: '16px',
-            borderBottom: '1px solid #e5e7eb'
-          }}>
-            <div style={{
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              color: '#6b7280',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '12px'
-            }}>
+          <div className="mb-4 pb-4 border-b border-gray-200">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Services ({selectedServices.length})
             </div>
             {selectedServices.map((service) => (
               <div
                 key={service.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '10px',
-                  padding: '8px',
-                  backgroundColor: '#fdf2f8',
-                  borderRadius: '6px'
-                }}
+                className="flex justify-between items-center mb-2.5 p-2 bg-pink-50 rounded-md"
               >
                 <div>
-                  <div style={{
-                    fontWeight: '600',
-                    color: '#111827',
-                    fontSize: '0.9rem'
-                  }}>
+                  <div className="font-semibold text-gray-900 text-sm">
                     {service.name}
                   </div>
-                  <div style={{
-                    fontSize: '0.75rem',
-                    color: '#6b7280'
-                  }}>
+                  <div className="text-xs text-gray-500">
                     {service.duration} minutes
                   </div>
                 </div>
-                <div style={{
-                  fontWeight: '600',
-                  color: '#111827',
-                  fontSize: '1rem'
-                }}>
+                <div className="font-semibold text-gray-900 text-base">
                   ${service.price}
                 </div>
               </div>
@@ -119,42 +61,19 @@ export default function BookingSummary({
 
         {/* Products */}
         {selectedProductsList.length > 0 && (
-          <div style={{
-            marginBottom: '16px',
-            paddingBottom: '16px',
-            borderBottom: '1px solid #e5e7eb'
-          }}>
-            <div style={{
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              color: '#6b7280',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '12px'
-            }}>
+          <div className="mb-4 pb-4 border-b border-gray-200">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Add-on Products
             </div>
             {selectedProductsList.map(product => (
               <div
                 key={product.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '8px'
-                }}
+                className="flex justify-between items-center mb-2"
               >
-                <div style={{
-                  fontSize: '0.875rem',
-                  color: '#374151'
-                }}>
+                <div className="text-sm text-gray-700">
                   {product.name}
                 </div>
-                <div style={{
-                  fontWeight: '600',
-                  color: '#374151',
-                  fontSize: '0.875rem'
-                }}>
+                <div className="font-semibold text-gray-700 text-sm">
                   ${product.price}
                 </div>
               </div>
@@ -163,24 +82,11 @@ export default function BookingSummary({
         )}
 
         {/* Total */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingTop: '16px'
-        }}>
-          <div style={{
-            fontSize: '1.25rem',
-            fontWeight: '700',
-            color: '#111827'
-          }}>
+        <div className="flex justify-between items-center pt-4">
+          <div className="text-xl font-bold text-gray-900">
             Total
           </div>
-          <div style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            color: '#ec4899'
-          }}>
+          <div className="text-2xl font-bold text-pink-600">
             ${totalPrice.toFixed(2)}
           </div>
         </div>
@@ -190,37 +96,15 @@ export default function BookingSummary({
       <button
         type="submit"
         disabled={loading}
-        style={{
-          width: '100%',
-          marginTop: '24px',
-          padding: '16px',
-          backgroundColor: loading ? '#9ca3af' : '#ec4899',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          fontSize: '1.125rem',
-          fontWeight: '600',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-          boxShadow: loading ? 'none' : '0 4px 6px rgba(236, 72, 153, 0.2)'
-        }}
+        className={`w-full mt-6 px-4 py-4 text-white border-0 rounded-lg text-lg font-semibold transition-all shadow-pink-200 ${
+          loading
+            ? 'bg-gray-400 cursor-not-allowed shadow-none'
+            : 'bg-pink-600 cursor-pointer hover:bg-pink-700 shadow-lg'
+        }`}
       >
         {loading ? (
-          <span style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px'
-          }}>
-            <span style={{
-              width: '20px',
-              height: '20px',
-              border: '2px solid #ffffff',
-              borderTop: '2px solid transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              display: 'inline-block'
-            }}></span>
+          <span className="flex items-center justify-center gap-3">
+            <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>
             Processing...
           </span>
         ) : (
@@ -228,12 +112,7 @@ export default function BookingSummary({
         )}
       </button>
 
-      <p style={{
-        textAlign: 'center',
-        marginTop: '16px',
-        fontSize: '0.875rem',
-        color: '#6b7280'
-      }}>
+      <p className="text-center mt-4 text-sm text-gray-500">
         By booking, you agree to our terms and conditions
       </p>
     </div>

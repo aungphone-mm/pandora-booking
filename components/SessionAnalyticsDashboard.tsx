@@ -161,84 +161,26 @@ export default function SessionAnalyticsDashboard() {
 
   if (loading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-        padding: '48px',
-        textAlign: 'center',
-        border: '1px solid #f1f5f9'
-      }}>
-        <div style={{
-          display: 'inline-block',
-          width: '48px',
-          height: '48px',
-          border: '4px solid #f1f5f9',
-          borderTop: '4px solid #ec4899',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          marginBottom: '20px'
-        }}></div>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: '700',
-          marginBottom: '8px',
-          color: '#1e293b'
-        }}>Loading Session Analytics</h2>
-        <p style={{
-          color: '#64748b',
-          fontSize: '1rem'
-        }}>Please wait while we fetch your data...</p>
+      <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-12 text-center border border-slate-100">
+        <div className="inline-block w-12 h-12 border-4 border-slate-100 border-t-pink-500 rounded-full animate-spin mb-5"></div>
+        <h2 className="text-2xl font-bold mb-2 text-slate-800">Loading Session Analytics</h2>
+        <p className="text-slate-500 text-base">Please wait while we fetch your data...</p>
       </div>
     )
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '32px'
-    }}>
+    <div className="flex flex-col gap-8">
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(102, 126, 234, 0.3)',
-        padding: '32px',
-        color: 'white'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px'
-        }}>
+      <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-600 rounded-[20px] shadow-[0_15px_35px_rgba(102,126,234,0.3)] p-8 text-white">
+        <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 style={{
-              fontSize: '2.25rem',
-              fontWeight: '800',
-              margin: '0 0 8px 0',
-              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>📊 Session Analytics</h2>
-            <p style={{
-              fontSize: '1.1rem',
-              margin: '0',
-              opacity: '0.9'
-            }}>Track user devices, browsers, and visit patterns</p>
+            <h2 className="text-4xl font-extrabold m-0 mb-2 drop-shadow-sm">📊 Session Analytics</h2>
+            <p className="text-lg m-0 opacity-90">Track user devices, browsers, and visit patterns</p>
           </div>
           <button
             onClick={loadSessionData}
-            style={{
-              background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
-              color: 'white',
-              padding: '16px 24px',
-              borderRadius: '12px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '600',
-              fontSize: '1rem',
-              boxShadow: '0 6px 20px rgba(236, 72, 153, 0.3)'
-            }}
+            className="bg-gradient-to-br from-pink-500 to-pink-700 text-white px-6 py-4 rounded-xl border-none cursor-pointer font-semibold text-base shadow-[0_6px_20px_rgba(236,72,153,0.3)] hover:-translate-y-px hover:shadow-[0_8px_25px_rgba(236,72,153,0.4)] active:translate-y-0 transition-all duration-200"
           >
             🔄 Refresh Data
           </button>
@@ -246,48 +188,24 @@ export default function SessionAnalyticsDashboard() {
       </div>
 
       {error && (
-        <div style={{
-          background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-          border: '1px solid #f87171',
-          borderRadius: '16px',
-          padding: '24px',
-          boxShadow: '0 8px 25px rgba(248, 113, 113, 0.2)'
-        }}>
-          <p style={{ color: '#dc2626', fontWeight: '600', margin: '0' }}>⚠️ {error}</p>
+        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-300 rounded-2xl p-6 shadow-[0_8px_25px_rgba(248,113,113,0.2)]">
+          <p className="text-red-600 font-semibold m-0">⚠️ {error}</p>
         </div>
       )}
 
       {/* Timeframe Selector */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.06)',
-        padding: '24px',
-        border: '1px solid #f1f5f9'
-      }}>
-        <h3 style={{
-          fontSize: '1.2rem',
-          fontWeight: '700',
-          margin: '0 0 16px 0',
-          color: '#1e293b'
-        }}>📅 Timeframe</h3>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+      <div className="bg-white rounded-[20px] shadow-[0_8px_25px_rgba(0,0,0,0.06)] p-6 border border-slate-100">
+        <h3 className="text-xl font-bold m-0 mb-4 text-slate-800">📅 Timeframe</h3>
+        <div className="flex gap-3 flex-wrap">
           {(['today', '7days', '30days', 'all'] as const).map(period => (
             <button
               key={period}
               onClick={() => setTimeframe(period)}
-              style={{
-                padding: '12px 24px',
-                borderRadius: '12px',
-                border: '2px solid',
-                borderColor: timeframe === period ? '#ec4899' : '#e2e8f0',
-                backgroundColor: timeframe === period ? '#fdf2f8' : 'white',
-                color: timeframe === period ? '#ec4899' : '#64748b',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '0.95rem',
-                transition: 'all 0.2s'
-              }}
+              className={`px-6 py-3 rounded-xl border-2 cursor-pointer font-semibold text-sm transition-all duration-200 ${
+                timeframe === period
+                  ? 'border-pink-500 bg-pink-50 text-pink-500'
+                  : 'border-slate-200 bg-white text-slate-500 hover:border-pink-300'
+              }`}
             >
               {period === 'today' && 'Today'}
               {period === '7days' && 'Last 7 Days'}
@@ -302,190 +220,60 @@ export default function SessionAnalyticsDashboard() {
       {analytics && (
         <>
           {/* Stats Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '20px'
-          }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Total Sessions */}
-            <div style={{
-              background: 'linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)',
-              padding: '28px',
-              borderRadius: '16px',
-              border: '1px solid #60a5fa',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.15)'
-            }}>
-              <div style={{ fontSize: '2rem', marginBottom: '8px' }}>👥</div>
-              <h3 style={{
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: '#1e40af',
-                textTransform: 'uppercase',
-                margin: '0 0 8px 0'
-              }}>Total Sessions</h3>
-              <p style={{
-                fontSize: '2.5rem',
-                fontWeight: '800',
-                color: '#1e40af',
-                margin: '0'
-              }}>{analytics.totalSessions}</p>
+            <div className="bg-gradient-to-br from-blue-100 to-blue-300 p-7 rounded-2xl border border-blue-400 shadow-[0_6px_20px_rgba(59,130,246,0.15)]">
+              <div className="text-3xl mb-2">👥</div>
+              <h3 className="text-sm font-semibold text-blue-900 uppercase m-0 mb-2">Total Sessions</h3>
+              <p className="text-5xl font-extrabold text-blue-900 m-0">{analytics.totalSessions}</p>
             </div>
 
             {/* Mobile Sessions */}
-            <div style={{
-              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-              padding: '28px',
-              borderRadius: '16px',
-              border: '1px solid #fbbf24',
-              boxShadow: '0 6px 20px rgba(251, 191, 36, 0.15)'
-            }}>
-              <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📱</div>
-              <h3 style={{
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: '#92400e',
-                textTransform: 'uppercase',
-                margin: '0 0 8px 0'
-              }}>Mobile Sessions</h3>
-              <p style={{
-                fontSize: '2.5rem',
-                fontWeight: '800',
-                color: '#92400e',
-                margin: '0'
-              }}>{analytics.mobileSessions}</p>
-              <p style={{
-                fontSize: '0.9rem',
-                color: '#92400e',
-                margin: '8px 0 0 0'
-              }}>{analytics.mobilePercentage}% of total</p>
+            <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 p-7 rounded-2xl border border-amber-400 shadow-[0_6px_20px_rgba(251,191,36,0.15)]">
+              <div className="text-3xl mb-2">📱</div>
+              <h3 className="text-sm font-semibold text-amber-900 uppercase m-0 mb-2">Mobile Sessions</h3>
+              <p className="text-5xl font-extrabold text-amber-900 m-0">{analytics.mobileSessions}</p>
+              <p className="text-sm text-amber-900 mt-2 mb-0">{analytics.mobilePercentage}% of total</p>
             </div>
 
             {/* Desktop Sessions */}
-            <div style={{
-              background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
-              padding: '28px',
-              borderRadius: '16px',
-              border: '1px solid #4ade80',
-              boxShadow: '0 6px 20px rgba(74, 222, 128, 0.15)'
-            }}>
-              <div style={{ fontSize: '2rem', marginBottom: '8px' }}>💻</div>
-              <h3 style={{
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: '#166534',
-                textTransform: 'uppercase',
-                margin: '0 0 8px 0'
-              }}>Desktop Sessions</h3>
-              <p style={{
-                fontSize: '2.5rem',
-                fontWeight: '800',
-                color: '#166534',
-                margin: '0'
-              }}>{analytics.desktopSessions}</p>
+            <div className="bg-gradient-to-br from-green-100 to-green-200 p-7 rounded-2xl border border-green-400 shadow-[0_6px_20px_rgba(74,222,128,0.15)]">
+              <div className="text-3xl mb-2">💻</div>
+              <h3 className="text-sm font-semibold text-green-800 uppercase m-0 mb-2">Desktop Sessions</h3>
+              <p className="text-5xl font-extrabold text-green-800 m-0">{analytics.desktopSessions}</p>
             </div>
 
             {/* Registered Users */}
-            <div style={{
-              background: 'linear-gradient(135deg, #ede9fe 0%, #c4b5fd 100%)',
-              padding: '28px',
-              borderRadius: '16px',
-              border: '1px solid #a78bfa',
-              boxShadow: '0 6px 20px rgba(167, 139, 250, 0.15)'
-            }}>
-              <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🔐</div>
-              <h3 style={{
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: '#6d28d9',
-                textTransform: 'uppercase',
-                margin: '0 0 8px 0'
-              }}>Registered Users</h3>
-              <p style={{
-                fontSize: '2.5rem',
-                fontWeight: '800',
-                color: '#6d28d9',
-                margin: '0'
-              }}>{analytics.registeredUsers}</p>
+            <div className="bg-gradient-to-br from-violet-100 to-violet-200 p-7 rounded-2xl border border-violet-300 shadow-[0_6px_20px_rgba(167,139,250,0.15)]">
+              <div className="text-3xl mb-2">🔐</div>
+              <h3 className="text-sm font-semibold text-violet-800 uppercase m-0 mb-2">Registered Users</h3>
+              <p className="text-5xl font-extrabold text-violet-800 m-0">{analytics.registeredUsers}</p>
             </div>
           </div>
 
           {/* Browser & OS Breakdown */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '24px'
-          }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Browser Stats */}
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '20px',
-              boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-              padding: '32px',
-              border: '1px solid #f1f5f9'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                margin: '0 0 20px 0',
-                color: '#1e293b'
-              }}>🌐 Browser Usage</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-8 border border-slate-100">
+              <h3 className="text-2xl font-bold m-0 mb-5 text-slate-800">🌐 Browser Usage</h3>
+              <div className="flex flex-col gap-3">
                 {Object.entries(analytics.browserCount).map(([browser, count]) => (
-                  <div key={browser} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '12px',
-                    backgroundColor: '#f8fafc',
-                    borderRadius: '8px'
-                  }}>
-                    <span style={{ fontWeight: '600', color: '#475569' }}>{browser}</span>
-                    <span style={{
-                      backgroundColor: '#ec4899',
-                      color: 'white',
-                      padding: '4px 12px',
-                      borderRadius: '20px',
-                      fontSize: '0.875rem',
-                      fontWeight: '600'
-                    }}>{count as number}</span>
+                  <div key={browser} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span className="font-semibold text-slate-600">{browser}</span>
+                    <span className="bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold">{count as number}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* OS Stats */}
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '20px',
-              boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-              padding: '32px',
-              border: '1px solid #f1f5f9'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                margin: '0 0 20px 0',
-                color: '#1e293b'
-              }}>💿 Operating Systems</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-8 border border-slate-100">
+              <h3 className="text-2xl font-bold m-0 mb-5 text-slate-800">💿 Operating Systems</h3>
+              <div className="flex flex-col gap-3">
                 {Object.entries(analytics.osCount).map(([os, count]) => (
-                  <div key={os} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '12px',
-                    backgroundColor: '#f8fafc',
-                    borderRadius: '8px'
-                  }}>
-                    <span style={{ fontWeight: '600', color: '#475569' }}>{os}</span>
-                    <span style={{
-                      backgroundColor: '#8b5cf6',
-                      color: 'white',
-                      padding: '4px 12px',
-                      borderRadius: '20px',
-                      fontSize: '0.875rem',
-                      fontWeight: '600'
-                    }}>{count as number}</span>
+                  <div key={os} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span className="font-semibold text-slate-600">{os}</span>
+                    <span className="bg-violet-600 text-white px-3 py-1 rounded-full text-sm font-semibold">{count as number}</span>
                   </div>
                 ))}
               </div>
@@ -493,111 +281,75 @@ export default function SessionAnalyticsDashboard() {
           </div>
 
           {/* Recent Sessions Table */}
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '20px',
-            boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-            padding: '32px',
-            border: '1px solid #f1f5f9'
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px',
-              flexWrap: 'wrap',
-              gap: '16px'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                margin: '0',
-                color: '#1e293b'
-              }}>📋 Recent Sessions</h3>
+          <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-8 border border-slate-100">
+            <div className="flex justify-between items-center mb-5 flex-wrap gap-4">
+              <h3 className="text-2xl font-bold m-0 text-slate-800">📋 Recent Sessions</h3>
 
               <button
                 onClick={() => {
                   setGroupSessions(!groupSessions)
                   setCurrentPage(1)
                 }}
-                style={{
-                  padding: '12px 20px',
-                  borderRadius: '12px',
-                  border: '2px solid',
-                  borderColor: groupSessions ? '#ec4899' : '#e2e8f0',
-                  backgroundColor: groupSessions ? '#fdf2f8' : 'white',
-                  color: groupSessions ? '#ec4899' : '#64748b',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.95rem',
-                  transition: 'all 0.2s'
-                }}
+                className={`px-5 py-3 rounded-xl border-2 cursor-pointer font-semibold text-sm transition-all duration-200 ${
+                  groupSessions
+                    ? 'border-pink-500 bg-pink-50 text-pink-500'
+                    : 'border-slate-200 bg-white text-slate-500'
+                }`}
               >
                 {groupSessions ? '✓ Grouped View' : '○ Group Similar Sessions'}
               </button>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                  <tr className="bg-slate-50 border-b-2 border-slate-200">
                     {groupSessions && (
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Count</th>
+                      <th className="p-3 text-left font-bold text-gray-700 text-sm">Count</th>
                     )}
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>User</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Device Type</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Phone/Device</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Browser</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>OS</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Screen</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Language</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Duration</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Referrer</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Landing Page</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Bot</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '700', color: '#374151', fontSize: '0.85rem' }}>Time</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">User</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Device Type</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Phone/Device</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Browser</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">OS</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Screen</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Language</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Duration</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Referrer</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Landing Page</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Bot</th>
+                    <th className="p-3 text-left font-bold text-gray-700 text-sm">Time</th>
                   </tr>
                 </thead>
                 <tbody>
                   {displaySessions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((session, idx) => (
-                    <tr key={session.id} style={{
-                      borderBottom: '1px solid #f1f5f9',
-                      backgroundColor: idx % 2 === 0 ? 'white' : '#fafbfc'
-                    }}>
+                    <tr key={session.id} className={`border-b border-slate-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}>
                       {groupSessions && (
-                        <td style={{ padding: '16px' }}>
-                          <div style={{
-                            display: 'inline-block',
-                            backgroundColor: '#ec4899',
-                            color: 'white',
-                            padding: '6px 12px',
-                            borderRadius: '20px',
-                            fontWeight: '700',
-                            fontSize: '1rem'
-                          }}>
+                        <td className="p-4">
+                          <div className="inline-block bg-pink-500 text-white px-3 py-1.5 rounded-full font-bold text-base">
                             {(session as any).sessionCount}×
                           </div>
                         </td>
                       )}
-                      <td style={{ padding: '16px' }}>
+                      <td className="p-4">
                         <div>
                           {groupSessions && (session as any).usersList?.length > 0 ? (
                             <>
-                              <p style={{ margin: '0', fontWeight: '600', color: '#1e293b' }}>
+                              <p className="m-0 font-semibold text-slate-800">
                                 {(session as any).usersList.length} user{(session as any).usersList.length > 1 ? 's' : ''}
                               </p>
-                              <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                              <p className="mt-1 mb-0 text-xs text-slate-500">
                                 {(session as any).usersList.slice(0, 2).join(', ')}
                                 {(session as any).usersList.length > 2 && ` +${(session as any).usersList.length - 2} more`}
                               </p>
                             </>
                           ) : (
                             <>
-                              <p style={{ margin: '0', fontWeight: '600', color: '#1e293b' }}>
+                              <p className="m-0 font-semibold text-slate-800">
                                 {session.user_name || session.user_email || 'Guest'}
                               </p>
                               {session.user_id && (
-                                <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>
+                                <p className="mt-1 mb-0 text-sm text-slate-500">
                                   🔐 Registered
                                 </p>
                               )}
@@ -605,28 +357,25 @@ export default function SessionAnalyticsDashboard() {
                           )}
                         </div>
                       </td>
-                      <td style={{ padding: '16px' }}>
-                        <span style={{
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          backgroundColor: session.is_mobile ? '#fef3c7' : session.is_tablet ? '#dbeafe' : '#dcfce7',
-                          color: session.is_mobile ? '#92400e' : session.is_tablet ? '#1e40af' : '#166534'
-                        }}>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          session.is_mobile ? 'bg-yellow-100 text-amber-900' :
+                          session.is_tablet ? 'bg-blue-100 text-blue-900' :
+                          'bg-green-100 text-green-800'
+                        }`}>
                           {session.device_type}
                         </span>
                       </td>
-                      <td style={{ padding: '16px', color: '#475569', fontWeight: '600', fontSize: '0.875rem' }}>
+                      <td className="p-4 text-slate-600 font-semibold text-sm">
                         {session.device_model || '-'}
                       </td>
 
                       {/* Browser with version */}
-                      <td style={{ padding: '16px', color: '#475569', fontSize: '0.875rem' }}>
+                      <td className="p-4 text-slate-600 text-sm">
                         <div>
-                          <p style={{ margin: '0', fontWeight: '600' }}>{session.browser_name || 'Unknown'}</p>
+                          <p className="m-0 font-semibold">{session.browser_name || 'Unknown'}</p>
                           {session.browser_version && (
-                            <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                            <p className="mt-0.5 mb-0 text-xs text-slate-400">
                               v{session.browser_version}
                             </p>
                           )}
@@ -634,11 +383,11 @@ export default function SessionAnalyticsDashboard() {
                       </td>
 
                       {/* OS with version */}
-                      <td style={{ padding: '16px', color: '#475569', fontSize: '0.875rem' }}>
+                      <td className="p-4 text-slate-600 text-sm">
                         <div>
-                          <p style={{ margin: '0', fontWeight: '600' }}>{session.os_name || 'Unknown'}</p>
+                          <p className="m-0 font-semibold">{session.os_name || 'Unknown'}</p>
                           {session.os_version && (
-                            <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                            <p className="mt-0.5 mb-0 text-xs text-slate-400">
                               v{session.os_version}
                             </p>
                           )}
@@ -646,11 +395,11 @@ export default function SessionAnalyticsDashboard() {
                       </td>
 
                       {/* Screen Resolution */}
-                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b' }}>
+                      <td className="p-4 text-sm text-slate-500">
                         <div>
-                          <p style={{ margin: '0', fontWeight: '600' }}>{session.screen_resolution || '-'}</p>
+                          <p className="m-0 font-semibold">{session.screen_resolution || '-'}</p>
                           {session.viewport_size && session.viewport_size !== session.screen_resolution && (
-                            <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#94a3b8' }}>
+                            <p className="mt-0.5 mb-0 text-xs text-slate-400">
                               View: {session.viewport_size}
                             </p>
                           )}
@@ -658,12 +407,12 @@ export default function SessionAnalyticsDashboard() {
                       </td>
 
                       {/* Language */}
-                      <td style={{ padding: '16px', fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>
+                      <td className="p-4 text-sm text-slate-500 font-semibold">
                         {session.language ? session.language.split('-')[0].toUpperCase() : '-'}
                       </td>
 
                       {/* Duration */}
-                      <td style={{ padding: '16px', fontSize: '0.85rem' }}>
+                      <td className="p-4 text-sm">
                         {(() => {
                           let durationSeconds = session.duration_seconds
 
@@ -680,38 +429,27 @@ export default function SessionAnalyticsDashboard() {
                             const isActive = !session.session_end
 
                             return (
-                              <span style={{
-                                backgroundColor: durationSeconds > 300 ? '#dcfce7' : durationSeconds > 60 ? '#fef3c7' : '#fee2e2',
-                                color: durationSeconds > 300 ? '#166534' : durationSeconds > 60 ? '#92400e' : '#991b1b',
-                                padding: '4px 8px',
-                                borderRadius: '6px',
-                                fontWeight: '600',
-                                fontSize: '0.75rem',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px'
-                              }}>
+                              <span className={`px-2 py-1 rounded-md font-semibold text-xs inline-flex items-center gap-1 ${
+                                durationSeconds > 300 ? 'bg-green-100 text-green-800' :
+                                durationSeconds > 60 ? 'bg-yellow-100 text-amber-900' :
+                                'bg-red-100 text-red-800'
+                              }`}>
                                 {minutes}m {seconds}s
-                                {isActive && <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>●</span>}
+                                {isActive && <span className="text-[0.6rem] opacity-70">●</span>}
                               </span>
                             )
                           }
 
                           return (
-                            <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>-</span>
+                            <span className="text-slate-400 text-xs">-</span>
                           )
                         })()}
                       </td>
 
                       {/* Referrer */}
-                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b', maxWidth: '200px' }}>
+                      <td className="p-4 text-sm text-slate-500 max-w-[200px]">
                         {session.referrer ? (
-                          <div style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            fontWeight: '500'
-                          }}>
+                          <div className="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
                             {session.referrer.includes('google') ? '🔍 Google' :
                              session.referrer.includes('facebook') ? '👥 Facebook' :
                              session.referrer.includes('instagram') ? '📸 Instagram' :
@@ -719,42 +457,30 @@ export default function SessionAnalyticsDashboard() {
                              safeGetHostname(session.referrer)}
                           </div>
                         ) : (
-                          <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Direct</span>
+                          <span className="text-slate-400 italic">Direct</span>
                         )}
                       </td>
 
                       {/* Landing Page */}
-                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b', maxWidth: '150px' }}>
-                        <div style={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          fontWeight: '500'
-                        }}>
+                      <td className="p-4 text-sm text-slate-500 max-w-[150px]">
+                        <div className="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
                           {safeGetPathname(session.landing_page)}
                         </div>
                       </td>
 
                       {/* Bot Flag */}
-                      <td style={{ padding: '16px', textAlign: 'center' }}>
+                      <td className="p-4 text-center">
                         {session.is_bot ? (
-                          <span style={{
-                            backgroundColor: '#fee2e2',
-                            color: '#991b1b',
-                            padding: '4px 8px',
-                            borderRadius: '6px',
-                            fontWeight: '700',
-                            fontSize: '0.7rem'
-                          }}>
+                          <span className="bg-red-100 text-red-800 px-2 py-1 rounded-md font-bold text-[0.7rem]">
                             🤖 BOT
                           </span>
                         ) : (
-                          <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>-</span>
+                          <span className="text-slate-400 text-xs">-</span>
                         )}
                       </td>
 
                       {/* Time */}
-                      <td style={{ padding: '16px', fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                      <td className="p-4 text-sm text-slate-500 whitespace-nowrap">
                         {format(new Date(session.created_at), 'MMM d, h:mm a')}
                       </td>
                     </tr>
@@ -764,31 +490,16 @@ export default function SessionAnalyticsDashboard() {
             </div>
 
             {/* Pagination Controls */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '24px',
-              flexWrap: 'wrap',
-              gap: '16px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <label style={{ color: '#64748b', fontWeight: '600' }}>Rows per page:</label>
+            <div className="flex justify-between items-center mt-6 flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <label className="text-slate-500 font-semibold">Rows per page:</label>
                 <select
                   value={itemsPerPage}
                   onChange={(e) => {
                     setItemsPerPage(Number(e.target.value))
                     setCurrentPage(1)
                   }}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    border: '2px solid #e2e8f0',
-                    backgroundColor: 'white',
-                    color: '#1e293b',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
+                  className="px-3 py-2 rounded-lg border-2 border-slate-200 bg-white text-slate-800 font-semibold cursor-pointer hover:border-pink-300 transition-colors"
                 >
                   <option value={10}>10</option>
                   <option value={20}>20</option>
@@ -797,25 +508,21 @@ export default function SessionAnalyticsDashboard() {
                 </select>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ color: '#64748b', fontWeight: '600' }}>
+              <div className="flex items-center gap-4">
+                <span className="text-slate-500 font-semibold">
                   Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, displaySessions.length)} of {displaySessions.length}
                   {groupSessions && ` (${sessions.length} total sessions)`}
                 </span>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="flex gap-2">
                   <button
                     onClick={() => setCurrentPage(1)}
                     disabled={currentPage === 1}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      border: '2px solid #e2e8f0',
-                      backgroundColor: currentPage === 1 ? '#f1f5f9' : 'white',
-                      color: currentPage === 1 ? '#94a3b8' : '#1e293b',
-                      fontWeight: '600',
-                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
-                    }}
+                    className={`px-3 py-2 rounded-lg border-2 border-slate-200 font-semibold transition-all ${
+                      currentPage === 1
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        : 'bg-white text-slate-800 cursor-pointer hover:border-pink-300'
+                    }`}
                   >
                     ⏮️ First
                   </button>
@@ -823,42 +530,27 @@ export default function SessionAnalyticsDashboard() {
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      border: '2px solid #e2e8f0',
-                      backgroundColor: currentPage === 1 ? '#f1f5f9' : 'white',
-                      color: currentPage === 1 ? '#94a3b8' : '#1e293b',
-                      fontWeight: '600',
-                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
-                    }}
+                    className={`px-3 py-2 rounded-lg border-2 border-slate-200 font-semibold transition-all ${
+                      currentPage === 1
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        : 'bg-white text-slate-800 cursor-pointer hover:border-pink-300'
+                    }`}
                   >
                     ◀️ Previous
                   </button>
 
-                  <span style={{
-                    padding: '8px 16px',
-                    borderRadius: '8px',
-                    border: '2px solid #ec4899',
-                    backgroundColor: '#fdf2f8',
-                    color: '#ec4899',
-                    fontWeight: '700'
-                  }}>
+                  <span className="px-4 py-2 rounded-lg border-2 border-pink-500 bg-pink-50 text-pink-500 font-bold">
                     Page {currentPage} of {Math.ceil(displaySessions.length / itemsPerPage)}
                   </span>
 
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(Math.ceil(displaySessions.length / itemsPerPage), prev + 1))}
                     disabled={currentPage >= Math.ceil(displaySessions.length / itemsPerPage)}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      border: '2px solid #e2e8f0',
-                      backgroundColor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#f1f5f9' : 'white',
-                      color: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#94a3b8' : '#1e293b',
-                      fontWeight: '600',
-                      cursor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? 'not-allowed' : 'pointer'
-                    }}
+                    className={`px-3 py-2 rounded-lg border-2 border-slate-200 font-semibold transition-all ${
+                      currentPage >= Math.ceil(displaySessions.length / itemsPerPage)
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        : 'bg-white text-slate-800 cursor-pointer hover:border-pink-300'
+                    }`}
                   >
                     Next ▶️
                   </button>
@@ -866,15 +558,11 @@ export default function SessionAnalyticsDashboard() {
                   <button
                     onClick={() => setCurrentPage(Math.ceil(displaySessions.length / itemsPerPage))}
                     disabled={currentPage >= Math.ceil(displaySessions.length / itemsPerPage)}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      border: '2px solid #e2e8f0',
-                      backgroundColor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#f1f5f9' : 'white',
-                      color: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? '#94a3b8' : '#1e293b',
-                      fontWeight: '600',
-                      cursor: currentPage >= Math.ceil(displaySessions.length / itemsPerPage) ? 'not-allowed' : 'pointer'
-                    }}
+                    className={`px-3 py-2 rounded-lg border-2 border-slate-200 font-semibold transition-all ${
+                      currentPage >= Math.ceil(displaySessions.length / itemsPerPage)
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        : 'bg-white text-slate-800 cursor-pointer hover:border-pink-300'
+                    }`}
                   >
                     Last ⏭️
                   </button>

@@ -28,35 +28,12 @@ export default function ProductSelector({
   }, {} as Record<string, Product[]>)
 
   return (
-    <div style={{ padding: '32px', backgroundColor: '#fafafa' }}>
-      <h2 style={{
-        fontSize: '1.5rem',
-        fontWeight: '600',
-        color: '#111827',
-        marginBottom: '8px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
-      }}>
-        <span style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '50%',
-          backgroundColor: '#8b5cf6',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '0.875rem',
-          fontWeight: 'bold'
-        }}>2</span>
+    <div className="p-8 bg-gray-50">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-2 flex items-center gap-3">
+        <span className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">2</span>
         Add Products (Optional)
       </h2>
-      <p style={{
-        color: '#6b7280',
-        marginBottom: '24px',
-        fontSize: '0.875rem'
-      }}>
+      <p className="text-gray-500 mb-6 text-sm">
         Enhance your experience with premium products
       </p>
 
@@ -65,61 +42,33 @@ export default function ProductSelector({
         if (categoryProducts.length === 0) return null
 
         return (
-          <div key={category.id} style={{ marginBottom: '24px' }}>
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '12px'
-            }}>
+          <div key={category.id} className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-700 mb-3">
               {category.name}
             </h3>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: '12px'
-            }}>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3">
               {categoryProducts.map(product => (
                 <label
                   key={product.id}
                   htmlFor={`product-${product.id}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '12px',
-                    border: `2px solid ${selectedProducts.has(product.id) ? '#8b5cf6' : '#e5e7eb'}`,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    backgroundColor: selectedProducts.has(product.id) ? '#f5f3ff' : 'white',
-                    transition: 'all 0.2s'
-                  }}
+                  className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                    selectedProducts.has(product.id)
+                      ? 'border-purple-600 bg-purple-50'
+                      : 'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-25'
+                  }`}
                 >
                   <input
                     type="checkbox"
                     id={`product-${product.id}`}
                     checked={selectedProducts.has(product.id)}
                     onChange={() => onProductToggle(product.id)}
-                    style={{
-                      marginRight: '12px',
-                      width: '18px',
-                      height: '18px',
-                      cursor: 'pointer'
-                    }}
+                    className="mr-3 w-[18px] h-[18px] cursor-pointer"
                   />
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontWeight: '600',
-                      color: '#111827',
-                      fontSize: '0.875rem',
-                      marginBottom: '4px'
-                    }}>
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-900 text-sm mb-1">
                       {product.name}
                     </div>
-                    <div style={{
-                      color: '#8b5cf6',
-                      fontWeight: '600',
-                      fontSize: '0.875rem'
-                    }}>
+                    <div className="text-purple-600 font-semibold text-sm">
                       ${product.price}
                     </div>
                   </div>

@@ -82,13 +82,13 @@ export default function MonthlyCalendarView() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return '#10b981'
+        return 'bg-emerald-500'
       case 'pending':
-        return '#f59e0b'
+        return 'bg-amber-500'
       case 'cancelled':
-        return '#ef4444'
+        return 'bg-red-500'
       default:
-        return '#6b7280'
+        return 'bg-gray-500'
     }
   }
 
@@ -117,25 +117,9 @@ export default function MonthlyCalendarView() {
 
   if (loading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        padding: '32px',
-        textAlign: 'center',
-        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-        border: '1px solid #f1f5f9'
-      }}>
-        <div style={{
-          display: 'inline-block',
-          width: '48px',
-          height: '48px',
-          border: '4px solid #f1f5f9',
-          borderTop: '4px solid #ec4899',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          marginBottom: '16px'
-        }}></div>
-        <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: '500' }}>
+      <div className="bg-white rounded-[20px] p-8 text-center shadow-[0_15px_35px_rgba(0,0,0,0.08)] border border-slate-100">
+        <div className="inline-block w-12 h-12 border-4 border-slate-100 border-t-pink-500 rounded-full animate-spin mb-4"></div>
+        <p className="text-slate-500 text-base font-medium">
           Loading calendar...
         </p>
       </div>
@@ -143,107 +127,35 @@ export default function MonthlyCalendarView() {
   }
 
   return (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '20px',
-      boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-      padding: '32px',
-      border: '1px solid #f1f5f9'
-    }} className="calendar-container">
+    <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-8 border border-slate-100 calendar-container">
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-        <div style={{
-          width: '40px',
-          height: '40px',
-          background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
-          borderRadius: '12px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.2rem'
-        }}>📅</div>
-        <h3 style={{
-          fontSize: '1.5rem',
-          fontWeight: '700',
-          margin: '0',
-          color: '#1e293b'
-        }}>Monthly Calendar</h3>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-xl flex items-center justify-center text-xl">📅</div>
+        <h3 className="text-2xl font-bold m-0 text-slate-800">Monthly Calendar</h3>
       </div>
 
       {error && (
-        <div style={{
-          background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-          border: '1px solid #f87171',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '20px'
-        }}>
-          <p style={{ color: '#dc2626', margin: '0', fontWeight: '500' }}>⚠️ {error}</p>
+        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-300 rounded-xl p-4 mb-5">
+          <p className="text-red-600 m-0 font-medium">⚠️ {error}</p>
         </div>
       )}
 
       {/* Calendar Navigation */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '24px',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
         <button
           onClick={goToPreviousMonth}
-          style={{
-            background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
-            border: '1px solid #cbd5e1',
-            borderRadius: '12px',
-            padding: '12px 20px',
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '0.95rem',
-            color: '#1e293b',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateX(-2px)'
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateX(0)'
-            e.currentTarget.style.boxShadow = 'none'
-          }}
+          className="bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300 rounded-xl px-5 py-3 cursor-pointer font-semibold text-sm text-slate-800 transition-all duration-200 hover:-translate-x-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
         >
           ← Previous
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <h2 style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            margin: '0',
-            color: '#1e293b'
-          }}>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold m-0 text-slate-800">
             {format(currentMonth, 'MMMM yyyy')}
           </h2>
           <button
             onClick={goToToday}
-            style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              cursor: 'pointer',
-              fontWeight: '600',
-              fontSize: '0.85rem',
-              color: 'white',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
+            className="bg-gradient-to-br from-blue-500 to-blue-800 border-none rounded-lg px-4 py-2 cursor-pointer font-semibold text-sm text-white transition-all duration-200 hover:scale-105"
           >
             Today
           </button>
@@ -251,55 +163,24 @@ export default function MonthlyCalendarView() {
 
         <button
           onClick={goToNextMonth}
-          style={{
-            background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
-            border: '1px solid #cbd5e1',
-            borderRadius: '12px',
-            padding: '12px 20px',
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '0.95rem',
-            color: '#1e293b',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateX(2px)'
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateX(0)'
-            e.currentTarget.style.boxShadow = 'none'
-          }}
+          className="bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300 rounded-xl px-5 py-3 cursor-pointer font-semibold text-sm text-slate-800 transition-all duration-200 hover:translate-x-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
         >
           Next →
         </button>
       </div>
 
       {/* Calendar Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(7, 1fr)',
-        gap: '8px',
-        marginBottom: '24px'
-      }}>
+      <div className="grid grid-cols-7 gap-2 mb-6">
         {/* Day headers */}
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} style={{
-            textAlign: 'center',
-            fontWeight: '700',
-            fontSize: '0.9rem',
-            color: '#64748b',
-            padding: '12px 0',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
+          <div key={day} className="text-center font-bold text-sm text-slate-500 py-3 uppercase tracking-wide">
             {day}
           </div>
         ))}
 
         {/* Empty cells before month starts */}
         {emptyDays.map(i => (
-          <div key={`empty-${i}`} style={{ padding: '8px' }}></div>
+          <div key={`empty-${i}`} className="p-2"></div>
         ))}
 
         {/* Days of the month */}
@@ -312,84 +193,31 @@ export default function MonthlyCalendarView() {
             <div
               key={date.toISOString()}
               onClick={() => setSelectedDate(date)}
-              style={{
-                backgroundColor: isSelected
-                  ? '#dbeafe'
+              className={`rounded-xl p-3 min-h-[90px] cursor-pointer transition-all duration-200 relative flex flex-col gap-1 ${
+                isSelected
+                  ? 'bg-blue-100 border-2 border-blue-500'
                   : isTodayDate
-                    ? '#fef3c7'
-                    : 'white',
-                border: isTodayDate
-                  ? '2px solid #f59e0b'
-                  : isSelected
-                    ? '2px solid #3b82f6'
-                    : '1px solid #e2e8f0',
-                borderRadius: '12px',
-                padding: '12px 8px',
-                minHeight: '90px',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px'
-              }}
-              onMouseEnter={(e) => {
-                if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = '#f8fafc'
-                  e.currentTarget.style.transform = 'scale(1.02)'
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = isTodayDate ? '#fef3c7' : 'white'
-                  e.currentTarget.style.transform = 'scale(1)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }
-              }}
+                    ? 'bg-yellow-100 border-2 border-amber-500'
+                    : 'bg-white border border-slate-200'
+              } ${!isSelected && 'hover:bg-slate-50 hover:scale-[1.02] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'}`}
             >
-              <div style={{
-                fontWeight: '600',
-                fontSize: '1.1rem',
-                color: isTodayDate ? '#92400e' : '#1e293b',
-                marginBottom: '4px'
-              }}>
+              <div className={`font-semibold text-lg mb-1 ${isTodayDate ? 'text-amber-900' : 'text-slate-800'}`}>
                 {format(date, 'd')}
               </div>
 
               {dayAppointments.length > 0 && (
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                  fontSize: '0.65rem'
-                }}>
+                <div className="flex flex-col gap-0.5 text-[0.65rem]">
                   {dayAppointments.slice(0, 2).map(apt => (
                     <div
                       key={apt.id}
-                      style={{
-                        backgroundColor: getStatusColor(apt.status),
-                        color: 'white',
-                        padding: '3px 6px',
-                        borderRadius: '4px',
-                        fontSize: '0.7rem',
-                        fontWeight: '600',
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap'
-                      }}
+                      className={`${getStatusColor(apt.status)} text-white px-1.5 py-0.5 rounded text-[0.7rem] font-semibold overflow-hidden text-ellipsis whitespace-nowrap`}
                       title={`${apt.appointment_time} - ${apt.customer_name}`}
                     >
                       {apt.appointment_time}
                     </div>
                   ))}
                   {dayAppointments.length > 2 && (
-                    <div style={{
-                      fontSize: '0.7rem',
-                      color: '#64748b',
-                      fontWeight: '600',
-                      textAlign: 'center'
-                    }}>
+                    <div className="text-[0.7rem] text-slate-500 font-semibold text-center">
                       +{dayAppointments.length - 2} more
                     </div>
                   )}
@@ -402,92 +230,40 @@ export default function MonthlyCalendarView() {
 
       {/* Selected Date Details */}
       {selectedDate && (
-        <div style={{
-          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid #0ea5e9'
-        }}>
-          <h4 style={{
-            fontSize: '1.2rem',
-            fontWeight: '700',
-            margin: '0 0 16px 0',
-            color: '#0369a1',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-2xl p-6 border border-sky-500">
+          <h4 className="text-xl font-bold m-0 mb-4 text-sky-800 flex items-center gap-2">
             📅 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
           </h4>
 
           {selectedDateAppointments.length === 0 ? (
-            <p style={{
-              color: '#0369a1',
-              margin: '0',
-              fontSize: '1rem',
-              fontStyle: 'italic'
-            }}>
+            <p className="text-sky-800 m-0 text-base italic">
               No appointments scheduled for this day
             </p>
           ) : (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px'
-            }}>
+            <div className="flex flex-col gap-3">
               {selectedDateAppointments.map(apt => (
                 <div
                   key={apt.id}
-                  style={{
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    padding: '16px',
-                    border: '1px solid #bae6fd',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-                  }}
+                  className="bg-white rounded-xl p-4 border border-sky-200 shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
                 >
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '8px'
-                  }}>
+                  <div className="flex justify-between items-start mb-2">
                     <div>
-                      <p style={{
-                        fontWeight: '700',
-                        fontSize: '1.1rem',
-                        color: '#1e293b',
-                        margin: '0 0 4px 0'
-                      }}>
+                      <p className="font-bold text-lg text-slate-800 m-0 mb-1">
                         {apt.customer_name}
                       </p>
-                      <p style={{
-                        fontSize: '0.95rem',
-                        color: '#64748b',
-                        margin: '0'
-                      }}>
+                      <p className="text-base text-slate-500 m-0">
                         💅 {apt.service?.name || 'Service N/A'}
                       </p>
                     </div>
-                    <span style={{
-                      padding: '6px 12px',
-                      borderRadius: '20px',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      backgroundColor: `${getStatusColor(apt.status)}20`,
-                      color: getStatusColor(apt.status),
-                      border: `1px solid ${getStatusColor(apt.status)}`
-                    }}>
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase border ${
+                      apt.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-500' :
+                      apt.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-500' :
+                      'bg-red-50 text-red-800 border-red-500'
+                    }`}>
                       {apt.status}
                     </span>
                   </div>
-                  <div style={{
-                    display: 'flex',
-                    gap: '16px',
-                    fontSize: '0.9rem',
-                    color: '#475569'
-                  }}>
+                  <div className="flex gap-4 text-sm text-slate-600">
                     <span>🕐 {apt.appointment_time}</span>
                     <span>💰 {apt.service?.price?.toLocaleString() || '0'}Ks</span>
                   </div>
@@ -499,75 +275,32 @@ export default function MonthlyCalendarView() {
       )}
 
       {/* Legend */}
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        background: '#f8fafc',
-        borderRadius: '12px',
-        display: 'flex',
-        gap: '24px',
-        flexWrap: 'wrap',
-        justifyContent: 'center'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            width: '16px',
-            height: '16px',
-            borderRadius: '4px',
-            backgroundColor: '#10b981'
-          }}></div>
-          <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>
+      <div className="mt-6 p-4 bg-slate-50 rounded-xl flex gap-6 flex-wrap justify-center">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-emerald-500"></div>
+          <span className="text-sm text-slate-500 font-medium">
             Confirmed
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            width: '16px',
-            height: '16px',
-            borderRadius: '4px',
-            backgroundColor: '#f59e0b'
-          }}></div>
-          <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-amber-500"></div>
+          <span className="text-sm text-slate-500 font-medium">
             Pending
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            width: '16px',
-            height: '16px',
-            borderRadius: '4px',
-            backgroundColor: '#ef4444'
-          }}></div>
-          <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-red-500"></div>
+          <span className="text-sm text-slate-500 font-medium">
             Cancelled
           </span>
         </div>
       </div>
 
       {/* Refresh Button */}
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+      <div className="mt-5 text-center">
         <button
           onClick={loadMonthAppointments}
-          style={{
-            background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
-            color: 'white',
-            padding: '12px 32px',
-            borderRadius: '12px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '1rem',
-            boxShadow: '0 6px 20px rgba(236, 72, 153, 0.3)',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)'
-            e.currentTarget.style.boxShadow = '0 8px 25px rgba(236, 72, 153, 0.4)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(236, 72, 153, 0.3)'
-          }}
+          className="bg-gradient-to-br from-pink-500 to-pink-700 text-white px-8 py-3 rounded-xl border-none cursor-pointer font-semibold text-base shadow-[0_6px_20px_rgba(236,72,153,0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(236,72,153,0.4)]"
         >
           🔄 Refresh Calendar
         </button>

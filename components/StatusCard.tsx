@@ -8,70 +8,39 @@ export interface StatusCardProps {
   className?: string
 }
 
-const StatusCard: React.FC<StatusCardProps> = ({ 
-  title, 
-  value, 
+const StatusCard: React.FC<StatusCardProps> = ({
+  title,
+  value,
   type = 'default',
   icon,
-  className = '' 
+  className = ''
 }) => {
-  const getCardStyles = () => {
+  const getCardClasses = () => {
     switch (type) {
       case 'pending':
       case 'warning':
-        return {
-          backgroundColor: '#fef3c7',
-          titleColor: '#92400e',
-          valueColor: '#92400e'
-        }
+        return 'bg-yellow-100 text-amber-900'
       case 'confirmed':
       case 'success':
-        return {
-          backgroundColor: '#dcfce7',
-          titleColor: '#166534',
-          valueColor: '#166534'
-        }
+        return 'bg-green-100 text-green-800'
       case 'cancelled':
       case 'danger':
-        return {
-          backgroundColor: '#fee2e2',
-          titleColor: '#991b1b',
-          valueColor: '#991b1b'
-        }
+        return 'bg-red-100 text-red-800'
       case 'primary':
-        return {
-          backgroundColor: '#dbeafe',
-          titleColor: '#1e40af',
-          valueColor: '#1e40af'
-        }
+        return 'bg-blue-100 text-blue-900'
       default:
-        return {
-          backgroundColor: '#f9fafb',
-          titleColor: '#6b7280',
-          valueColor: '#111827'
-        }
+        return 'bg-gray-50 text-gray-800'
     }
   }
 
-  const styles = getCardStyles()
-
   return (
-    <div 
-      className={`rounded-lg p-4 ${className}`}
-      style={{ backgroundColor: styles.backgroundColor }}
-    >
+    <div className={`rounded-lg p-4 ${getCardClasses()} ${className}`}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <h3 
-            className="text-sm font-medium"
-            style={{ color: styles.titleColor }}
-          >
+          <h3 className="text-sm font-medium">
             {title}
           </h3>
-          <p 
-            className="text-2xl font-bold mt-1"
-            style={{ color: styles.valueColor }}
-          >
+          <p className="text-2xl font-bold mt-1">
             {value}
           </p>
         </div>
