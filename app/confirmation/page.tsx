@@ -171,31 +171,14 @@ export default function ConfirmationPage() {
   })
 
   return (
-    <div style={{
-      maxWidth: '1200px',
-      margin: '0 auto',
-      padding: '48px 16px'
-    }}>
-      <div style={{
-        maxWidth: '512px',
-        margin: '0 auto',
-        backgroundColor: 'white',
-        padding: '32px',
-        borderRadius: '8px',
-        boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
-        textAlign: 'center'
-      }}>
+    <div className="max-w-7xl mx-auto py-12 px-4">
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-xl text-center">
         {/* Search Section */}
         {showSearch && !bookingData && (
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ marginBottom: '24px' }}>
+          <div className="mb-8">
+            <div className="mb-6">
               <svg
-                style={{
-                  width: '64px',
-                  height: '64px',
-                  color: '#3b82f6',
-                  margin: '0 auto'
-                }}
+                className="w-16 h-16 text-blue-500 mx-auto"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -209,60 +192,31 @@ export default function ConfirmationPage() {
               </svg>
             </div>
 
-            <h1 style={{
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '16px'
-            }}>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Find Your Booking
             </h1>
 
-            <p style={{
-              color: '#6b7280',
-              marginBottom: '24px',
-              fontSize: '1rem'
-            }}>
+            <p className="text-gray-600 mb-6">
               Enter your booking ID to retrieve your appointment details
             </p>
 
             <form onSubmit={handleSearch}>
-              <div style={{ marginBottom: '8px' }}>
+              <div className="mb-2">
                 <input
                   type="text"
                   value={searchId}
                   onChange={(e) => setSearchId(e.target.value)}
                   placeholder="Paste your full Booking ID here"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '0.9rem',
-                    textAlign: 'center',
-                    fontFamily: 'monospace'
-                  }}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm text-center font-mono focus:outline-none focus:border-blue-500"
                 />
               </div>
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#6b7280',
-                marginBottom: '16px',
-                textAlign: 'center'
-              }}>
+              <p className="text-xs text-gray-600 mb-4 text-center">
                 Copy the full Booking ID from your confirmation (e.g., a1b2c3d4-e5f6-7890-abcd-ef1234567890)
               </p>
 
               {searchError && (
-                <div style={{
-                  padding: '12px',
-                  backgroundColor: '#fee2e2',
-                  color: '#991b1b',
-                  borderRadius: '8px',
-                  marginBottom: '16px',
-                  fontSize: '0.875rem'
-                }}>
+                <div className="p-3 bg-red-100 text-red-800 rounded-lg mb-4 text-sm">
                   {searchError}
                 </div>
               )}
@@ -270,42 +224,19 @@ export default function ConfirmationPage() {
               <button
                 type="submit"
                 disabled={searching || !searchId}
-                style={{
-                  width: '100%',
-                  padding: '12px 24px',
-                  backgroundColor: searching || !searchId ? '#9ca3af' : '#3b82f6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: searching || !searchId ? 'not-allowed' : 'pointer'
-                }}
+                className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
               >
                 {searching ? 'Searching...' : 'Search Booking'}
               </button>
             </form>
 
-            <div style={{
-              marginTop: '24px',
-              paddingTop: '24px',
-              borderTop: '1px solid #e5e7eb'
-            }}>
-              <p style={{
-                color: '#6b7280',
-                fontSize: '0.875rem',
-                marginBottom: '16px'
-              }}>
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <p className="text-gray-600 text-sm mb-4">
                 Don't have a booking yet?
               </p>
               <Link
                 href="/booking"
-                style={{
-                  display: 'inline-block',
-                  color: '#3b82f6',
-                  textDecoration: 'none',
-                  fontWeight: '600'
-                }}
+                className="inline-block text-blue-500 hover:text-blue-600 font-semibold"
               >
                 Book an Appointment →
               </Link>
@@ -316,14 +247,9 @@ export default function ConfirmationPage() {
         {/* Success Icon and Title (shown when booking data exists) */}
         {bookingData && (
           <>
-            <div style={{ marginBottom: '24px' }}>
+            <div className="mb-6">
               <svg
-                style={{
-                  width: '64px',
-                  height: '64px',
-                  color: '#10b981',
-                  margin: '0 auto'
-                }}
+                className="w-16 h-16 text-green-500 mx-auto"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -337,12 +263,7 @@ export default function ConfirmationPage() {
               </svg>
             </div>
 
-            <h1 style={{
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '16px'
-            }}>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Booking Confirmed!
             </h1>
           </>
@@ -350,42 +271,16 @@ export default function ConfirmationPage() {
 
         {/* Booking Details Section */}
         {bookingData && (
-          <div style={{
-            backgroundColor: '#f9fafb',
-            border: '2px solid #e5e7eb',
-            borderRadius: '12px',
-            padding: '24px',
-            marginBottom: '24px',
-            textAlign: 'left'
-          }}>
-            <h2 style={{
-              fontSize: '1.25rem',
-              fontWeight: '600',
-              color: '#111827',
-              marginBottom: '16px',
-              textAlign: 'center'
-            }}>
+          <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 mb-6 text-left">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
               📋 Your Booking Details
             </h2>
 
-            <div style={{ display: 'grid', gap: '12px' }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
-                gap: '8px'
-              }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Booking ID:</span>
+            <div className="space-y-3">
+              <div className="grid grid-cols-[140px_1fr] gap-2">
+                <span className="font-semibold text-gray-700">Booking ID:</span>
                 <div>
-                  <div style={{
-                    color: '#6b7280',
-                    fontFamily: 'monospace',
-                    fontSize: '0.75rem',
-                    wordBreak: 'break-all',
-                    backgroundColor: '#f9fafb',
-                    padding: '6px 8px',
-                    borderRadius: '4px',
-                    border: '1px solid #e5e7eb'
-                  }}>
+                  <div className="text-gray-600 font-mono text-xs break-all bg-gray-50 p-1.5 rounded border border-gray-200">
                     {bookingData.id}
                   </div>
                   <button
@@ -393,122 +288,81 @@ export default function ConfirmationPage() {
                       navigator.clipboard.writeText(bookingData.id)
                       alert('Booking ID copied to clipboard!')
                     }}
-                    style={{
-                      marginTop: '4px',
-                      padding: '4px 8px',
-                      fontSize: '0.7rem',
-                      backgroundColor: '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
+                    className="mt-1 px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                   >
                     📋 Copy ID
                   </button>
                 </div>
               </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
-                gap: '8px'
-              }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Name:</span>
-                <span style={{ color: '#6b7280' }}>{bookingData.customerName}</span>
+              <div className="grid grid-cols-[140px_1fr] gap-2">
+                <span className="font-semibold text-gray-700">Name:</span>
+                <span className="text-gray-600">{bookingData.customerName}</span>
               </div>
 
               {bookingData.customerEmail && (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '140px 1fr',
-                  gap: '8px'
-                }}>
-                  <span style={{ fontWeight: '600', color: '#374151' }}>Email:</span>
-                  <span style={{ color: '#6b7280' }}>{bookingData.customerEmail}</span>
+                <div className="grid grid-cols-[140px_1fr] gap-2">
+                  <span className="font-semibold text-gray-700">Email:</span>
+                  <span className="text-gray-600">{bookingData.customerEmail}</span>
                 </div>
               )}
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
-                gap: '8px'
-              }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Phone:</span>
-                <span style={{ color: '#6b7280' }}>{bookingData.customerPhone}</span>
+              <div className="grid grid-cols-[140px_1fr] gap-2">
+                <span className="font-semibold text-gray-700">Phone:</span>
+                <span className="text-gray-600">{bookingData.customerPhone}</span>
               </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
-                gap: '8px'
-              }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>
+              <div className="grid grid-cols-[140px_1fr] gap-2">
+                <span className="font-semibold text-gray-700">
                   Service{services.length !== 1 ? 's' : ''}:
                 </span>
                 <div>
                   {services.length > 0 ? (
                     services.map((service) => (
-                      <div key={service.id} style={{ marginBottom: '4px' }}>
-                        <span style={{ color: '#6b7280' }}>
+                      <div key={service.id} className="mb-1">
+                        <span className="text-gray-600">
                           {service.name} ({service.duration} min - ${service.price})
                         </span>
                       </div>
                     ))
                   ) : (
-                    <span style={{ color: '#9ca3af', fontStyle: 'italic', fontSize: '0.875rem' }}>
+                    <span className="text-gray-400 italic text-sm">
                       No services found
                     </span>
                   )}
                 </div>
               </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
-                gap: '8px'
-              }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Date:</span>
-                <span style={{ color: '#6b7280' }}>
+              <div className="grid grid-cols-[140px_1fr] gap-2">
+                <span className="font-semibold text-gray-700">Date:</span>
+                <span className="text-gray-600">
                   {format(new Date(bookingData.appointmentDate), 'EEEE, MMMM d, yyyy')}
                 </span>
               </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
-                gap: '8px'
-              }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Time:</span>
-                <span style={{ color: '#6b7280' }}>{bookingData.appointmentTime}</span>
+              <div className="grid grid-cols-[140px_1fr] gap-2">
+                <span className="font-semibold text-gray-700">Time:</span>
+                <span className="text-gray-600">{bookingData.appointmentTime}</span>
               </div>
 
               {services.length > 0 && (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '140px 1fr',
-                  gap: '8px'
-                }}>
-                  <span style={{ fontWeight: '600', color: '#374151' }}>Total Duration:</span>
-                  <span style={{ color: '#6b7280' }}>
+                <div className="grid grid-cols-[140px_1fr] gap-2">
+                  <span className="font-semibold text-gray-700">Total Duration:</span>
+                  <span className="text-gray-600">
                     {services.reduce((sum, s) => sum + s.duration, 0)} minutes
                   </span>
                 </div>
               )}
 
               {products.length > 0 && (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '140px 1fr',
-                  gap: '8px'
-                }}>
-                  <span style={{ fontWeight: '600', color: '#374151' }}>
+                <div className="grid grid-cols-[140px_1fr] gap-2">
+                  <span className="font-semibold text-gray-700">
                     Add-on Product{products.length > 1 ? 's' : ''}:
                   </span>
                   <div>
                     {products.map((product) => (
-                      <div key={product.id} style={{ marginBottom: '4px' }}>
-                        <span style={{ color: '#6b7280' }}>
+                      <div key={product.id} className="mb-1">
+                        <span className="text-gray-600">
                           {product.name} (${product.price})
                         </span>
                       </div>
@@ -517,35 +371,17 @@ export default function ConfirmationPage() {
                 </div>
               )}
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '140px 1fr',
-                gap: '8px',
-                paddingTop: '12px',
-                borderTop: '2px solid #e5e7eb',
-                marginTop: '8px'
-              }}>
-                <span style={{ fontWeight: '700', color: '#111827', fontSize: '1.125rem' }}>Total Price:</span>
-                <span style={{ fontWeight: '700', color: '#ec4899', fontSize: '1.125rem' }}>
+              <div className="grid grid-cols-[140px_1fr] gap-2 pt-3 border-t-2 border-gray-200 mt-2">
+                <span className="font-bold text-gray-900 text-lg">Total Price:</span>
+                <span className="font-bold text-pink-600 text-lg">
                   ${bookingData.totalPrice.toFixed(2)}
                 </span>
               </div>
             </div>
 
-            <div style={{
-              marginTop: '16px',
-              padding: '12px',
-              backgroundColor: '#dbeafe',
-              borderRadius: '8px',
-              textAlign: 'center'
-            }}>
-              <p style={{
-                color: '#1e40af',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                margin: 0
-              }}>
-                💡 Please save this information for your records.Please screenshot!
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg text-center">
+              <p className="text-blue-800 text-sm font-medium">
+                💡 Please save this information for your records. Please screenshot!
               </p>
             </div>
           </div>
@@ -553,7 +389,7 @@ export default function ConfirmationPage() {
 
         {/* Search Another Booking Button */}
         {bookingData && (
-          <div style={{ marginTop: '16px', marginBottom: '24px' }}>
+          <div className="mt-4 mb-6">
             <button
               onClick={() => {
                 setBookingData(null)
@@ -563,23 +399,7 @@ export default function ConfirmationPage() {
                 setSearchError(null)
                 setShowSearch(true)
               }}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#f3f4f6',
-                color: '#374151',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#e5e7eb'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = '#f3f4f6'
-              }}
+              className="px-5 py-2.5 bg-gray-100 text-gray-700 border-2 border-gray-300 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
             >
               🔍 Search Another Booking
             </button>
@@ -589,54 +409,27 @@ export default function ConfirmationPage() {
         {user ? (
           // Registered user message
           <>
-            <p style={{
-              color: '#6b7280',
-              marginBottom: '24px',
-              fontSize: '1.125rem',
-              lineHeight: '1.6'
-            }}>
+            <p className="text-gray-600 mb-6 text-lg leading-relaxed">
               Thank you for booking with Pandora Beauty Salon!
               We've sent a confirmation email with your appointment details to <strong>{user.email}</strong>.
             </p>
-            
-            <div style={{
-              backgroundColor: '#dcfce7',
-              border: '1px solid #86efac',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '24px'
-            }}>
-              <p style={{
-                color: '#166534',
-                fontSize: '0.875rem',
-                fontWeight: '500'
-              }}>
+
+            <div className="bg-green-100 border border-green-300 rounded-lg p-4 mb-6">
+              <p className="text-green-800 text-sm font-medium">
                 ✅ As a registered member, you can view and manage all your appointments in your account dashboard.
               </p>
             </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <Link 
-                href="/account" 
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: '#ec4899',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: '600'
-                }}
+
+            <div className="flex flex-col gap-4">
+              <Link
+                href="/account"
+                className="inline-block bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors"
               >
                 View My Appointments
               </Link>
-              <Link 
-                href="/" 
-                style={{
-                  display: 'inline-block',
-                  color: '#ec4899',
-                  textDecoration: 'none'
-                }}
+              <Link
+                href="/"
+                className="inline-block text-pink-600 hover:text-pink-700"
               >
                 Return to Home
               </Link>
@@ -645,106 +438,49 @@ export default function ConfirmationPage() {
         ) : (
           // Guest user message
           <>
-            <p style={{
-              color: '#6b7280',
-              marginBottom: '16px',
-              fontSize: '1.125rem',
-              lineHeight: '1.6'
-            }}>
-              Your appointment has been successfully recorded! 
+            <p className="text-gray-600 mb-4 text-lg leading-relaxed">
+              Your appointment has been successfully recorded!
               We've received your booking request and will process it shortly.
             </p>
-            
-            <div style={{
-              backgroundColor: '#fef3c7',
-              border: '1px solid #fbbf24',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '24px'
-            }}>
-              <p style={{
-                color: '#92400e',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '8px'
-              }}>
+
+            <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-4 mb-6">
+              <p className="text-yellow-900 text-sm font-medium mb-2">
                 ⚠️ Important Notice
               </p>
-              <p style={{
-                color: '#92400e',
-                fontSize: '0.875rem',
-                lineHeight: '1.5'
-              }}>
-                Since you booked as a guest, you won't be able to view or manage your appointments online. 
+              <p className="text-yellow-900 text-sm leading-relaxed">
+                Since you booked as a guest, you won't be able to view or manage your appointments online.
                 For full access to your booking history and account features, please create an account.
               </p>
             </div>
-            
-            <div style={{
-              backgroundColor: '#f0f9ff',
-              border: '1px solid #7dd3fc',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '24px'
-            }}>
-              <h3 style={{
-                color: '#0c4a6e',
-                fontSize: '1rem',
-                fontWeight: '600',
-                marginBottom: '8px'
-              }}>
+
+            <div className="bg-blue-50 border border-blue-300 rounded-lg p-4 mb-6">
+              <h3 className="text-blue-900 text-base font-semibold mb-2">
                 Create an Account for Better Experience
               </h3>
-              <ul style={{
-                color: '#0c4a6e',
-                fontSize: '0.875rem',
-                textAlign: 'left',
-                lineHeight: '1.5',
-                paddingLeft: '16px'
-              }}>
+              <ul className="text-blue-900 text-sm text-left leading-relaxed pl-4">
                 <li>View all your appointments in one place</li>
                 <li>Receive email confirmations and reminders</li>
                 <li>Easy rebooking and appointment management</li>
                 <li>Exclusive member offers and updates</li>
               </ul>
             </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <Link 
-                href="/auth/register" 
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: '#ec4899',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: '600'
-                }}
+
+            <div className="flex flex-col gap-4">
+              <Link
+                href="/auth/register"
+                className="inline-block bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors"
               >
                 Create Account Now
               </Link>
-              <Link 
-                href="/auth/login" 
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: '#6b7280',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: '600'
-                }}
+              <Link
+                href="/auth/login"
+                className="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
               >
                 I Already Have an Account
               </Link>
-              <Link 
-                href="/" 
-                style={{
-                  display: 'inline-block',
-                  color: '#ec4899',
-                  textDecoration: 'none'
-                }}
+              <Link
+                href="/"
+                className="inline-block text-pink-600 hover:text-pink-700"
               >
                 Return to Home
               </Link>
@@ -753,55 +489,23 @@ export default function ConfirmationPage() {
         )}
 
         {/* Contact Information */}
-        <div style={{
-          marginTop: '32px',
-          paddingTop: '24px',
-          borderTop: '1px solid #e5e7eb'
-        }}>
-          <h3 style={{
-            fontSize: '1.125rem',
-            fontWeight: '600',
-            color: '#111827',
-            marginBottom: '12px'
-          }}>
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">
             Need Help?
           </h3>
-          <p style={{
-            color: '#6b7280',
-            fontSize: '0.875rem',
-            marginBottom: '16px'
-          }}>
+          <p className="text-gray-600 text-sm mb-4">
             If you have any questions about your appointment, please contact us:
           </p>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '16px',
-            flexWrap: 'wrap'
-          }}>
-            <a 
-              href="tel:+1234567890" 
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                color: '#ec4899',
-                textDecoration: 'none',
-                fontSize: '0.875rem',
-                fontWeight: '500'
-              }}
+          <div className="flex justify-center gap-4 flex-wrap">
+            <a
+              href="tel:+1234567890"
+              className="inline-flex items-center text-pink-600 hover:text-pink-700 text-sm font-medium"
             >
               📞 (123) 456-7890
             </a>
-            <a 
-              href="mailto:info@pandorabeauty.com" 
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                color: '#ec4899',
-                textDecoration: 'none',
-                fontSize: '0.875rem',
-                fontWeight: '500'
-              }}
+            <a
+              href="mailto:info@pandorabeauty.com"
+              className="inline-flex items-center text-pink-600 hover:text-pink-700 text-sm font-medium"
             >
               ✉️ info@pandorabeauty.com
             </a>

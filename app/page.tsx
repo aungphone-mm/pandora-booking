@@ -5,147 +5,39 @@ import HomeGallery from '@/components/HomeGallery'
 
 export default function HomePage() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #fce7f3 0%, #f3e8ff 50%, #e0e7ff 100%)',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 relative overflow-hidden">
       {/* Decorative elements */}
-      <div style={{
-        position: 'absolute',
-        top: '-10%',
-        right: '-5%',
-        width: '400px',
-        height: '400px',
-        background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%)',
-        borderRadius: '50%',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-15%',
-        left: '-10%',
-        width: '500px',
-        height: '500px',
-        background: 'radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%)',
-        borderRadius: '50%',
-        pointerEvents: 'none'
-      }} />
+      <div className="absolute -top-[10%] -right-[5%] w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-[15%] -left-[10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '80px 24px',
-        position: 'relative',
-        zIndex: 1
-      }}>
+      <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
         {/* Hero Section */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '60px'
-        }}>
-          <div style={{
-            fontSize: '1rem',
-            fontWeight: '600',
-            color: '#ec4899',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            marginBottom: '16px'
-          }}>
+        <div className="text-center mb-15">
+          <div className="text-base font-semibold text-pink-600 tracking-widest uppercase mb-4">
             Premium Beauty Experience
           </div>
-          <h1 style={{
-            fontSize: '4rem',
-            fontWeight: '800',
-            background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '24px',
-            lineHeight: '1.2'
-          }}>
+          <h1 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-6 leading-tight">
             Pandora Beauty Salon
           </h1>
-          <p style={{
-            fontSize: '1.5rem',
-            color: '#4b5563',
-            maxWidth: '700px',
-            margin: '0 auto 40px',
-            lineHeight: '1.6'
-          }}>
+          <p className="text-2xl text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed">
             Where beauty meets artistry. Experience world-class treatments
             in a luxurious and relaxing environment.
           </p>
-          <p style={{
-            fontSize: '1.25rem',
-            color: '#6b7280',
-            maxWidth: '700px',
-            margin: '0 auto 40px',
-            lineHeight: '1.6',
-            fontWeight: '500'
-          }}>
+          <p className="text-xl text-gray-500 max-w-3xl mx-auto mb-10 leading-relaxed font-medium">
             အလှအပနှင့် အနုပညာ ပေါင်းစပ်ရာနေရာ။ အရည်အသွေးမြင့်ပြီး အပန်းဖြေနိုင်သော ပတ်ဝန်းကျင်တွင် ကမ္ဘာ့အဆင့်မီ အလှပြုပြင်မှုများကို တွေ့ကြုံခံစားပါ။
           </p>
 
           {/* CTA Buttons */}
-          <div style={{
-            display: 'flex',
-            gap: '20px',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            marginBottom: '20px'
-          }}>
+          <div className="flex gap-5 justify-center flex-wrap mb-5">
             <Link
               href="/booking"
-              style={{
-                background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-                color: 'white',
-                padding: '18px 40px',
-                borderRadius: '50px',
-                textDecoration: 'none',
-                fontWeight: '700',
-                fontSize: '1.125rem',
-                boxShadow: '0 10px 30px rgba(236, 72, 153, 0.3)',
-                transition: 'all 0.3s ease',
-                display: 'inline-block',
-                border: 'none'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 15px 40px rgba(236, 72, 153, 0.4)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(236, 72, 153, 0.3)'
-              }}
+              className="bg-gradient-to-r from-pink-600 to-pink-700 text-white px-10 py-4 rounded-full font-bold text-lg shadow-[0_10px_30px_rgba(236,72,153,0.3)] hover:shadow-[0_15px_40px_rgba(236,72,153,0.4)] hover:-translate-y-0.5 transition-all duration-300"
             >
               Book Your Appointment (Booking တင်ရန်)
             </Link>
             <Link
               href="/account"
-              style={{
-                background: 'white',
-                color: '#8b5cf6',
-                padding: '18px 40px',
-                borderRadius: '50px',
-                textDecoration: 'none',
-                fontWeight: '700',
-                fontSize: '1.125rem',
-                boxShadow: '0 10px 30px rgba(139, 92, 246, 0.15)',
-                transition: 'all 0.3s ease',
-                display: 'inline-block',
-                border: '2px solid #8b5cf6'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.background = '#8b5cf6'
-                e.currentTarget.style.color = 'white'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.background = 'white'
-                e.currentTarget.style.color = '#8b5cf6'
-              }}
+              className="bg-white text-purple-600 px-10 py-4 rounded-full font-bold text-lg shadow-[0_10px_30px_rgba(139,92,246,0.15)] border-2 border-purple-600 hover:bg-purple-600 hover:text-white hover:-translate-y-0.5 transition-all duration-300"
             >
               My Account (ကျွန်ုပ်၏အကောင့်)
             </Link>
@@ -153,160 +45,47 @@ export default function HomePage() {
         </div>
 
         {/* Features Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '30px',
-          marginBottom: '60px'
-        }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-15">
           {/* Feature 1 */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '20px',
-            padding: '40px 30px',
-            textAlign: 'center',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-8px)'
-            e.currentTarget.style.boxShadow = '0 25px 70px rgba(0, 0, 0, 0.15)'
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.1)'
-          }}
-          >
-            <div style={{
-              fontSize: '4rem',
-              marginBottom: '20px',
-              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
-            }}>💇‍♀️</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              color: '#111827',
-              marginBottom: '12px'
-            }}>
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-10 text-center shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-white/50 hover:-translate-y-2 hover:shadow-[0_25px_70px_rgba(0,0,0,0.15)] transition-all duration-300">
+            <div className="text-6xl mb-5 drop-shadow-md">💇‍♀️</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               Expert Stylists
             </h3>
-            <p style={{
-              color: '#9ca3af',
-              fontSize: '0.95rem',
-              lineHeight: '1.6',
-              marginBottom: '8px'
-            }}>
+            <p className="text-gray-400 text-sm leading-relaxed mb-2">
               ကျွမ်းကျင်သော Stylist များ
             </p>
-            <p style={{
-              color: '#6b7280',
-              fontSize: '1rem',
-              lineHeight: '1.6'
-            }}>
+            <p className="text-gray-600 text-base leading-relaxed">
               Our certified professionals bring years of experience
               and passion to every service
             </p>
           </div>
 
           {/* Feature 2 */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '20px',
-            padding: '40px 30px',
-            textAlign: 'center',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-8px)'
-            e.currentTarget.style.boxShadow = '0 25px 70px rgba(0, 0, 0, 0.15)'
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.1)'
-          }}
-          >
-            <div style={{
-              fontSize: '4rem',
-              marginBottom: '20px',
-              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
-            }}>✨</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              color: '#111827',
-              marginBottom: '12px'
-            }}>
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-10 text-center shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-white/50 hover:-translate-y-2 hover:shadow-[0_25px_70px_rgba(0,0,0,0.15)] transition-all duration-300">
+            <div className="text-6xl mb-5 drop-shadow-md">✨</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               Premium Products
             </h3>
-            <p style={{
-              color: '#9ca3af',
-              fontSize: '0.95rem',
-              lineHeight: '1.6',
-              marginBottom: '8px'
-            }}>
+            <p className="text-gray-400 text-sm leading-relaxed mb-2">
               အရည်အသွေးမြင့် ထုတ်ကုန်များ
             </p>
-            <p style={{
-              color: '#6b7280',
-              fontSize: '1rem',
-              lineHeight: '1.6'
-            }}>
+            <p className="text-gray-600 text-base leading-relaxed">
               Only the finest, salon-grade products for
               exceptional results and care
             </p>
           </div>
 
           {/* Feature 3 */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '20px',
-            padding: '40px 30px',
-            textAlign: 'center',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-8px)'
-            e.currentTarget.style.boxShadow = '0 25px 70px rgba(0, 0, 0, 0.15)'
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.1)'
-          }}
-          >
-            <div style={{
-              fontSize: '4rem',
-              marginBottom: '20px',
-              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
-            }}>🌟</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              color: '#111827',
-              marginBottom: '12px'
-            }}>
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-10 text-center shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-white/50 hover:-translate-y-2 hover:shadow-[0_25px_70px_rgba(0,0,0,0.15)] transition-all duration-300">
+            <div className="text-6xl mb-5 drop-shadow-md">🌟</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               Luxurious Ambiance
             </h3>
-            <p style={{
-              color: '#9ca3af',
-              fontSize: '0.95rem',
-              lineHeight: '1.6',
-              marginBottom: '8px'
-            }}>
+            <p className="text-gray-400 text-sm leading-relaxed mb-2">
               ဇိမ်ခံပတ်ဝန်းကျင်
             </p>
-            <p style={{
-              color: '#6b7280',
-              fontSize: '1rem',
-              lineHeight: '1.6'
-            }}>
+            <p className="text-gray-600 text-base leading-relaxed">
               Relax in our elegant, comfortable space designed
               for your ultimate pampering
             </p>
@@ -314,84 +93,44 @@ export default function HomePage() {
         </div>
 
         {/* Why Choose Us Section */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '30px',
-          padding: '50px 40px',
-          textAlign: 'center',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.5)'
-        }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            marginBottom: '30px',
-            background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
+        <div className="bg-white/80 backdrop-blur-md rounded-[30px] p-12 text-center shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-white/50">
+          <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
             Why Choose Pandora?
           </h2>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '30px',
-            marginTop: '40px'
-          }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
             <div>
-              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📅</div>
-              <h4 style={{
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '8px'
-              }}>
+              <div className="text-5xl mb-3">📅</div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 Easy Online Booking
               </h4>
-              <p style={{ fontSize: '0.95rem', color: '#6b7280' }}>
+              <p className="text-sm text-gray-600">
                 Book anytime, anywhere with our simple system
               </p>
             </div>
             <div>
-              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🎁</div>
-              <h4 style={{
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '8px'
-              }}>
+              <div className="text-5xl mb-3">🎁</div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 Member Rewards
               </h4>
-              <p style={{ fontSize: '0.95rem', color: '#6b7280' }}>
+              <p className="text-sm text-gray-600">
                 Exclusive perks and special offers for members
               </p>
             </div>
             <div>
-              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>💖</div>
-              <h4 style={{
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '8px'
-              }}>
+              <div className="text-5xl mb-3">💖</div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 Personalized Care
               </h4>
-              <p style={{ fontSize: '0.95rem', color: '#6b7280' }}>
+              <p className="text-sm text-gray-600">
                 Tailored treatments for your unique needs
               </p>
             </div>
             <div>
-              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⭐</div>
-              <h4 style={{
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '8px'
-              }}>
+              <div className="text-5xl mb-3">⭐</div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 5-Star Experience
               </h4>
-              <p style={{ fontSize: '0.95rem', color: '#6b7280' }}>
+              <p className="text-sm text-gray-600">
                 Consistently rated excellent by our clients
               </p>
             </div>

@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@types/react": "19.1.5",
+    "autoprefixer": "^10.4.23",
     "sharp": "^0.34.5"
   }
 }

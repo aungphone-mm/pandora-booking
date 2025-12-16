@@ -50,114 +50,56 @@ export default function RegisterPage() {
 
   if (showEmailAlert) {
     return (
-      <div style={{
-        maxWidth: '448px',
-        margin: '32px auto',
-        padding: '24px',
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
-        marginLeft: '16px',
-        marginRight: '16px',
-        textAlign: 'center'
-      }}>
+      <div className="max-w-md mx-8 md:mx-auto my-8 p-6 bg-white rounded-xl shadow-xl text-center">
         {/* Success Icon */}
-        <div style={{ marginBottom: '24px' }}>
-          <svg 
-            style={{
-              width: '64px',
-              height: '64px',
-              color: '#10b981',
-              margin: '0 auto'
-            }}
-            fill="none" 
-            stroke="currentColor" 
+        <div className="mb-6">
+          <svg
+            className="w-16 h-16 text-green-500 mx-auto"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
         </div>
 
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          marginBottom: '16px',
-          color: '#111827'
-        }}>Check Your Email!</h2>
-        
-        <p style={{
-          color: '#6b7280',
-          marginBottom: '8px',
-          lineHeight: '1.6'
-        }}>
+        <h2 className="text-2xl font-bold mb-4 text-gray-900">Check Your Email!</h2>
+
+        <p className="text-gray-600 mb-2 leading-relaxed">
           We've sent a confirmation email to:
         </p>
-        
-        <p style={{
-          fontWeight: '600',
-          color: '#111827',
-          marginBottom: '16px'
-        }}>
+
+        <p className="font-semibold text-gray-900 mb-4">
           {formData.email}
         </p>
-        
-        <p style={{
-          color: '#6b7280',
-          marginBottom: '24px',
-          lineHeight: '1.6',
-          fontSize: '0.875rem'
-        }}>
-          Please click the confirmation link in your email to activate your account. 
+
+        <p className="text-gray-600 mb-6 leading-relaxed text-sm">
+          Please click the confirmation link in your email to activate your account.
           Once confirmed, you can login and access all features.
         </p>
 
-        <div style={{
-          backgroundColor: '#fef3c7',
-          border: '1px solid #fbbf24',
-          borderRadius: '8px',
-          padding: '12px',
-          marginBottom: '24px'
-        }}>
-          <p style={{
-            color: '#92400e',
-            fontSize: '0.875rem',
-            fontWeight: '500'
-          }}>
+        <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-3 mb-6">
+          <p className="text-yellow-900 text-sm font-medium">
             📧 Don't forget to check your spam/junk folder if you don't see the email!
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => router.push('/auth/login')}
-            style={{
-              backgroundColor: '#ec4899',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '600'
-            }}
+            className="bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors"
           >
             Go to Login
           </button>
-          
+
           <button
             onClick={() => router.push('/booking')}
-            style={{
-              backgroundColor: 'transparent',
-              color: '#6b7280',
-              padding: '8px 16px',
-              border: 'none',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
+            className="text-gray-600 px-4 py-2 underline hover:text-gray-800 transition-colors"
           >
             Continue Booking as Guest
           </button>
@@ -167,115 +109,52 @@ export default function RegisterPage() {
   }
 
   return (
-    <div style={{
-      maxWidth: '448px',
-      margin: '16px auto',
-      padding: '16px',
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)',
-      marginLeft: '16px',
-      marginRight: '16px'
-    }}>
-      <h2 style={{
-        fontSize: '1.25rem',
-        fontWeight: 'bold',
-        marginBottom: '16px',
-        textAlign: 'center'
-      }}>Create Account</h2>
+    <div className="max-w-md mx-4 md:mx-auto my-4 p-4 bg-white rounded-xl shadow-xl">
+      <h2 className="text-xl font-bold mb-4 text-center">Create Account</h2>
       <form onSubmit={handleRegister}>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{
-            display: 'block',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>Full Name</label>
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2">Full Name</label>
           <input
             type="text"
             required
             value={formData.fullName}
             onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600"
           />
         </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{
-            display: 'block',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>Email</label>
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2">Email</label>
           <input
             type="email"
             required
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600"
           />
         </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{
-            display: 'block',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>Phone</label>
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2">Phone</label>
           <input
             type="tel"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600"
           />
         </div>
-        <div style={{ marginBottom: '24px' }}>
-          <label style={{
-            display: 'block',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>Password</label>
+        <div className="mb-6">
+          <label className="block text-gray-700 mb-2">Password</label>
           <input
             type="password"
             required
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          style={{
-            width: '100%',
-            backgroundColor: loading ? '#9ca3af' : '#ec4899',
-            color: 'white',
-            padding: '12px',
-            borderRadius: '8px',
-            border: 'none',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontWeight: '600'
-          }}
+          className="w-full bg-pink-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-pink-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Creating Account...' : 'Register'}
         </button>

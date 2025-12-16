@@ -13,62 +13,24 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <>
-      <div style={{
-        display: 'flex',
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-      }}>
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 font-sans">
         <AdminSidebar />
-        <div style={{
-          flex: 1,
-          padding: '0',
-          overflow: 'auto',
-          position: 'relative',
-          minWidth: 0, // Prevents flex item from overflowing
-        }}
-        className="main-content"
-        >
+        <div className="flex-1 p-0 overflow-auto relative min-w-0 main-content">
           {/* Main Content Area with Enhanced Styling */}
-          <main style={{
-            width: '100%',
-            minHeight: '100vh',
-            position: 'relative'
-          }}>
+          <main className="w-full min-h-screen relative">
             {/* Decorative background elements */}
-            <div style={{
-              position: 'absolute',
-              top: '10%',
-              right: '5%',
-              width: '300px',
-              height: '300px',
-              background: 'radial-gradient(circle, rgba(236, 72, 153, 0.05) 0%, transparent 70%)',
-              borderRadius: '50%',
-              pointerEvents: 'none'
-            }}></div>
-            <div style={{
-              position: 'absolute',
-              bottom: '20%',
-              left: '10%',
-              width: '200px',
-              height: '200px',
-              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%)',
-              borderRadius: '50%',
-              pointerEvents: 'none'
-            }}></div>
-            
+            <div className="absolute top-[10%] right-[5%] w-[300px] h-[300px] bg-pink-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-[20%] left-[10%] w-[200px] h-[200px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
             {/* Content Container */}
-            <div style={{
-              position: 'relative',
-              zIndex: 1
-            }}>
+            <div className="relative z-10">
               {children}
             </div>
           </main>
         </div>
       </div>
 
-      {/* Mobile-specific styles using regular style tag */}
+      {/* Mobile-specific styles */}
       <style>{`
         @media (max-width: 768px) {
           .main-content {
@@ -76,7 +38,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             width: 100% !important;
           }
         }
-        
+
         @media (min-width: 769px) {
           .main-content {
             padding-top: 0 !important;

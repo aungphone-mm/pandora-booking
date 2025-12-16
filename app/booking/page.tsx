@@ -12,22 +12,11 @@ export default async function BookingPage() {
   return (
     <>
       {/* Back to Home Link */}
-      <div style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '16px'
-        }}>
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <a
             href="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              color: '#ec4899',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}
+            className="inline-flex items-center text-pink-600 hover:text-pink-700 text-sm font-medium transition-colors"
           >
             ← Back to Home
           </a>
@@ -38,69 +27,25 @@ export default async function BookingPage() {
       <SinglePageBookingForm user={user} />
 
       {/* Contact Information */}
-      <div style={{
-        backgroundColor: '#f9fafb',
-        padding: '48px 0'
-      }}>
-        <div style={{
-          maxWidth: '1024px',
-          margin: '0 auto',
-          padding: '0 16px',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '32px',
-            boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)'
-          }}>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '16px'
-            }}>Need Assistance?</h3>
-            <p style={{
-              color: '#6b7280',
-              marginBottom: '24px',
-              fontSize: '1.125rem'
-            }}>
+      <div className="bg-gray-50 py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="bg-white rounded-xl p-8 shadow-xl">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Need Assistance?
+            </h3>
+            <p className="text-gray-600 mb-6 text-lg">
               Our friendly team is here to help you with any questions about our services or booking process.
             </p>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '24px'
-            }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <a
                 href="tel:+1234567890"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#ec4899',
-                  color: 'white',
-                  padding: '16px 24px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: '600'
-                }}
+                className="inline-flex items-center justify-center bg-pink-600 text-white px-6 py-4 rounded-lg font-semibold hover:bg-pink-700 transition-colors"
               >
                 Call (123) 456-7890
               </a>
               <a
                 href="mailto:info@pandorabeauty.com"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#7c3aed',
-                  color: 'white',
-                  padding: '16px 24px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: '600'
-                }}
+                className="inline-flex items-center justify-center bg-purple-600 text-white px-6 py-4 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
               >
                 Email Us
               </a>
@@ -111,117 +56,66 @@ export default async function BookingPage() {
 
       {/* Get More with a Free Account - Only show for non-logged-in users */}
       {!user && (
-        <div style={{
-          backgroundColor: '#f9fafb',
-          padding: '0 0 48px 0'
-        }}>
-          <div style={{
-            maxWidth: '1024px',
-            margin: '0 auto',
-            padding: '0 16px'
-          }}>
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                padding: '20px',
-                color: 'white',
-                position: 'relative'
-              }}>
-                <h3 style={{
-                  fontSize: '1.25rem',
-                  fontWeight: '600',
-                  marginBottom: '8px'
-                }}>
+        <div className="bg-gray-50 pb-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-5 text-white relative">
+                <h3 className="text-xl font-semibold mb-2">
                   💫 Get More with a Free Account!
                 </h3>
-                <p style={{
-                  opacity: 0.9,
-                  fontSize: '0.9rem',
-                  lineHeight: '1.5'
-                }}>
+                <p className="opacity-90 text-sm leading-relaxed">
                   You're booking as a guest. Create a free account to unlock exclusive benefits!
                 </p>
               </div>
-              <div style={{ padding: '20px' }}>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px',
-                  marginBottom: '20px'
-                }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📅</div>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+              <div className="p-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">📅</div>
+                    <h4 className="text-sm font-semibold text-gray-900">
                       Appointment History
                     </h4>
-                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                    <p className="text-xs text-gray-600">
                       View & manage all bookings
                     </p>
                   </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📧</div>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">📧</div>
+                    <h4 className="text-sm font-semibold text-gray-900">
                       Email Confirmations
                     </h4>
-                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                    <p className="text-xs text-gray-600">
                       Automatic booking updates
                     </p>
                   </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⚡</div>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">⚡</div>
+                    <h4 className="text-sm font-semibold text-gray-900">
                       Quick Rebooking
                     </h4>
-                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                    <p className="text-xs text-gray-600">
                       One-click repeat visits
                     </p>
                   </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🎁</div>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111827' }}>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">🎁</div>
+                    <h4 className="text-sm font-semibold text-gray-900">
                       Member Perks
                     </h4>
-                    <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                    <p className="text-xs text-gray-600">
                       Exclusive offers & discounts
                     </p>
                   </div>
                 </div>
-                <div style={{
-                  display: 'flex',
-                  gap: '12px',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap'
-                }}>
+                <div className="flex gap-3 justify-center flex-wrap">
                   <Link
                     href="/auth/register"
-                    style={{
-                      backgroundColor: '#ec4899',
-                      color: 'white',
-                      padding: '12px 24px',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      fontWeight: '600',
-                      fontSize: '0.9rem'
-                    }}
+                    className="bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-pink-700 transition-colors"
                   >
                     Create Free Account
                   </Link>
                   <Link
                     href="/auth/login"
-                    style={{
-                      backgroundColor: '#6b7280',
-                      color: 'white',
-                      padding: '12px 24px',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      fontWeight: '600',
-                      fontSize: '0.9rem'
-                    }}
+                    className="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-700 transition-colors"
                   >
                     Login
                   </Link>

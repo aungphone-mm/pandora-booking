@@ -36,7 +36,7 @@ async function getUser() {
   try {
     const supabase = createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
-    
+
     if (error) {
       console.warn('Auth error:', error.message)
       return { user: null, profile: null }
@@ -52,7 +52,7 @@ async function getUser() {
       .select('is_admin, full_name')
       .eq('id', user.id)
       .single()
-    
+
     if (profileError) {
       console.warn('Profile error:', profileError.message)
       return { user, profile: null }
@@ -74,109 +74,51 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-        <header style={{
-          backgroundColor: '#ec4899',
-          color: 'white'
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '16px'
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '16px'
-            }}>
-              <Link 
-                href="/" 
-                style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
-                  color: 'white',
-                  textDecoration: 'none'
-                }}
+      <body className="font-sans">
+        <header className="bg-pink-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex justify-between items-center flex-wrap gap-4">
+              <Link
+                href="/"
+                className="text-2xl font-bold text-white hover:text-pink-100 transition-colors"
               >
                 Pandora Beauty Salon
               </Link>
-              <nav style={{
-                display: 'flex',
-                gap: '16px',
-                alignItems: 'center',
-                flexWrap: 'wrap'
-              }}>
+              <nav className="flex gap-4 items-center flex-wrap">
                 <Link
                   href="/booking"
-                  style={{
-                    color: 'white',
-                    textDecoration: 'none',
-                    padding: '8px 12px',
-                    borderRadius: '4px'
-                  }}
+                  className="text-white hover:bg-pink-700 px-3 py-2 rounded transition-colors"
                 >
                   Book Now
                 </Link>
                 <Link
                   href="/confirmation"
-                  style={{
-                    color: 'white',
-                    textDecoration: 'none',
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
+                  className="text-white hover:bg-pink-700 px-3 py-2 rounded flex items-center gap-1 transition-colors"
                 >
                   🔍 Search Booking
                 </Link>
                 {user ? (
                   <>
-                    <span style={{
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      fontSize: '0.875rem'
-                    }}>
+                    <span className="text-white/80 text-sm">
                       Welcome, {profile?.full_name || user.email?.split('@')[0] || 'User'}!
                     </span>
-                    <Link 
-                      href="/account" 
-                      style={{
-                        color: 'white',
-                        textDecoration: 'none',
-                        padding: '8px 12px',
-                        borderRadius: '4px'
-                      }}
+                    <Link
+                      href="/account"
+                      className="text-white hover:bg-pink-700 px-3 py-2 rounded transition-colors"
                     >
                       My Account
                     </Link>
                     {profile?.is_admin && (
-                      <Link 
-                        href="/admin" 
-                        style={{
-                          color: 'white',
-                          textDecoration: 'none',
-                          padding: '8px 12px',
-                          borderRadius: '4px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                        }}
+                      <Link
+                        href="/admin"
+                        className="text-white bg-white/10 hover:bg-white/20 px-3 py-2 rounded transition-colors"
                       >
                         Admin
                       </Link>
                     )}
-                    <form action="/api/auth/signout" method="POST" style={{margin: 0}}>
-                      <button 
-                        style={{
-                          color: 'white',
-                          backgroundColor: 'transparent',
-                          border: '1px solid rgba(255, 255, 255, 0.3)',
-                          cursor: 'pointer',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
-                          fontSize: '0.875rem'
-                        }}
+                    <form action="/api/auth/signout" method="POST" className="m-0">
+                      <button
+                        className="text-white border border-white/30 hover:bg-white/10 px-3 py-1.5 rounded text-sm transition-colors cursor-pointer"
                       >
                         Sign Out
                       </button>
@@ -184,28 +126,15 @@ export default async function RootLayout({
                   </>
                 ) : (
                   <>
-                    <Link 
-                      href="/auth/login" 
-                      style={{
-                        color: 'white',
-                        textDecoration: 'none',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        border: '1px solid rgba(255, 255, 255, 0.3)'
-                      }}
+                    <Link
+                      href="/auth/login"
+                      className="text-white border border-white/30 hover:bg-white/10 px-3 py-2 rounded transition-colors"
                     >
                       Login
                     </Link>
-                    <Link 
-                      href="/auth/register" 
-                      style={{
-                        backgroundColor: 'white',
-                        color: '#ec4899',
-                        padding: '8px 16px',
-                        borderRadius: '4px',
-                        textDecoration: 'none',
-                        fontWeight: '600'
-                      }}
+                    <Link
+                      href="/auth/register"
+                      className="bg-white text-pink-600 px-4 py-2 rounded font-semibold hover:bg-pink-50 transition-colors"
                     >
                       Register
                     </Link>
@@ -215,10 +144,7 @@ export default async function RootLayout({
             </div>
           </div>
         </header>
-        <main style={{
-          minHeight: '100vh',
-          backgroundColor: '#f9fafb'
-        }}>
+        <main className="min-h-screen bg-gray-50">
           <SessionTrackingProvider>
             {children}
           </SessionTrackingProvider>
