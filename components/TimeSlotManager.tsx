@@ -221,100 +221,40 @@ export default function TimeSlotManager() {
 
   if (loading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        padding: '24px'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '300px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            border: '2px solid #f59e0b',
-            borderTop: '2px solid transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-center items-center h-[300px]">
+          <div className="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '24px'
-    }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '24px'
-      }}>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold'
-        }}>Time Slot Management</h2>
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Time Slot Management</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          style={{
-            backgroundColor: '#f59e0b',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '600'
-          }}
+          className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-3 rounded font-semibold transition-colors"
         >
           {showAddForm ? 'Cancel' : 'Add Time Slot'}
         </button>
       </div>
 
       {error && (
-        <div style={{
-          marginBottom: '24px',
-          padding: '16px',
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '8px'
-        }}>
-          <p style={{ color: '#b91c1c', fontWeight: '500' }}>{error}</p>
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700 font-medium">{error}</p>
         </div>
       )}
 
       {/* Filters */}
-      <div style={{
-        marginBottom: '24px',
-        display: 'flex',
-        gap: '16px',
-        alignItems: 'center'
-      }}>
+      <div className="mb-6 flex gap-4 items-center">
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '4px'
-          }}>Filter by Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            style={{
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600"
           >
             <option value="all">All Time Slots</option>
             <option value="active">Active Only</option>
@@ -324,79 +264,26 @@ export default function TimeSlotManager() {
       </div>
 
       {/* Summary Stats */}
-      <div style={{
-        marginBottom: '24px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: '16px'
-      }}>
-        <div style={{
-          backgroundColor: '#f9fafb',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#6b7280'
-          }}>Total Slots</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#111827'
-          }}>{timeSlots.length}</p>
+      <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-gray-600">Total Slots</h3>
+          <p className="text-2xl font-bold text-gray-900">{timeSlots.length}</p>
         </div>
-        <div style={{
-          backgroundColor: '#dcfce7',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#166534'
-          }}>Active</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#166534'
-          }}>
+        <div className="bg-green-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-green-800">Active</h3>
+          <p className="text-2xl font-bold text-green-800">
             {timeSlots.filter(slot => slot.is_active).length}
           </p>
         </div>
-        <div style={{
-          backgroundColor: '#fee2e2',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#991b1b'
-          }}>Inactive</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#991b1b'
-          }}>
+        <div className="bg-red-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-red-800">Inactive</h3>
+          <p className="text-2xl font-bold text-red-800">
             {timeSlots.filter(slot => !slot.is_active).length}
           </p>
         </div>
-        <div style={{
-          backgroundColor: '#dbeafe',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#1e40af'
-          }}>Weekly Slots</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#1e40af'
-          }}>
+        <div className="bg-blue-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-blue-900">Weekly Slots</h3>
+          <p className="text-2xl font-bold text-blue-900">
             {timeSlots.filter(slot => slot.is_active).length * 7}
           </p>
         </div>
@@ -404,139 +291,61 @@ export default function TimeSlotManager() {
 
       {/* Add Time Slot Form */}
       {showAddForm && (
-        <div style={{
-          marginBottom: '24px',
-          padding: '24px',
-          border: '2px solid #f59e0b',
-          borderRadius: '8px',
-          backgroundColor: '#fffbeb'
-        }}>
-          <h3 style={{
-            fontSize: '1.25rem',
-            fontWeight: 'bold',
-            marginBottom: '16px',
-            color: '#d97706'
-          }}>Add New Time Slot</h3>
+        <div className="mb-6 p-6 border-2 border-amber-600 rounded-lg bg-amber-50">
+          <h3 className="text-xl font-bold mb-4 text-amber-700">Add New Time Slot</h3>
           
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'auto auto 1fr',
-            gap: '16px',
-            alignItems: 'end',
-            marginBottom: '16px'
-          }}>
+          <div className="grid grid-cols-[auto_auto_1fr] gap-4 items-end mb-4">
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '4px'
-              }}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Time
               </label>
               <input
                 type="time"
                 value={newTimeSlot.time}
                 onChange={(e) => setNewTimeSlot({ ...newTimeSlot, time: e.target.value })}
-                style={{
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  minWidth: '140px'
-                }}
+                className="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 min-w-[140px]"
               />
             </div>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '12px'
-            }}>
+            <div className="flex items-center p-3">
               <input
                 type="checkbox"
                 id="newActive"
                 checked={newTimeSlot.is_active}
                 onChange={(e) => setNewTimeSlot({ ...newTimeSlot, is_active: e.target.checked })}
-                style={{ marginRight: '8px' }}
+                className="mr-2"
               />
-              <label htmlFor="newActive" style={{
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#374151'
-              }}>
+              <label htmlFor="newActive" className="text-sm font-medium text-gray-700">
                 Active
               </label>
             </div>
           </div>
           
           {/* Quick add section */}
-          <div style={{
-            padding: '16px',
-            backgroundColor: '#f3f4f6',
-            borderRadius: '8px',
-            marginBottom: '16px'
-          }}>
-            <h4 style={{
-              fontSize: '1rem',
-              fontWeight: '600',
-              marginBottom: '8px',
-              color: '#374151'
-            }}>Quick Add Business Hours</h4>
+          <div className="p-4 bg-gray-100 rounded-lg mb-4">
+            <h4 className="text-base font-semibold mb-2 text-gray-700">Quick Add Business Hours</h4>
             <button
               onClick={addCommonTimeSlots}
               disabled={saving}
-              style={{
-                backgroundColor: saving ? '#9ca3af' : '#6b7280',
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '4px',
-                opacity: saving ? 0.6 : 1
-              }}
+              className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-4 py-2 rounded font-medium text-sm mb-1 disabled:cursor-not-allowed transition-colors"
             >
               {saving ? 'Adding...' : 'Add 9 AM - 5 PM (30 min intervals)'}
             </button>
-            <p style={{
-              fontSize: '0.75rem',
-              color: '#6b7280'
-            }}>
+            <p className="text-xs text-gray-600">
               Adds 30-minute intervals from 9:00 AM to 5:00 PM
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="flex gap-2">
             <button
               onClick={handleAddTimeSlot}
               disabled={saving || !newTimeSlot.time}
-              style={{
-                backgroundColor: saving ? '#9ca3af' : '#f59e0b',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: saving || !newTimeSlot.time ? 'not-allowed' : 'pointer',
-                fontWeight: '600',
-                opacity: saving || !newTimeSlot.time ? 0.6 : 1
-              }}
+              className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {saving ? 'Adding...' : 'Add Time Slot'}
             </button>
             <button
               onClick={() => setShowAddForm(false)}
-              style={{
-                backgroundColor: '#6b7280',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '600'
-              }}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded font-semibold transition-colors"
             >
               Cancel
             </button>
@@ -546,12 +355,9 @@ export default function TimeSlotManager() {
 
       {/* Time Slots List */}
       {filteredTimeSlots.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '48px 0'
-        }}>
-          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🕐</div>
-          <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4">🕐</div>
+          <p className="text-gray-600 text-lg">
             {filterStatus !== 'all'
               ? `No ${filterStatus} time slots found.`
               : 'No time slots configured. Add some time slots to get started.'
@@ -559,98 +365,50 @@ export default function TimeSlotManager() {
           </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="flex flex-col gap-4">
           {filteredTimeSlots.map((timeSlot) => (
-            <div key={timeSlot.id} style={{
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              padding: '20px',
-              backgroundColor: timeSlot.is_active ? 'white' : '#f9fafb'
-            }}>
+            <div key={timeSlot.id} className="border border-gray-200 rounded-lg p-5 bg-white">
               {editingSlot?.id === timeSlot.id ? (
                 // Edit Mode
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'auto auto',
-                    gap: '16px',
-                    alignItems: 'end'
-                  }}>
+                <div className="flex flex-col gap-4">
+                  <div className="grid grid-cols-[auto_auto] gap-4 items-end">
                     <div>
-                      <label style={{
-                        display: 'block',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#374151',
-                        marginBottom: '4px'
-                      }}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Time
                       </label>
                       <input
                         type="time"
                         value={editingSlot.time}
                         onChange={(e) => setEditingSlot({ ...editingSlot, time: e.target.value })}
-                        style={{
-                          padding: '12px',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '8px',
-                          outline: 'none',
-                          minWidth: '140px'
-                        }}
+                        className="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 min-w-[140px]"
                       />
                     </div>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '12px'
-                    }}>
+                    <div className="flex items-center p-3">
                       <input
                         type="checkbox"
                         id={`active-${editingSlot.id}`}
                         checked={editingSlot.is_active}
                         onChange={(e) => setEditingSlot({ ...editingSlot, is_active: e.target.checked })}
-                        style={{ marginRight: '8px' }}
+                        className="mr-2"
                       />
-                      <label htmlFor={`active-${editingSlot.id}`} style={{
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#374151'
-                      }}>
+                      <label htmlFor={`active-${editingSlot.id}`} className="text-sm font-medium text-gray-700">
                         Active
                       </label>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleUpdateTimeSlot(editingSlot)}
                       disabled={saving}
-                      style={{
-                        backgroundColor: saving ? '#9ca3af' : '#16a34a',
-                        color: 'white',
-                        padding: '12px 24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: saving ? 'not-allowed' : 'pointer',
-                        fontWeight: '600',
-                        opacity: saving ? 0.6 : 1
-                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                     >
                       {saving ? 'Saving...' : 'Save Changes'}
                     </button>
                     <button
                       onClick={() => setEditingSlot(null)}
                       disabled={saving}
-                      style={{
-                        backgroundColor: '#6b7280',
-                        color: 'white',
-                        padding: '12px 24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: saving ? 'not-allowed' : 'pointer',
-                        fontWeight: '600',
-                        opacity: saving ? 0.6 : 1
-                      }}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                     >
                       Cancel
                     </button>
@@ -658,84 +416,39 @@ export default function TimeSlotManager() {
                 </div>
               ) : (
                 // View Mode
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      marginBottom: '8px'
-                    }}>
-                      <h3 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: 'bold',
-                        color: timeSlot.is_active ? '#111827' : '#6b7280',
-                        fontFamily: 'monospace'
-                      }}>
+                <div className="flex justify-between items-center">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className={`text-2xl font-bold font-mono ${timeSlot.is_active ? 'text-gray-900' : 'text-gray-600'}`}>
                         {formatTime(timeSlot.time)}
                       </h3>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        padding: '4px 8px',
-                        borderRadius: '12px',
-                        fontWeight: '500',
-                        ...getStatusColor(timeSlot.is_active)
-                      }}>
+                      <span className="text-xs px-2 py-1 rounded-full font-medium">
                         {timeSlot.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
                     
-                    <p style={{
-                      fontSize: '0.875rem',
-                      color: '#6b7280'
-                    }}>
+                    <p className="text-sm text-gray-600">
                       Created: {format(new Date(timeSlot.created_at), 'MMM d, yyyy')}
                     </p>
                   </div>
 
-                  <div style={{
-                    display: 'flex',
-                    gap: '8px',
-                    alignItems: 'center',
-                    marginLeft: '16px'
-                  }}>
+                  <div className="flex gap-2 items-center ml-4">
                     <button
                       onClick={() => setEditingSlot(timeSlot)}
-                      style={{
-                        color: '#3b82f6',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className="text-blue-600 hover:text-blue-700 underline text-sm transition-colors"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => toggleSlotStatus(timeSlot.id, timeSlot.is_active)}
-                      style={{
-                        color: timeSlot.is_active ? '#dc2626' : '#16a34a',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className={`hover:opacity-75 underline text-sm transition-opacity ${timeSlot.is_active ? 'text-red-600' : 'text-green-600'}`}
                     >
                       {timeSlot.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                     <button
                       onClick={() => handleDeleteTimeSlot(timeSlot.id)}
                       disabled={saving}
-                      style={{
-                        color: saving ? '#9ca3af' : '#dc2626',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: saving ? 'not-allowed' : 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className="text-red-600 hover:text-red-700 disabled:text-gray-400 disabled:cursor-not-allowed underline text-sm transition-colors"
                     >
                       Delete
                     </button>

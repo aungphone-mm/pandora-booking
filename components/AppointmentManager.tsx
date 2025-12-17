@@ -387,103 +387,27 @@ export default function AppointmentManager() {
 
   if (loading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-        padding: '48px',
-        textAlign: 'center',
-        border: '1px solid #f1f5f9'
-      }}>
-        <div style={{
-          display: 'inline-block',
-          width: '48px',
-          height: '48px',
-          border: '4px solid #f1f5f9',
-          borderTop: '4px solid #ec4899',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          marginBottom: '20px'
-        }}></div>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: '700',
-          marginBottom: '8px',
-          color: '#1e293b'
-        }}>Loading Appointments</h2>
-        <p style={{
-          color: '#64748b',
-          fontSize: '1rem'
-        }}>Please wait while we fetch your appointment data...</p>
+      <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-12 text-center border border-slate-100">
+        <div className="inline-block w-12 h-12 border-4 border-slate-100 border-t-pink-600 rounded-full animate-spin mb-5"></div>
+        <h2 className="mb-2">Loading Appointments</h2>
+        <p className="text-slate-500 text-base">Please wait while we fetch your appointment data...</p>
       </div>
     )
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '32px',
-      animation: 'fadeIn 0.6s ease-out'
-    }}>
+    <div className="flex flex-col gap-8 animate-[fadeIn_0.6s_ease-out]">
       {/* Enhanced Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(102, 126, 234, 0.3)',
-        padding: window.innerWidth <= 768 ? '20px' : '32px',
-        color: 'white',
-        position: 'relative',
-        overflow: 'hidden'
-      }} className="appointment-card">
-        <div style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-50%',
-          width: '200%',
-          height: '200%',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }}></div>
-        <div style={{
-          display: 'flex',
-          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
-          justifyContent: 'space-between',
-          alignItems: window.innerWidth <= 768 ? 'flex-start' : 'center',
-          gap: window.innerWidth <= 768 ? '16px' : '0',
-          position: 'relative',
-          zIndex: 1
-        }}>
+      <div className="appointment-card bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[20px] shadow-[0_15px_35px_rgba(102,126,234,0.3)] p-8 text-white relative overflow-hidden">
+        <div className="absolute -top-1/2 -right-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,rgba(255,255,255,0.1)_0%,transparent_70%)] pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 relative z-10">
           <div>
-            <h2 style={{
-              fontSize: window.innerWidth <= 768 ? '1.5rem' : '2.25rem',
-              fontWeight: '800',
-              margin: '0 0 8px 0',
-              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>📅 Appointment Management</h2>
-            <p style={{
-              fontSize: '1.1rem',
-              margin: '0',
-              opacity: '0.9'
-            }}>Manage all customer appointments and schedules</p>
+            <h2 className="text-2xl md:text-4xl font-extrabold m-0 mb-2 [text-shadow:0_2px_4px_rgba(0,0,0,0.1)]">📅 Appointment Management</h2>
+            <p className="text-lg m-0 opacity-90">Manage all customer appointments and schedules</p>
           </div>
           <button
             onClick={loadAppointments}
-            style={{
-              background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
-              color: 'white',
-              padding: '16px 24px',
-              borderRadius: '12px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '600',
-              fontSize: '1rem',
-              boxShadow: '0 6px 20px rgba(236, 72, 153, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-            className="action-button"
+            className="action-button bg-gradient-to-br from-pink-600 to-pink-700 text-white px-6 py-4 rounded-xl border-none cursor-pointer font-semibold text-base shadow-[0_6px_20px_rgba(236,72,153,0.3)] flex items-center gap-2"
           >
             🔄 Refresh Data
           </button>
@@ -491,47 +415,18 @@ export default function AppointmentManager() {
       </div>
 
       {error && (
-        <div style={{
-          background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-          border: '1px solid #f87171',
-          borderRadius: '16px',
-          padding: '24px',
-          boxShadow: '0 8px 25px rgba(248, 113, 113, 0.2)'
-        }} className="slideIn">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-            <span style={{ fontSize: '1.5rem' }}>⚠️</span>
-            <h3 style={{ 
-              color: '#b91c1c', 
-              fontWeight: '700',
-              margin: '0',
-              fontSize: '1.2rem'
-            }}>Error Loading Appointments</h3>
+        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-400 rounded-2xl p-6 shadow-[0_8px_25px_rgba(248,113,113,0.2)]">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-2xl">⚠️</span>
+            <h3 className="text-red-700 font-bold m-0 text-xl">Error Loading Appointments</h3>
           </div>
-          <p style={{ color: '#dc2626', fontWeight: '500', margin: '0 0 16px 0' }}>{error}</p>
+          <p className="text-red-600 font-medium m-0 mb-4">{error}</p>
           
-          <details style={{ 
-            background: 'rgba(239, 68, 68, 0.1)',
-            borderRadius: '8px',
-            padding: '12px'
-          }}>
-            <summary style={{
-              fontSize: '0.875rem',
-              color: '#dc2626',
-              cursor: 'pointer',
-              fontWeight: '600'
-            }}>🔧 Troubleshooting Guide</summary>
-            <div style={{
-              marginTop: '12px',
-              fontSize: '0.875rem',
-              color: '#dc2626',
-              lineHeight: '1.6'
-            }}>
+          <details className="p-3">
+            <summary className="text-sm text-red-600 cursor-pointer font-semibold">🔧 Troubleshooting Guide</summary>
+            <div className="mt-3 text-sm text-red-600 leading-relaxed">
               <p><strong>Common solutions:</strong></p>
-              <ol style={{
-                listStyle: 'decimal',
-                paddingLeft: '20px',
-                marginTop: '8px'
-              }}>
+              <ol className="list-decimal pl-5 mt-2">
                 <li>Verify database tables exist (appointments, services, profiles, products)</li>
                 <li>Check RLS policies allow reading from all tables</li>
                 <li>Ensure proper relationships are set up between tables</li>
@@ -544,60 +439,19 @@ export default function AppointmentManager() {
       )}
 
       {/* Enhanced Filters and Sorting */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.06)',
-        padding: window.innerWidth <= 768 ? '20px' : '32px',
-        border: '1px solid #f1f5f9'
-      }} className="appointment-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.2rem'
-          }}>🔍</div>
-          <h3 style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            margin: '0',
-            color: '#1e293b'
-          }}>Filter & Sort Options</h3>
+      <div className="appointment-card bg-white rounded-[20px] shadow-[0_8px_25px_rgba(0,0,0,0.06)] p-5 md:p-8 border border-slate-100">
+        <div className="mb-6">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-xl">🔍</div>
+          <h3 className="text-2xl font-bold m-0 text-slate-800">Filter & Sort Options</h3>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '24px'
-        }}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6">
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>📊 Filter by Status</label>
+            <label className="mb-2">📊 Filter by Status</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                background: 'white',
-                color: '#1e293b'
-              }}
-              className="filter-select"
+              className="filter-select w-full py-3.5 px-4 border-2 border-slate-200 rounded-xl outline-none text-base font-medium bg-white text-slate-800"
             >
               <option value="all">All Statuses</option>
               <option value="pending">⏳ Pending</option>
@@ -607,28 +461,11 @@ export default function AppointmentManager() {
           </div>
 
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>📋 Sort by</label>
+            <label className="mb-2">📋 Sort by</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'date' | 'created' | 'customer')}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                background: 'white',
-                color: '#1e293b'
-              }}
-              className="filter-select"
+              className="filter-select w-full py-3.5 px-4 border-2 border-slate-200 rounded-xl outline-none text-base font-medium bg-white text-slate-800"
             >
               <option value="date">📅 Appointment Date</option>
               <option value="created">🕐 Created Date</option>
@@ -637,28 +474,11 @@ export default function AppointmentManager() {
           </div>
 
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>🔄 Order</label>
+            <label className="mb-2">🔄 Order</label>
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                background: 'white',
-                color: '#1e293b'
-              }}
-              className="filter-select"
+              className="filter-select w-full py-3.5 px-4 border-2 border-slate-200 rounded-xl outline-none text-base font-medium bg-white text-slate-800"
             >
               <option value="desc">📉 Newest First</option>
               <option value="asc">📈 Oldest First</option>
@@ -681,21 +501,9 @@ export default function AppointmentManager() {
           boxShadow: '0 6px 20px rgba(0, 0, 0, 0.06)',
           textAlign: 'center'
         }} className="appointment-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📊</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#64748b',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Total Appointments</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#1e293b',
-            margin: '0'
-          }}>{appointments.length}</p>
+          <div className="mb-2">📊</div>
+          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider m-0 mb-2">Total Appointments</h3>
+          <p className="text-5xl font-extrabold text-slate-800 m-0">{appointments.length}</p>
         </div>
         
         <div style={{
@@ -706,7 +514,7 @@ export default function AppointmentManager() {
           boxShadow: '0 6px 20px rgba(245, 158, 11, 0.15)',
           textAlign: 'center'
         }} className="appointment-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⏳</div>
+          <div className="mb-2">⏳</div>
           <h3 style={{
             fontSize: '0.9rem',
             fontWeight: '600',
@@ -733,7 +541,7 @@ export default function AppointmentManager() {
           boxShadow: '0 6px 20px rgba(34, 197, 94, 0.15)',
           textAlign: 'center'
         }} className="appointment-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✅</div>
+          <div className="mb-2">✅</div>
           <h3 style={{
             fontSize: '0.9rem',
             fontWeight: '600',
@@ -760,7 +568,7 @@ export default function AppointmentManager() {
           boxShadow: '0 6px 20px rgba(220, 38, 38, 0.15)',
           textAlign: 'center'
         }} className="appointment-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>❌</div>
+          <div className="mb-2">❌</div>
           <h3 style={{
             fontSize: '0.9rem',
             fontWeight: '600',
@@ -781,30 +589,14 @@ export default function AppointmentManager() {
       </div>
 
       {/* Enhanced Appointments Table */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-        padding: '0',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden'
-      }} className="appointment-card">
+      <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-0 border border-slate-100 overflow-hidden">
         {filteredAndSortedAppointments.length === 0 ? (
-          <div style={{
-            textAlign: 'center',
-            padding: '64px 32px',
-            color: '#64748b'
-          }}>
-            <div style={{ fontSize: '4rem', marginBottom: '16px', opacity: '0.5' }}>📅</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '600',
-              marginBottom: '8px',
-              color: '#475569'
-            }}>
+          <div className="text-center py-16 px-8 text-slate-500">
+            <div className="mb-4">📅</div>
+            <h3 className="mb-2">
               {filterStatus === 'all' ? 'No appointments found' : `No ${filterStatus} appointments found`}
             </h3>
-            <p style={{ fontSize: '1rem', opacity: '0.8' }}>
+            <p className="text-base opacity-80">
               {filterStatus === 'all' 
                 ? 'Start by creating your first appointment or check your filters.' 
                 : `Try changing the filter to see other appointments.`
@@ -814,88 +606,18 @@ export default function AppointmentManager() {
         ) : (
           <>
             {/* Desktop Table */}
-            <div className="desktop-table" style={{ overflowX: 'auto' }}>
-              <table style={{
-                width: '100%',
-                borderCollapse: 'collapse'
-              }}>
+            <div className="desktop-table overflow-x-auto">
+              <table className="w-full border-collapse">
                 <thead>
-                <tr style={{
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                  borderBottom: '2px solid #e2e8f0'
-                }}>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>👤 Customer</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>🔖 Booking ID</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>✨ Service</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>👥 Staff</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>📅 Date & Time</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>💰 Total</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>📊 Status</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>⚡ Actions</th>
+                <tr className="bg-gradient-to-br from-slate-50 to-slate-200 border-b-2 border-slate-200">
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">👤 Customer</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">🔖 Booking ID</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">✨ Service</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">👥 Staff</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">📅 Date & Time</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">💰 Total</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">📊 Status</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">⚡ Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -904,24 +626,11 @@ export default function AppointmentManager() {
                     borderBottom: '1px solid #f1f5f9',
                     backgroundColor: index % 2 === 0 ? 'white' : '#fafbfc'
                   }} className="table-row">
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <div>
-                        <p style={{ 
-                          fontWeight: '600',
-                          fontSize: '1.1rem',
-                          color: '#1e293b',
-                          margin: '0 0 4px 0'
-                        }}>{appointment.customer_name}</p>
-                        <p style={{
-                          fontSize: '0.9rem',
-                          color: '#64748b',
-                          margin: '0 0 2px 0'
-                        }}>📧 {appointment.customer_email}</p>
-                        <p style={{
-                          fontSize: '0.9rem',
-                          color: '#64748b',
-                          margin: '0 0 8px 0'
-                        }}>📞 {appointment.customer_phone}</p>
+                        <p className="font-semibold text-lg text-slate-800 m-0 mb-1">{appointment.customer_name}</p>
+                        <p className="text-sm text-slate-500 m-0 mb-0.5">📧 {appointment.customer_email}</p>
+                        <p className="text-sm text-slate-500 m-0 mb-2">📞 {appointment.customer_phone}</p>
                         <span style={{
                           fontSize: '0.8rem',
                           padding: '4px 12px',
@@ -943,7 +652,7 @@ export default function AppointmentManager() {
                         )}
                       </div>
                     </td>
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <div>
                         <div style={{
                           fontFamily: 'monospace',
@@ -978,19 +687,10 @@ export default function AppointmentManager() {
                         </button>
                       </div>
                     </td>
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <div>
-                        <p style={{
-                          fontWeight: '600',
-                          fontSize: '1.1rem',
-                          color: '#1e293b',
-                          margin: '0 0 4px 0'
-                        }}>💅 {appointment.service?.name}</p>
-                        <p style={{
-                          fontSize: '0.9rem',
-                          color: '#64748b',
-                          margin: '0 0 8px 0'
-                        }}>
+                        <p className="font-semibold text-lg text-slate-800 m-0 mb-1">💅 {appointment.service?.name}</p>
+                        <p className="text-sm text-slate-500 m-0 mb-2">
                           💰 {appointment.service?.price}Ks • ⏱️ {appointment.service?.duration} min
                         </p>
                         {appointment.appointment_products && appointment.appointment_products.length > 0 && (
@@ -1013,7 +713,7 @@ export default function AppointmentManager() {
                         )}
                       </div>
                     </td>
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <select
                         value={appointment.staff_id || ''}
                         onChange={(e) => updateAppointmentStaff(
@@ -1053,14 +753,9 @@ export default function AppointmentManager() {
                         </p>
                       )}
                     </td>
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <div>
-                        <p style={{ 
-                          fontWeight: '600',
-                          fontSize: '1.1rem',
-                          color: '#1e293b',
-                          margin: '0 0 4px 0'
-                        }}>
+                        <p className="font-semibold text-lg text-slate-800 m-0 mb-1">
                           📅 {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
                         </p>
                         <p style={{
@@ -1078,7 +773,7 @@ export default function AppointmentManager() {
                         </p>
                       </div>
                     </td>
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <p style={{ 
                         fontWeight: '700',
                         fontSize: '1.2rem',
@@ -1086,7 +781,7 @@ export default function AppointmentManager() {
                         margin: '0'
                       }}>💰 {calculateTotal(appointment).toLocaleString()}Ks</p>
                     </td>
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <select
                         value={appointment.status}
                         onChange={(e) => updateAppointmentStatus(
@@ -1111,7 +806,7 @@ export default function AppointmentManager() {
                         <option value="cancelled">❌ Cancelled</option>
                       </select>
                     </td>
-                    <td style={{ padding: '24px' }}>
+                    <td className="p-6">
                       <button
                         onClick={() => deleteAppointment(appointment.id)}
                         style={{
@@ -1158,40 +853,32 @@ export default function AppointmentManager() {
             <div className="mobile-table">
               {filteredAndSortedAppointments.map((appointment) => (
                 <div key={appointment.id} className="mobile-card">
-                  <div style={{ marginBottom: '16px' }}>
+                  <div className="mb-4">
                     <h3 style={{ 
                       fontWeight: '600',
                       fontSize: '1.1rem',
                       color: '#1e293b',
                       margin: '0 0 8px 0'
                     }}>{appointment.customer_name}</h3>
-                    <p style={{ fontSize: '0.9rem', color: '#64748b', margin: '4px 0' }}>
+                    <p className="text-sm text-slate-500 my-1">
                       📧 {appointment.customer_email}
                     </p>
-                    <p style={{ fontSize: '0.9rem', color: '#64748b', margin: '4px 0' }}>
+                    <p className="text-sm text-slate-500 my-1">
                       📞 {appointment.customer_phone}
                     </p>
                   </div>
                   
-                  <div style={{
-                    borderTop: '1px solid #e2e8f0',
-                    paddingTop: '16px',
-                    marginBottom: '16px'
-                  }}>
-                    <p style={{ fontWeight: '600', marginBottom: '8px' }}>
+                  <div className="mb-4">
+                    <p className="mb-2">
                       💅 {appointment.service?.name}
                     </p>
-                    <p style={{ fontSize: '0.9rem', color: '#64748b' }}>
+                    <p className="text-sm text-slate-500">
                       💰 {appointment.service?.price}Ks • ⏱️ {appointment.service?.duration} min
                     </p>
                   </div>
                   
-                  <div style={{
-                    borderTop: '1px solid #e2e8f0',
-                    paddingTop: '16px',
-                    marginBottom: '16px'
-                  }}>
-                    <p style={{ fontWeight: '600', marginBottom: '8px' }}>
+                  <div className="mb-4">
+                    <p className="mb-2">
                       📅 {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
                     </p>
                     <p style={{ fontSize: '0.95rem', color: '#3b82f6', fontWeight: '600' }}>
@@ -1199,12 +886,7 @@ export default function AppointmentManager() {
                     </p>
                   </div>
                   
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: '12px', 
-                    marginBottom: '16px',
-                    flexWrap: 'wrap'
-                  }}>
+                  <div className="mb-4">
                     <select
                       value={appointment.status}
                       onChange={(e) => updateAppointmentStatus(
@@ -1248,12 +930,7 @@ export default function AppointmentManager() {
                     borderTop: '1px solid #e2e8f0',
                     paddingTop: '16px'
                   }}>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '0.9rem',
-                      fontWeight: '600',
-                      marginBottom: '8px'
-                    }}>Assign Staff:</label>
+                    <label className="mb-2">Assign Staff:</label>
                     <select
                       value={appointment.staff_id || ''}
                       onChange={(e) => updateAppointmentStaff(
@@ -1278,13 +955,7 @@ export default function AppointmentManager() {
                     </select>
                   </div>
                   
-                  <div style={{
-                    marginTop: '16px',
-                    padding: '12px',
-                    backgroundColor: '#f8fafc',
-                    borderRadius: '8px',
-                    textAlign: 'center'
-                  }}>
+                  <div className="p-3">
                     <p style={{ 
                       fontWeight: '700',
                       fontSize: '1.1rem',

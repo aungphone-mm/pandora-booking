@@ -223,101 +223,27 @@ export default function ServiceManager() {
 
   if (loading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-        padding: '48px',
-        textAlign: 'center',
-        border: '1px solid #f1f5f9'
-      }}>
-        <div style={{
-          display: 'inline-block',
-          width: '48px',
-          height: '48px',
-          border: '4px solid #f1f5f9',
-          borderTop: '4px solid #22c55e',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          marginBottom: '20px'
-        }}></div>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: '700',
-          marginBottom: '8px',
-          color: '#1e293b'
-        }}>Loading Services</h2>
-        <p style={{
-          color: '#64748b',
-          fontSize: '1rem'
-        }}>Please wait while we fetch your service data...</p>
+      <div className="bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-12 text-center border border-slate-100">
+        <div className="inline-block w-12 h-12 border-4 border-slate-100 border-t-green-600 rounded-full animate-spin mb-5"></div>
+        <h2 className="mb-2">Loading Services</h2>
+        <p className="text-slate-500 text-base">Please wait while we fetch your service data...</p>
       </div>
     )
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '32px',
-      animation: 'fadeIn 0.6s ease-out'
-    }}>
+    <div className="flex flex-col gap-8 animate-[fadeIn_0.6s_ease-out]">
       {/* Enhanced Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(34, 197, 94, 0.3)',
-        padding: '32px',
-        color: 'white',
-        position: 'relative',
-        overflow: 'hidden'
-      }} className="service-card">
-        <div style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-50%',
-          width: '200%',
-          height: '200%',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }}></div>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          position: 'relative',
-          zIndex: 1
-        }}>
+      <div className="service-card bg-gradient-to-br from-green-600 to-green-700 rounded-[20px] shadow-[0_15px_35px_rgba(34,197,94,0.3)] p-8 text-white relative overflow-hidden">
+        <div className="absolute -top-1/2 -right-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,rgba(255,255,255,0.1)_0%,transparent_70%)] pointer-events-none"></div>
+        <div className="flex justify-between items-center relative z-10">
           <div>
-            <h2 style={{
-              fontSize: '2.25rem',
-              fontWeight: '800',
-              margin: '0 0 8px 0',
-              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>✨ Service Management</h2>
-            <p style={{
-              fontSize: '1.1rem',
-              margin: '0',
-              opacity: '0.9'
-            }}>Manage your salon services and pricing</p>
+            <h2 className="text-4xl font-extrabold m-0 mb-2 [text-shadow:0_2px_4px_rgba(0,0,0,0.1)]">✨ Service Management</h2>
+            <p className="text-lg m-0 opacity-90">Manage your salon services and pricing</p>
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            style={{
-              background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
-              color: 'white',
-              padding: '16px 24px',
-              borderRadius: '12px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '600',
-              fontSize: '1rem',
-              boxShadow: '0 6px 20px rgba(236, 72, 153, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-            className="action-button"
+            className="action-button bg-gradient-to-br from-pink-600 to-pink-700 text-white px-6 py-4 rounded-xl border-none cursor-pointer font-semibold text-base shadow-[0_6px_20px_rgba(236,72,153,0.3)] flex items-center gap-2"
           >
             {showAddForm ? '❌ Cancel' : '➕ Add Service'}
           </button>
@@ -325,80 +251,28 @@ export default function ServiceManager() {
       </div>
 
       {error && (
-        <div style={{
-          background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-          border: '1px solid #f87171',
-          borderRadius: '16px',
-          padding: '24px',
-          boxShadow: '0 8px 25px rgba(248, 113, 113, 0.2)'
-        }} className="slideIn">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '1.5rem' }}>⚠️</span>
-            <p style={{ 
-              color: '#dc2626', 
-              fontWeight: '600',
-              margin: '0',
-              fontSize: '1.1rem'
-            }}>{error}</p>
+        <div className="slideIn bg-gradient-to-br from-red-50 to-red-100 border border-red-400 rounded-2xl p-6 shadow-[0_8px_25px_rgba(248,113,113,0.2)]">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚠️</span>
+            <p className="text-red-600 font-semibold m-0 text-lg">{error}</p>
           </div>
         </div>
       )}
 
       {/* Enhanced Filters and Sorting */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.06)',
-        padding: '32px',
-        border: '1px solid #f1f5f9'
-      }} className="service-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.2rem'
-          }}>🔍</div>
-          <h3 style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            margin: '0',
-            color: '#1e293b'
-          }}>Filter & Sort Options</h3>
+      <div className="service-card bg-white rounded-[20px] shadow-[0_8px_25px_rgba(0,0,0,0.06)] p-8 border border-slate-100">
+        <div className="mb-6">
+          <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center text-xl">🔍</div>
+          <h3 className="text-2xl font-bold m-0 text-slate-800">Filter & Sort Options</h3>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '24px'
-        }}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6">
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>📂 Filter by Category</label>
+            <label className="mb-2">📂 Filter by Category</label>
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                background: 'white',
-                color: '#1e293b'
-              }}
-              className="filter-select"
+              className="filter-select w-full py-3.5 px-4 border-2 border-slate-200 rounded-xl outline-none text-base font-medium bg-white text-slate-800"
             >
               <option value="all">All Categories</option>
               {categories.map(cat => (
@@ -408,28 +282,11 @@ export default function ServiceManager() {
           </div>
 
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>📊 Filter by Status</label>
+            <label className="mb-2">📊 Filter by Status</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                background: 'white',
-                color: '#1e293b'
-              }}
-              className="filter-select"
+              className="filter-select w-full py-3.5 px-4 border-2 border-slate-200 rounded-xl outline-none text-base font-medium bg-white text-slate-800"
             >
               <option value="all">All Services</option>
               <option value="active">✅ Active Only</option>
@@ -438,28 +295,11 @@ export default function ServiceManager() {
           </div>
 
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>📋 Sort by</label>
+            <label className="mb-2">📋 Sort by</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'duration')}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                background: 'white',
-                color: '#1e293b'
-              }}
-              className="filter-select"
+              className="filter-select w-full py-3.5 px-4 border-2 border-slate-200 rounded-xl outline-none text-base font-medium bg-white text-slate-800"
             >
               <option value="name">✨ Name</option>
               <option value="price">💰 Price (High to Low)</option>
@@ -470,114 +310,34 @@ export default function ServiceManager() {
       </div>
 
       {/* Enhanced Summary Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '20px'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.06)',
-          textAlign: 'center'
-        }} className="service-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✨</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#64748b',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Total Services</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#1e293b',
-            margin: '0'
-          }}>{services.length}</p>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5">
+        <div className="service-card bg-gradient-to-br from-slate-50 to-slate-200 p-6 rounded-2xl border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.06)] text-center">
+          <div className="mb-2">✨</div>
+          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider m-0 mb-2">Total Services</h3>
+          <p className="text-5xl font-extrabold text-slate-800 m-0">{services.length}</p>
         </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #16a34a',
-          boxShadow: '0 6px 20px rgba(34, 197, 94, 0.15)',
-          textAlign: 'center'
-        }} className="service-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✅</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#166534',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Active Services</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#166534',
-            margin: '0'
-          }}>
+
+        <div className="service-card bg-gradient-to-br from-green-100 to-green-200 p-6 rounded-2xl border border-green-700 shadow-[0_6px_20px_rgba(34,197,94,0.15)] text-center">
+          <div className="mb-2">✅</div>
+          <h3 className="text-sm font-semibold text-green-800 uppercase tracking-wider m-0 mb-2">Active Services</h3>
+          <p className="text-5xl font-extrabold text-green-800 m-0">
             {services.filter(s => s.is_active).length}
           </p>
         </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #dc2626',
-          boxShadow: '0 6px 20px rgba(220, 38, 38, 0.15)',
-          textAlign: 'center'
-        }} className="service-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>❌</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#991b1b',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Inactive Services</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#991b1b',
-            margin: '0'
-          }}>
+
+        <div className="service-card bg-gradient-to-br from-red-100 to-red-200 p-6 rounded-2xl border border-red-600 shadow-[0_6px_20px_rgba(220,38,38,0.15)] text-center">
+          <div className="mb-2">❌</div>
+          <h3 className="text-sm font-semibold text-red-800 uppercase tracking-wider m-0 mb-2">Inactive Services</h3>
+          <p className="text-5xl font-extrabold text-red-800 m-0">
             {services.filter(s => !s.is_active).length}
           </p>
         </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #eab308',
-          boxShadow: '0 6px 20px rgba(234, 179, 8, 0.15)',
-          textAlign: 'center'
-        }} className="service-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>💰</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#a16207',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Avg Price</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#a16207',
-            margin: '0'
-          }}>
-            {services.length > 0 
+
+        <div className="service-card bg-gradient-to-br from-yellow-50 to-amber-100 p-6 rounded-2xl border border-yellow-500 shadow-[0_6px_20px_rgba(234,179,8,0.15)] text-center">
+          <div className="mb-2">💰</div>
+          <h3 className="text-sm font-semibold text-yellow-700 uppercase tracking-wider m-0 mb-2">Avg Price</h3>
+          <p className="text-5xl font-extrabold text-yellow-700 m-0">
+            {services.length > 0
               ? Math.round(services.reduce((acc, s) => acc + s.price, 0) / services.length)
               : 0
             }Ks
@@ -587,66 +347,24 @@ export default function ServiceManager() {
 
       {/* Enhanced Add Service Form */}
       {showAddForm && (
-        <div style={{
-          background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-          border: '2px solid #22c55e',
-          borderRadius: '20px',
-          padding: '32px',
-          boxShadow: '0 15px 35px rgba(34, 197, 94, 0.2)'
-        }} className="service-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.2rem'
-            }}>➕</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              margin: '0',
-              color: '#166534'
-            }}>Add New Service</h3>
+        <div className="service-card bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-600 rounded-[20px] p-8 shadow-[0_15px_35px_rgba(34,197,94,0.2)]">
+          <div className="mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center text-xl">➕</div>
+            <h3 className="text-2xl font-bold m-0 text-green-800">Add New Service</h3>
           </div>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '20px'
-          }}>
+
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5">
             <input
               type="text"
               placeholder="✨ Service name"
               value={newService.name}
               onChange={(e) => setNewService({ ...newService, name: e.target.value })}
-              style={{
-                padding: '16px',
-                border: '2px solid #16a34a',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                backgroundColor: 'white'
-              }}
-              className="form-input"
+              className="form-input p-4 border-2 border-green-700 rounded-xl outline-none text-base font-medium bg-white"
             />
             <select
               value={newService.category_id}
               onChange={(e) => setNewService({ ...newService, category_id: e.target.value })}
-              style={{
-                padding: '16px',
-                border: '2px solid #16a34a',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                backgroundColor: 'white'
-              }}
-              className="form-input"
+              className="form-input p-4 border-2 border-green-700 rounded-xl outline-none text-base font-medium bg-white"
             >
               <option value="">📂 Select category</option>
               {categories.map(cat => (
@@ -658,16 +376,7 @@ export default function ServiceManager() {
               placeholder="⏱️ Duration (minutes)"
               value={newService.duration}
               onChange={(e) => setNewService({ ...newService, duration: parseInt(e.target.value) })}
-              style={{
-                padding: '16px',
-                border: '2px solid #16a34a',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                backgroundColor: 'white'
-              }}
-              className="form-input"
+              className="form-input p-4 border-2 border-green-700 rounded-xl outline-none text-base font-medium bg-white"
             />
             <input
               type="number"
@@ -675,106 +384,43 @@ export default function ServiceManager() {
               step="0.01"
               value={newService.price}
               onChange={(e) => setNewService({ ...newService, price: parseFloat(e.target.value) })}
-              style={{
-                padding: '16px',
-                border: '2px solid #16a34a',
-                borderRadius: '12px',
-                outline: 'none',
-                fontSize: '1rem',
-                fontWeight: '500',
-                backgroundColor: 'white'
-              }}
-              className="form-input"
+              className="form-input p-4 border-2 border-green-700 rounded-xl outline-none text-base font-medium bg-white"
             />
           </div>
-          
+
           <textarea
             placeholder="📝 Description"
             value={newService.description}
             onChange={(e) => setNewService({ ...newService, description: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '16px',
-              border: '2px solid #16a34a',
-              borderRadius: '12px',
-              outline: 'none',
-              marginTop: '20px',
-              marginBottom: '16px',
-              minHeight: '100px',
-              fontSize: '1rem',
-              fontWeight: '500',
-              backgroundColor: 'white',
-              resize: 'vertical'
-            }}
-            className="form-input"
+            className="form-input w-full p-4 border-2 border-green-700 rounded-xl outline-none mt-5 mb-4 min-h-[100px] text-base font-medium bg-white resize-y"
           />
 
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            marginBottom: '24px',
-            padding: '16px',
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            border: '2px solid #16a34a'
-          }}>
+          <div className="flex items-center gap-3 mb-6 p-4 bg-white rounded-xl border-2 border-green-700">
             <input
               type="checkbox"
               id="active-new-service"
               checked={newService.is_active}
               onChange={(e) => setNewService({ ...newService, is_active: e.target.checked })}
-              style={{
-                width: '20px',
-                height: '20px',
-                cursor: 'pointer'
-              }}
+              className="w-5 h-5 cursor-pointer"
             />
             <label
               htmlFor="active-new-service"
-              style={{
-                fontSize: '1rem',
-                fontWeight: '600',
-                color: newService.is_active ? '#166534' : '#991b1b',
-                cursor: 'pointer'
-              }}
+              className={`text-base font-semibold cursor-pointer ${newService.is_active ? 'text-green-800' : 'text-red-800'}`}
             >
               {newService.is_active ? '✅ Active (Service will be immediately available)' : '❌ Inactive (Service will be hidden)'}
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '16px' }}>
+          <div className="flex gap-4">
             <button
               onClick={handleAddService}
-              style={{
-                background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-                color: 'white',
-                padding: '16px 24px',
-                borderRadius: '12px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '1rem',
-                boxShadow: '0 6px 20px rgba(22, 163, 74, 0.3)'
-              }}
-              className="action-button"
+              className="action-button bg-gradient-to-br from-green-700 to-green-800 text-white px-6 py-4 rounded-xl border-none cursor-pointer font-semibold text-base shadow-[0_6px_20px_rgba(22,163,74,0.3)]"
             >
               ✅ Add Service
             </button>
             <button
               onClick={() => setShowAddForm(false)}
-              style={{
-                background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                color: 'white',
-                padding: '16px 24px',
-                borderRadius: '12px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '1rem',
-                boxShadow: '0 6px 20px rgba(107, 114, 128, 0.3)'
-              }}
-              className="action-button"
+              className="action-button bg-gradient-to-br from-gray-500 to-gray-600 text-white px-6 py-4 rounded-xl border-none cursor-pointer font-semibold text-base shadow-[0_6px_20px_rgba(107,114,128,0.3)]"
             >
               ❌ Cancel
             </button>
@@ -783,30 +429,14 @@ export default function ServiceManager() {
       )}
 
       {/* Enhanced Services Table */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
-        padding: '0',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden'
-      }} className="service-card">
+      <div className="service-card bg-white rounded-[20px] shadow-[0_15px_35px_rgba(0,0,0,0.08)] p-0 border border-slate-100 overflow-hidden">
         {filteredAndSortedServices.length === 0 ? (
-          <div style={{
-            textAlign: 'center',
-            padding: '64px 32px',
-            color: '#64748b'
-          }}>
-            <div style={{ fontSize: '4rem', marginBottom: '16px', opacity: '0.5' }}>✨</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '600',
-              marginBottom: '8px',
-              color: '#475569'
-            }}>
+          <div className="text-center py-16 px-8 text-slate-500">
+            <div className="mb-4">✨</div>
+            <h3 className="mb-2">
               No services found
             </h3>
-            <p style={{ fontSize: '1rem', opacity: '0.8' }}>
+            <p className="text-base opacity-80">
               {filterCategory !== 'all' || filterStatus !== 'all'
                 ? 'Try adjusting your filters to see more services.'
                 : 'Add your first service to get started.'
@@ -814,129 +444,44 @@ export default function ServiceManager() {
             </p>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse'
-            }}>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
               <thead>
-                <tr style={{
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                  borderBottom: '2px solid #e2e8f0'
-                }}>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>✨ Service</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>📂 Category</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>⏱️ Duration</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>💰 Price</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>📊 Status</th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '20px 24px',
-                    fontWeight: '700',
-                    fontSize: '0.9rem',
-                    color: '#374151',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>⚡ Actions</th>
+                <tr className="bg-gradient-to-br from-slate-50 to-slate-200 border-b-2 border-slate-200">
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">✨ Service</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">📂 Category</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">⏱️ Duration</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">💰 Price</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">📊 Status</th>
+                  <th className="text-left py-5 px-6 font-bold text-sm text-gray-700 uppercase tracking-wider">⚡ Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredAndSortedServices.map((service, index) => (
-                  <tr key={service.id} style={{
-                    borderBottom: '1px solid #f1f5f9',
-                    backgroundColor: index % 2 === 0 ? 'white' : '#fafbfc'
-                  }} className="table-row">
-                    <td style={{ padding: '20px 24px' }}>
+                  <tr key={service.id} className={`border-b border-slate-100 ${index % 2 === 0 ? "bg-white" : "bg-slate-50"} table-row`}>
+                    <td className="py-5 px-6">
                       {editingService?.id === service.id ? (
                         <input
                           type="text"
                           value={editingService.name}
                           onChange={(e) => setEditingService({ ...editingService, name: e.target.value })}
-                          style={{
-                            padding: '8px 12px',
-                            border: '2px solid #22c55e',
-                            borderRadius: '8px',
-                            outline: 'none',
-                            fontSize: '1rem',
-                            fontWeight: '500',
-                            width: '200px'
-                          }}
-                          className="form-input"
+                          className="form-input p-2 px-3 border-2 border-green-600 rounded-lg outline-none text-base font-medium w-[200px]"
                         />
                       ) : (
                         <div>
-                          <p style={{ 
-                            fontWeight: '600',
-                            fontSize: '1.1rem',
-                            color: '#1e293b',
-                            margin: '0 0 4px 0'
-                          }}>{service.name}</p>
+                          <p className="font-semibold text-lg text-slate-800 m-0 mb-1">{service.name}</p>
                           {service.description && (
-                            <p style={{
-                              fontSize: '0.85rem',
-                              color: '#64748b',
-                              margin: '0',
-                              lineHeight: '1.4'
-                            }}>{service.description}</p>
+                            <p className="text-sm text-slate-500 m-0 leading-snug">{service.description}</p>
                           )}
                         </div>
                       )}
                     </td>
-                    <td style={{ padding: '20px 24px' }}>
+                    <td className="py-5 px-6">
                       {editingService?.id === service.id ? (
                         <select
                           value={editingService.category_id}
                           onChange={(e) => setEditingService({ ...editingService, category_id: e.target.value })}
-                          style={{
-                            padding: '8px 12px',
-                            border: '2px solid #22c55e',
-                            borderRadius: '8px',
-                            outline: 'none',
-                            fontSize: '1rem',
-                            fontWeight: '500',
-                            width: '180px'
-                          }}
-                          className="form-input"
+                          className="form-input p-2 px-3 border-2 border-green-600 rounded-lg outline-none text-base font-medium w-[180px]"
                         >
                           <option value="">Select category</option>
                           {categories.map(cat => (
@@ -944,210 +489,96 @@ export default function ServiceManager() {
                           ))}
                         </select>
                       ) : (
-                        <span style={{
-                          fontSize: '0.9rem',
-                          padding: '6px 12px',
-                          borderRadius: '20px',
-                          backgroundColor: '#f0fdf4',
-                          color: '#166534',
-                          fontWeight: '600',
-                          border: '1px solid #bbf7d0'
-                        }}>
+                        <span className="text-sm py-1.5 px-3 rounded-[20px] bg-green-50 text-green-800 font-semibold border border-green-200">
                           {service.category?.name || 'No Category'}
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: '20px 24px' }}>
+                    <td className="py-5 px-6">
                       {editingService?.id === service.id ? (
                         <input
                           type="number"
                           value={editingService.duration}
                           onChange={(e) => setEditingService({ ...editingService, duration: parseInt(e.target.value) })}
-                          style={{
-                            padding: '8px 12px',
-                            border: '2px solid #22c55e',
-                            borderRadius: '8px',
-                            outline: 'none',
-                            fontSize: '1rem',
-                            fontWeight: '500',
-                            width: '100px'
-                          }}
-                          className="form-input"
+                          className="form-input p-2 px-3 border-2 border-green-600 rounded-lg outline-none text-base font-medium w-[100px]"
                         />
                       ) : (
-                        <span style={{
-                          fontSize: '1rem',
-                          fontWeight: '600',
-                          color: '#3b82f6'
-                        }}>
+                        <span className="text-base font-semibold text-blue-500">
                           ⏱️ {service.duration} min
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: '20px 24px' }}>
+                    <td className="py-5 px-6">
                       {editingService?.id === service.id ? (
                         <input
                           type="number"
                           step="0.01"
                           value={editingService.price}
                           onChange={(e) => setEditingService({ ...editingService, price: parseFloat(e.target.value) })}
-                          style={{
-                            padding: '8px 12px',
-                            border: '2px solid #22c55e',
-                            borderRadius: '8px',
-                            outline: 'none',
-                            fontSize: '1rem',
-                            fontWeight: '500',
-                            width: '100px'
-                          }}
-                          className="form-input"
+                          className="form-input p-2 px-3 border-2 border-green-600 rounded-lg outline-none text-base font-medium w-[100px]"
                         />
                       ) : (
-                        <span style={{
-                          fontSize: '1.1rem',
-                          fontWeight: '700',
-                          color: '#059669'
-                        }}>
+                        <span className="text-lg font-bold text-emerald-600">
                           💰 {service.price.toLocaleString()}Ks
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: '20px 24px' }}>
+                    <td className="py-5 px-6">
                       {editingService?.id === service.id ? (
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px'
-                        }}>
+                        <div className="flex items-center gap-2">
                           <input
                             type="checkbox"
                             id={`active-${editingService.id}`}
                             checked={editingService.is_active}
                             onChange={(e) => setEditingService({ ...editingService, is_active: e.target.checked })}
-                            style={{
-                              width: '18px',
-                              height: '18px',
-                              cursor: 'pointer'
-                            }}
+                            className="w-4.5 h-4.5 cursor-pointer"
                           />
                           <label
                             htmlFor={`active-${editingService.id}`}
-                            style={{
-                              fontSize: '0.9rem',
-                              fontWeight: '600',
-                              color: editingService.is_active ? '#166534' : '#991b1b',
-                              cursor: 'pointer'
-                            }}
+                            className={`text-sm font-semibold cursor-pointer ${editingService.is_active ? "text-green-800" : "text-red-800"}`}
                           >
                             {editingService.is_active ? '✅ Active' : '❌ Inactive'}
                           </label>
                         </div>
                       ) : (
-                        <span style={{
-                          padding: '6px 12px',
-                          borderRadius: '20px',
-                          fontSize: '0.85rem',
-                          fontWeight: '600',
-                          backgroundColor: service.is_active ? '#dcfce7' : '#fee2e2',
-                          color: service.is_active ? '#166534' : '#991b1b',
-                          border: service.is_active ? '1px solid #16a34a' : '1px solid #dc2626'
-                        }}>
+                        <span className={`py-1.5 px-3 rounded-[20px] text-sm font-semibold ${service.is_active ? "bg-green-100 text-green-800 border border-green-700" : "bg-red-100 text-red-800 border border-red-600"}`}>
                           {service.is_active ? '✅ Active' : '❌ Inactive'}
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: '20px 24px' }}>
+                    <td className="py-5 px-6">
                       {editingService?.id === service.id ? (
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="flex gap-2">
                           <button
                             onClick={() => handleUpdateService(editingService)}
-                            style={{
-                              background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '8px 16px',
-                              cursor: 'pointer',
-                              fontSize: '0.875rem',
-                              fontWeight: '600',
-                              boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)'
-                            }}
-                            className="action-button"
+                            className="action-button bg-gradient-to-br from-green-700 to-green-800 text-white border-none rounded-lg py-2 px-4 cursor-pointer text-sm font-semibold shadow-[0_4px_12px_rgba(22,163,74,0.3)]"
                           >
                             ✅ Save
                           </button>
                           <button
                             onClick={() => setEditingService(null)}
-                            style={{
-                              background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '8px 16px',
-                              cursor: 'pointer',
-                              fontSize: '0.875rem',
-                              fontWeight: '600',
-                              boxShadow: '0 4px 12px rgba(107, 114, 128, 0.3)'
-                            }}
-                            className="action-button"
+                            className="action-button bg-gradient-to-br from-gray-500 to-gray-600 text-white border-none rounded-lg py-2 px-4 cursor-pointer text-sm font-semibold shadow-[0_4px_12px_rgba(107,114,128,0.3)]"
                           >
                             ❌ Cancel
                           </button>
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <div className="flex gap-2">
                           <button
                             onClick={() => setEditingService(service)}
-                            style={{
-                              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '8px 16px',
-                              cursor: 'pointer',
-                              fontSize: '0.875rem',
-                              fontWeight: '600',
-                              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
-                            }}
-                            className="action-button"
+                            className="action-button bg-gradient-to-br from-blue-500 to-blue-700 text-white border-none rounded-lg py-2 px-4 cursor-pointer text-sm font-semibold shadow-[0_4px_12px_rgba(59,130,246,0.3)]"
                           >
                             ✏️ Edit
                           </button>
                           <button
                             onClick={() => toggleServiceStatus(service.id, service.is_active)}
-                            style={{
-                              background: service.is_active
-                                ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-                                : 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '8px 16px',
-                              cursor: 'pointer',
-                              fontSize: '0.875rem',
-                              fontWeight: '600',
-                              boxShadow: service.is_active
-                                ? '0 4px 12px rgba(245, 158, 11, 0.3)'
-                                : '0 4px 12px rgba(22, 163, 74, 0.3)'
-                            }}
-                            className="action-button"
+                            className={`action-button text-white border-none rounded-lg py-2 px-4 cursor-pointer text-sm font-semibold ${service.is_active ? "bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_4px_12px_rgba(245,158,11,0.3)]" : "bg-gradient-to-br from-green-700 to-green-800 shadow-[0_4px_12px_rgba(22,163,74,0.3)]"}`}
                           >
                             {service.is_active ? '⏸️ Deactivate' : '▶️ Activate'}
                           </button>
                           <button
                             onClick={() => handleDeleteService(service.id)}
-                            style={{
-                              background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '8px 16px',
-                              cursor: 'pointer',
-                              fontSize: '0.875rem',
-                              fontWeight: '600',
-                              boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
-                            }}
-                            className="action-button"
+                            className="action-button bg-gradient-to-br from-red-600 to-red-700 text-white border-none rounded-lg py-2 px-4 cursor-pointer text-sm font-semibold shadow-[0_4px_12px_rgba(220,38,38,0.3)]"
                           >
                             🗑️ Delete
                           </button>

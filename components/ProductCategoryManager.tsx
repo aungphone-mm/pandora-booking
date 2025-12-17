@@ -164,132 +164,47 @@ export default function ProductCategoryManager() {
 
   if (loading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        padding: '24px'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '300px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            border: '2px solid #8b5cf6',
-            borderTop: '2px solid transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-center items-center h-[300px]">
+          <div className="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '24px'
-    }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '24px'
-      }}>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold'
-        }}>Product Category Management</h2>
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Product Category Management</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          style={{
-            backgroundColor: '#8b5cf6',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '4px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '600'
-          }}
+          className="bg-purple-600 text-white px-4 py-3 rounded hover:bg-purple-700 font-semibold transition-colors"
         >
           {showAddForm ? 'Cancel' : 'Add Category'}
         </button>
       </div>
 
       {error && (
-        <div style={{
-          marginBottom: '24px',
-          padding: '16px',
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '8px'
-        }}>
-          <p style={{ color: '#b91c1c', fontWeight: '500' }}>{error}</p>
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700 font-medium">{error}</p>
         </div>
       )}
 
       {/* Summary Stats */}
-      <div style={{
-        marginBottom: '24px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: '16px'
-      }}>
-        <div style={{
-          backgroundColor: '#f9fafb',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#6b7280'
-          }}>Total Categories</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#111827'
-          }}>{categories.length}</p>
+      <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-gray-600">Total Categories</h3>
+          <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
         </div>
-        <div style={{
-          backgroundColor: '#ede9fe',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#6d28d9'
-          }}>Max Order</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#6d28d9'
-          }}>
+        <div className="bg-purple-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-purple-900">Max Order</h3>
+          <p className="text-2xl font-bold text-purple-900">
             {Math.max(...categories.map(c => c.display_order), 0)}
           </p>
         </div>
-        <div style={{
-          backgroundColor: '#dcfce7',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#166534'
-          }}>Added This Week</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#166534'
-          }}>
+        <div className="bg-green-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-green-800">Added This Week</h3>
+          <p className="text-2xl font-bold text-green-800">
             {categories.filter(c => new Date(c.created_at) > new Date(Date.now() - 7*24*60*60*1000)).length}
           </p>
         </div>
@@ -297,104 +212,47 @@ export default function ProductCategoryManager() {
 
       {/* Add Category Form */}
       {showAddForm && (
-        <div style={{
-          marginBottom: '24px',
-          padding: '24px',
-          border: '2px solid #8b5cf6',
-          borderRadius: '8px',
-          backgroundColor: '#faf5ff'
-        }}>
-          <h3 style={{
-            fontSize: '1.25rem',
-            fontWeight: 'bold',
-            marginBottom: '16px',
-            color: '#6d28d9'
-          }}>Add New Product Category</h3>
+        <div className="mb-6 p-6 border-2 border-purple-600 rounded-lg bg-purple-50">
+          <h3 className="text-xl font-bold mb-4 text-purple-900">Add New Product Category</h3>
           
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto',
-            gap: '16px',
-            alignItems: 'end'
-          }}>
+          <div className="grid grid-cols-[1fr_auto] gap-4 items-end">
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '4px'
-              }}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Category Name
               </label>
               <input
                 type="text"
                 value={newCategory.name}
                 onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  outline: 'none'
-                }}
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600"
                 placeholder="Enter category name"
               />
             </div>
-            <div style={{ minWidth: '120px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '4px'
-              }}>
+            <div className="min-w-[120px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Display Order
               </label>
               <input
                 type="number"
                 value={newCategory.display_order}
                 onChange={(e) => setNewCategory({ ...newCategory, display_order: parseInt(e.target.value) || 0 })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  outline: 'none'
-                }}
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600"
                 min="0"
               />
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+          <div className="flex gap-2 mt-4">
             <button
               onClick={handleAddCategory}
               disabled={saving || !newCategory.name.trim()}
-              style={{
-                backgroundColor: saving ? '#9ca3af' : '#8b5cf6',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                fontWeight: '600',
-                opacity: saving || !newCategory.name.trim() ? 0.6 : 1
-              }}
+              className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {saving ? 'Adding...' : 'Add Category'}
             </button>
             <button
               onClick={() => setShowAddForm(false)}
-              style={{
-                backgroundColor: '#6b7280',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '600'
-              }}
+              className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 font-semibold transition-colors"
             >
               Cancel
             </button>
@@ -404,112 +262,57 @@ export default function ProductCategoryManager() {
 
       {/* Categories List */}
       {categories.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '48px 0'
-        }}>
-          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🏷️</div>
-          <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4">🏷️</div>
+          <p className="text-gray-600 text-lg">
             No product categories found. Add your first category to get started.
           </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="flex flex-col gap-4">
           {categories.map((category, index) => (
-            <div key={category.id} style={{
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              padding: '20px',
-              backgroundColor: 'white'
-            }}>
+            <div key={category.id} className="border border-gray-200 rounded-lg p-5 bg-white">
               {editingCategory?.id === category.id ? (
                 // Edit Mode
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto',
-                    gap: '16px',
-                    alignItems: 'end'
-                  }}>
+                <div className="flex flex-col gap-4">
+                  <div className="grid grid-cols-[1fr_auto] gap-4 items-end">
                     <div>
-                      <label style={{
-                        display: 'block',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#374151',
-                        marginBottom: '4px'
-                      }}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Category Name
                       </label>
                       <input
                         type="text"
                         value={editingCategory.name}
                         onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
-                        style={{
-                          width: '100%',
-                          padding: '12px',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '8px',
-                          outline: 'none'
-                        }}
+                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600"
                       />
                     </div>
-                    <div style={{ minWidth: '120px' }}>
-                      <label style={{
-                        display: 'block',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#374151',
-                        marginBottom: '4px'
-                      }}>
+                    <div className="min-w-[120px]">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Display Order
                       </label>
                       <input
                         type="number"
                         value={editingCategory.display_order}
                         onChange={(e) => setEditingCategory({ ...editingCategory, display_order: parseInt(e.target.value) || 0 })}
-                        style={{
-                          width: '100%',
-                          padding: '12px',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '8px',
-                          outline: 'none'
-                        }}
+                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600"
                         min="0"
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleUpdateCategory(editingCategory)}
                       disabled={saving}
-                      style={{
-                        backgroundColor: saving ? '#9ca3af' : '#16a34a',
-                        color: 'white',
-                        padding: '12px 24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: saving ? 'not-allowed' : 'pointer',
-                        fontWeight: '600',
-                        opacity: saving ? 0.6 : 1
-                      }}
+                      className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                     >
                       {saving ? 'Saving...' : 'Save Changes'}
                     </button>
                     <button
                       onClick={() => setEditingCategory(null)}
                       disabled={saving}
-                      style={{
-                        backgroundColor: '#6b7280',
-                        color: 'white',
-                        padding: '12px 24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: saving ? 'not-allowed' : 'pointer',
-                        fontWeight: '600',
-                        opacity: saving ? 0.6 : 1
-                      }}
+                      className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                     >
                       Cancel
                     </button>
@@ -517,71 +320,33 @@ export default function ProductCategoryManager() {
                 </div>
               ) : (
                 // View Mode
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      marginBottom: '8px'
-                    }}>
-                      <h3 style={{
-                        fontSize: '1.25rem',
-                        fontWeight: 'bold',
-                        color: '#111827'
-                      }}>
+                <div className="flex justify-between items-center">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-bold text-gray-900">
                         {category.name}
                       </h3>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        padding: '4px 8px',
-                        borderRadius: '12px',
-                        fontWeight: '500',
-                        backgroundColor: '#ede9fe',
-                        color: '#6d28d9'
-                      }}>
+                      <span className="text-xs px-2 py-1 rounded-full font-medium bg-purple-100 text-purple-900">
                         Order: {category.display_order}
                       </span>
                     </div>
-                    
-                    <p style={{
-                      fontSize: '0.875rem',
-                      color: '#6b7280'
-                    }}>
+
+                    <p className="text-sm text-gray-600">
                       Created: {format(new Date(category.created_at), 'MMM d, yyyy')}
                     </p>
                   </div>
 
-                  <div style={{
-                    display: 'flex',
-                    gap: '8px',
-                    alignItems: 'center',
-                    marginLeft: '16px'
-                  }}>
+                  <div className="flex gap-2 items-center ml-4">
                     <button
                       onClick={() => setEditingCategory(category)}
-                      style={{
-                        color: '#3b82f6',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className="text-blue-600 hover:text-blue-700 underline text-sm transition-colors"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => moveCategory(category.id, 'up')}
                       disabled={index === 0 || saving}
-                      style={{
-                        color: saving || index === 0 ? '#9ca3af' : '#8b5cf6',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: saving || index === 0 ? 'not-allowed' : 'pointer',
-                        fontSize: '1.25rem',
-                        fontWeight: 'bold'
-                      }}
+                      className="text-purple-600 hover:text-purple-700 disabled:text-gray-400 disabled:cursor-not-allowed text-xl font-bold transition-colors"
                       title="Move up"
                     >
                       ↑
@@ -589,14 +354,7 @@ export default function ProductCategoryManager() {
                     <button
                       onClick={() => moveCategory(category.id, 'down')}
                       disabled={index === categories.length - 1 || saving}
-                      style={{
-                        color: saving || index === categories.length - 1 ? '#9ca3af' : '#8b5cf6',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: saving || index === categories.length - 1 ? 'not-allowed' : 'pointer',
-                        fontSize: '1.25rem',
-                        fontWeight: 'bold'
-                      }}
+                      className="text-purple-600 hover:text-purple-700 disabled:text-gray-400 disabled:cursor-not-allowed text-xl font-bold transition-colors"
                       title="Move down"
                     >
                       ↓
@@ -604,14 +362,7 @@ export default function ProductCategoryManager() {
                     <button
                       onClick={() => handleDeleteCategory(category.id)}
                       disabled={saving}
-                      style={{
-                        color: saving ? '#9ca3af' : '#dc2626',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: saving ? 'not-allowed' : 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className="text-red-600 hover:text-red-700 disabled:text-gray-400 disabled:cursor-not-allowed underline text-sm transition-colors"
                     >
                       Delete
                     </button>

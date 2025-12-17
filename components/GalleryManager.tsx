@@ -288,54 +288,31 @@ export default function GalleryManager() {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '400px'
-      }}>
-        <div style={{
-          width: '48px',
-          height: '48px',
-          border: '4px solid #e2e8f0',
-          borderTopColor: '#ec4899',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }} />
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="w-12 h-12 border-4 border-slate-200 border-t-pink-600 rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+    <div className="animate-[fadeIn_0.5s_ease-out]">
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-        borderRadius: '24px',
-        padding: '32px',
-        marginBottom: '32px',
-        boxShadow: '0 10px 40px rgba(236, 72, 153, 0.3)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="bg-gradient-to-br from-pink-600 to-purple-600 rounded-3xl p-8 mb-8 shadow-[0_10px_40px_rgba(236,72,153,0.3)]">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 style={{ fontSize: '2rem', fontWeight: '800', color: 'white', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '2.5rem' }}>🖼️</span>
+            <h1 className="text-3xl font-extrabold text-white m-0 mb-2 flex items-center gap-3">
+              <span className="text-4xl">🖼️</span>
               Photo Gallery
             </h1>
-            <p style={{ color: 'rgba(255,255,255,0.9)', margin: 0 }}>
+            <p className="text-white/90 m-0">
               Manage photos displayed on the home page ({photos.length} of {MAX_PHOTOS})
             </p>
           </div>
-          <div style={{
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '16px',
-            padding: '16px 24px',
-            backdropFilter: 'blur(10px)'
-          }}>
-            <div style={{ fontSize: '2rem', fontWeight: '800', color: 'white', textAlign: 'center' }}>
+          <div className="bg-white/20 rounded-2xl px-6 py-4 backdrop-blur-[10px]">
+            <div className="text-3xl font-extrabold text-white text-center">
               {photos.length}/{MAX_PHOTOS}
             </div>
-            <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.8)' }}>
+            <div className="text-sm text-white/80">
               Photos
             </div>
           </div>
@@ -344,29 +321,12 @@ export default function GalleryManager() {
 
       {/* Error Message */}
       {error && (
-        <div style={{
-          background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-          border: '2px solid #f87171',
-          borderRadius: '16px',
-          padding: '16px 24px',
-          marginBottom: '24px',
-          color: '#dc2626',
-          fontWeight: '600',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+        <div className="bg-gradient-to-br from-red-100 to-red-200 border-2 border-red-400 rounded-2xl px-6 py-4 mb-6 text-red-600 font-semibold flex items-center gap-3">
+          <span className="text-2xl">⚠️</span>
           {error}
           <button
             onClick={() => setError(null)}
-            style={{
-              marginLeft: 'auto',
-              background: 'none',
-              border: 'none',
-              fontSize: '1.25rem',
-              cursor: 'pointer'
-            }}
+            className="ml-auto bg-transparent border-none text-xl cursor-pointer hover:opacity-70"
           >
             ✕
           </button>
@@ -375,116 +335,67 @@ export default function GalleryManager() {
 
       {/* Upload Section */}
       {photos.length < MAX_PHOTOS && (
-        <div style={{
-          background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-          border: '3px dashed #22c55e',
-          borderRadius: '20px',
-          padding: '32px',
-          marginBottom: '32px'
-        }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#166534', margin: '0 0 20px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 border-[3px] border-dashed border-green-600 rounded-[20px] p-8 mb-8">
+          <h2 className="text-xl font-bold text-green-800 m-0 mb-5 flex items-center gap-2">
             <span>📤</span> Upload New Photo
           </h2>
 
           {!previewUrl ? (
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={handleFileSelect}
-                style={{ display: 'none' }}
+                className="hidden"
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                style={{
-                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '16px 32px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  margin: '0 auto'
-                }}
-                className="action-button"
+                className="action-button bg-gradient-to-br from-green-600 to-green-700 text-white border-none rounded-xl px-8 py-4 text-base font-semibold cursor-pointer flex items-center gap-2 mx-auto hover:from-green-700 hover:to-green-800 transition-all"
               >
-                <span style={{ fontSize: '1.25rem' }}>📁</span>
+                <span className="text-xl">📁</span>
                 Choose Photo
               </button>
-              <p style={{ color: '#64748b', marginTop: '12px', fontSize: '0.875rem' }}>
+              <p className="text-slate-600 mt-3 text-sm">
                 Supported formats: JPEG, PNG, WebP (Max 5MB)
               </p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '24px', alignItems: 'start' }}>
+            <div className="grid grid-cols-[200px_1fr] gap-6 items-start">
               {/* Preview */}
               <div>
                 <img
                   src={previewUrl}
                   alt="Preview"
-                  style={{
-                    width: '100%',
-                    height: '150px',
-                    objectFit: 'cover',
-                    borderRadius: '12px',
-                    border: '2px solid #22c55e'
-                  }}
+                  className="w-full h-[150px] object-cover rounded-xl border-2 border-green-600"
                 />
               </div>
 
               {/* Form Fields */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="flex flex-col gap-4">
                 <input
                   type="text"
                   placeholder="Alt text (for accessibility)"
                   value={altText}
                   onChange={(e) => setAltText(e.target.value)}
-                  style={{
-                    padding: '12px 16px',
-                    border: '2px solid #d1d5db',
-                    borderRadius: '10px',
-                    fontSize: '1rem'
-                  }}
+                  className="px-4 py-3 border-2 border-gray-300 rounded-[10px] text-base focus:outline-none focus:border-green-600"
                 />
                 <input
                   type="text"
                   placeholder="Caption (optional)"
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
-                  style={{
-                    padding: '12px 16px',
-                    border: '2px solid #d1d5db',
-                    borderRadius: '10px',
-                    fontSize: '1rem'
-                  }}
+                  className="px-4 py-3 border-2 border-gray-300 rounded-[10px] text-base focus:outline-none focus:border-green-600"
                 />
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div className="flex gap-3">
                   <button
                     onClick={handleUpload}
                     disabled={uploading}
-                    style={{
-                      background: uploading ? '#9ca3af' : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '10px',
-                      padding: '12px 24px',
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      cursor: uploading ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                    className="action-button"
+                    className="action-button bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white border-none rounded-[10px] px-6 py-3 text-base font-semibold flex items-center gap-2"
                   >
                     {uploading ? (
                       <>
-                        <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⏳</span>
+                        <span className="animate-spin inline-block">⏳</span>
                         Uploading...
                       </>
                     ) : (
@@ -494,16 +405,7 @@ export default function GalleryManager() {
                   <button
                     onClick={cancelUpload}
                     disabled={uploading}
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#64748b',
-                      border: '2px solid #e2e8f0',
-                      borderRadius: '10px',
-                      padding: '12px 24px',
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      cursor: uploading ? 'not-allowed' : 'pointer'
-                    }}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-slate-200 rounded-[10px] px-6 py-3 text-base font-semibold disabled:cursor-not-allowed"
                   >
                     ❌ Cancel
                   </button>
@@ -516,167 +418,78 @@ export default function GalleryManager() {
 
       {/* Limit Reached Message */}
       {photos.length >= MAX_PHOTOS && (
-        <div style={{
-          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-          border: '2px solid #f59e0b',
-          borderRadius: '16px',
-          padding: '16px 24px',
-          marginBottom: '24px',
-          color: '#92400e',
-          fontWeight: '600',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <span style={{ fontSize: '1.5rem' }}>📷</span>
+        <div className="bg-gradient-to-br from-amber-100 to-amber-200 border-2 border-amber-500 rounded-2xl px-6 py-4 mb-6 text-amber-900 font-semibold flex items-center gap-3">
+          <span className="text-2xl">📷</span>
           Maximum {MAX_PHOTOS} photos reached. Delete a photo to upload a new one.
         </div>
       )}
 
       {/* Photos Grid */}
       {photos.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '60px 20px',
-          background: '#f8fafc',
-          borderRadius: '20px',
-          border: '2px dashed #e2e8f0'
-        }}>
-          <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🖼️</div>
-          <h3 style={{ fontSize: '1.25rem', color: '#64748b', fontWeight: '600' }}>
+        <div className="text-center py-15 px-5 bg-slate-50 rounded-[20px] border-2 border-dashed border-slate-200">
+          <div className="text-6xl mb-4">🖼️</div>
+          <h3 className="text-xl text-slate-600 font-semibold">
             No photos yet
           </h3>
-          <p style={{ color: '#94a3b8' }}>
+          <p className="text-slate-400">
             Upload your first photo to display on the home page
           </p>
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '24px'
-        }}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
           {photos.map((photo, index) => (
             <div
               key={photo.id}
-              className="gallery-card"
-              style={{
-                background: 'white',
-                borderRadius: '20px',
-                overflow: 'hidden',
-                border: '2px solid #e2e8f0',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                opacity: photo.is_active ? 1 : 0.6
-              }}
+              className={`gallery-card bg-white rounded-[20px] overflow-hidden border-2 border-slate-200 shadow-[0_4px_20px_rgba(0,0,0,0.05)] ${photo.is_active ? 'opacity-100' : 'opacity-60'}`}
             >
               {/* Image */}
-              <div style={{ position: 'relative' }}>
+              <div className="relative">
                 <img
                   src={photo.image_url}
                   alt={photo.alt_text || 'Gallery photo'}
-                  style={{
-                    width: '100%',
-                    height: '200px',
-                    objectFit: 'cover'
-                  }}
+                  className="w-full h-[200px] object-cover"
                 />
 
                 {/* Order Badge */}
-                <div style={{
-                  position: 'absolute',
-                  top: '12px',
-                  left: '12px',
-                  background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-                  color: 'white',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '700',
-                  fontSize: '1rem',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
-                }}>
+                <div className="absolute top-3 left-3 bg-gradient-to-br from-pink-600 to-purple-600 text-white rounded-full w-9 h-9 flex items-center justify-center font-bold text-base shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
                   {index + 1}
                 </div>
 
                 {/* Status Badge */}
-                <div style={{
-                  position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  background: photo.is_active ? '#22c55e' : '#ef4444',
-                  color: 'white',
-                  borderRadius: '20px',
-                  padding: '4px 12px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
-                }}>
+                <div className={`absolute top-3 right-3 text-white rounded-[20px] px-3 py-1 text-xs font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.2)] ${photo.is_active ? 'bg-green-600' : 'bg-red-600'}`}>
                   {photo.is_active ? 'Active' : 'Hidden'}
                 </div>
               </div>
 
               {/* Content */}
-              <div style={{ padding: '20px' }}>
+              <div className="p-5">
                 {editingPhoto?.id === photo.id ? (
                   // Edit Mode
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div className="flex flex-col gap-3">
                     <input
                       type="text"
                       placeholder="Alt text"
                       value={editingPhoto.alt_text || ''}
                       onChange={(e) => setEditingPhoto({ ...editingPhoto, alt_text: e.target.value })}
-                      style={{
-                        padding: '10px 12px',
-                        border: '2px solid #ec4899',
-                        borderRadius: '8px',
-                        fontSize: '0.875rem'
-                      }}
+                      className="px-3 py-2.5 border-2 border-pink-600 rounded-lg text-sm focus:outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Caption"
                       value={editingPhoto.caption || ''}
                       onChange={(e) => setEditingPhoto({ ...editingPhoto, caption: e.target.value })}
-                      style={{
-                        padding: '10px 12px',
-                        border: '2px solid #ec4899',
-                        borderRadius: '8px',
-                        fontSize: '0.875rem'
-                      }}
+                      className="px-3 py-2.5 border-2 border-pink-600 rounded-lg text-sm focus:outline-none"
                     />
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                    <div className="flex gap-2">
                       <button
                         onClick={handleUpdatePhoto}
-                        style={{
-                          flex: 1,
-                          background: '#22c55e',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white border-none rounded-lg px-2 py-2 text-sm font-semibold cursor-pointer transition-colors"
                       >
                         ✓ Save
                       </button>
                       <button
                         onClick={() => setEditingPhoto(null)}
-                        style={{
-                          flex: 1,
-                          background: '#f1f5f9',
-                          color: '#64748b',
-                          border: '2px solid #e2e8f0',
-                          borderRadius: '8px',
-                          padding: '8px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
+                        className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-slate-200 rounded-lg px-2 py-2 text-sm font-semibold cursor-pointer transition-colors"
                       >
                         ✕ Cancel
                       </button>
@@ -686,40 +499,30 @@ export default function GalleryManager() {
                   // View Mode
                   <>
                     {photo.caption && (
-                      <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#1f2937' }}>
+                      <p className="m-0 mb-2 font-semibold text-gray-800">
                         {photo.caption}
                       </p>
                     )}
                     {photo.alt_text && (
-                      <p style={{ margin: '0 0 16px 0', fontSize: '0.875rem', color: '#64748b' }}>
+                      <p className="m-0 mb-4 text-sm text-slate-600">
                         Alt: {photo.alt_text}
                       </p>
                     )}
                     {!photo.caption && !photo.alt_text && (
-                      <p style={{ margin: '0 0 16px 0', fontSize: '0.875rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                      <p className="m-0 mb-4 text-sm text-slate-400 italic">
                         No caption or alt text
                       </p>
                     )}
 
                     {/* Action Buttons */}
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <div className="flex gap-2 flex-wrap">
                       {/* Reorder Buttons */}
                       <button
                         onClick={() => handleMoveUp(index)}
                         disabled={index === 0}
                         aria-label={`Move photo ${index + 1} up in gallery order`}
                         title="Move up"
-                        style={{
-                          background: index === 0 ? '#f1f5f9' : '#e0e7ff',
-                          color: index === 0 ? '#94a3b8' : '#4f46e5',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px 12px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: index === 0 ? 'not-allowed' : 'pointer'
-                        }}
-                        className="action-button"
+                        className={`action-button border-none rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${index === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 cursor-pointer'}`}
                       >
                         ⬆️
                       </button>
@@ -728,17 +531,7 @@ export default function GalleryManager() {
                         disabled={index === photos.length - 1}
                         aria-label={`Move photo ${index + 1} down in gallery order`}
                         title="Move down"
-                        style={{
-                          background: index === photos.length - 1 ? '#f1f5f9' : '#e0e7ff',
-                          color: index === photos.length - 1 ? '#94a3b8' : '#4f46e5',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px 12px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: index === photos.length - 1 ? 'not-allowed' : 'pointer'
-                        }}
-                        className="action-button"
+                        className={`action-button border-none rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${index === photos.length - 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 cursor-pointer'}`}
                       >
                         ⬇️
                       </button>
@@ -748,17 +541,7 @@ export default function GalleryManager() {
                         onClick={() => setEditingPhoto(photo)}
                         aria-label={`Edit photo ${index + 1} caption and alt text`}
                         title="Edit photo details"
-                        style={{
-                          background: '#fef3c7',
-                          color: '#92400e',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px 12px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
-                        className="action-button"
+                        className="action-button bg-amber-100 hover:bg-amber-200 text-amber-900 border-none rounded-lg px-3 py-2 text-sm font-semibold cursor-pointer transition-colors"
                       >
                         ✏️ Edit
                       </button>
@@ -768,17 +551,7 @@ export default function GalleryManager() {
                         onClick={() => handleToggleActive(photo)}
                         aria-label={photo.is_active ? `Hide photo ${index + 1} from public gallery` : `Show photo ${index + 1} in public gallery`}
                         title={photo.is_active ? 'Hide from public' : 'Show to public'}
-                        style={{
-                          background: photo.is_active ? '#fee2e2' : '#dcfce7',
-                          color: photo.is_active ? '#dc2626' : '#16a34a',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px 12px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
-                        className="action-button"
+                        className={`action-button border-none rounded-lg px-3 py-2 text-sm font-semibold cursor-pointer transition-colors ${photo.is_active ? 'bg-red-100 hover:bg-red-200 text-red-600' : 'bg-green-100 hover:bg-green-200 text-green-700'}`}
                       >
                         {photo.is_active ? '👁️ Hide' : '👁️ Show'}
                       </button>
@@ -788,17 +561,7 @@ export default function GalleryManager() {
                         onClick={() => handleDelete(photo.id)}
                         aria-label={`Delete photo ${index + 1} permanently`}
                         title="Delete photo"
-                        style={{
-                          background: '#fee2e2',
-                          color: '#dc2626',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px 12px',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
-                        className="action-button"
+                        className="action-button bg-red-100 hover:bg-red-200 text-red-600 border-none rounded-lg px-3 py-2 text-sm font-semibold cursor-pointer transition-colors"
                       >
                         🗑️ Delete
                       </button>

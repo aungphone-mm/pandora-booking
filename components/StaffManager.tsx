@@ -283,12 +283,7 @@ export default function StaffManager() {
           animation: 'spin 1s linear infinite',
           marginBottom: '20px'
         }}></div>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: '700',
-          marginBottom: '8px',
-          color: '#1e293b'
-        }}>Loading Staff</h2>
+        <h2 className="mb-2">Loading Staff</h2>
         <p style={{
           color: '#64748b',
           fontSize: '1rem'
@@ -416,7 +411,7 @@ export default function StaffManager() {
         padding: '32px',
         border: '1px solid #f1f5f9'
       }} className="staff-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+        <div className="mb-6">
           <div style={{
             width: '40px',
             height: '40px',
@@ -441,13 +436,7 @@ export default function StaffManager() {
           gap: '24px'
         }}>
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>👥 Filter by Status</label>
+            <label className="mb-2">👥 Filter by Status</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -471,13 +460,7 @@ export default function StaffManager() {
           </div>
 
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              color: '#475569',
-              marginBottom: '8px'
-            }}>📋 Sort by</label>
+            <label className="mb-2">📋 Sort by</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'name' | 'position' | 'hire_date')}
@@ -516,7 +499,7 @@ export default function StaffManager() {
           boxShadow: '0 6px 20px rgba(0, 0, 0, 0.06)',
           textAlign: 'center'
         }} className="staff-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>👥</div>
+          <div className="mb-2">👥</div>
           <h3 style={{
             fontSize: '0.9rem',
             fontWeight: '600',
@@ -541,7 +524,7 @@ export default function StaffManager() {
           boxShadow: '0 6px 20px rgba(34, 197, 94, 0.15)',
           textAlign: 'center'
         }} className="staff-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✅</div>
+          <div className="mb-2">✅</div>
           <h3 style={{
             fontSize: '0.9rem',
             fontWeight: '600',
@@ -568,7 +551,7 @@ export default function StaffManager() {
           boxShadow: '0 6px 20px rgba(220, 38, 38, 0.15)',
           textAlign: 'center'
         }} className="staff-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>❌</div>
+          <div className="mb-2">❌</div>
           <h3 style={{
             fontSize: '0.9rem',
             fontWeight: '600',
@@ -595,7 +578,7 @@ export default function StaffManager() {
           boxShadow: '0 6px 20px rgba(59, 130, 246, 0.15)',
           textAlign: 'center'
         }} className="staff-card">
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>💼</div>
+          <div className="mb-2">💼</div>
           <h3 style={{
             fontSize: '0.9rem',
             fontWeight: '600',
@@ -624,7 +607,7 @@ export default function StaffManager() {
           padding: '32px',
           boxShadow: '0 15px 35px rgba(245, 158, 11, 0.2)'
         }} className="staff-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+          <div className="mb-6">
             <div style={{
               width: '40px',
               height: '40px',
@@ -766,14 +749,7 @@ export default function StaffManager() {
               }}
               className="form-input"
             />
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '16px',
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              border: '2px solid #fbbf24'
-            }}>
+            <div className="p-4">
               <input
                 type="checkbox"
                 id="active"
@@ -837,7 +813,7 @@ export default function StaffManager() {
             className="form-input"
           />
 
-          <div style={{ display: 'flex', gap: '16px' }}>
+          <div className="flex gap-4">
             <button
               onClick={handleAddStaff}
               style={{
@@ -891,13 +867,8 @@ export default function StaffManager() {
             padding: '64px 32px',
             color: '#64748b'
           }}>
-            <div style={{ fontSize: '4rem', marginBottom: '16px', opacity: '0.5' }}>👥</div>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: '600',
-              marginBottom: '8px',
-              color: '#475569'
-            }}>
+            <div className="mb-4">👥</div>
+            <h3 className="mb-2">
               {filterStatus === 'all' 
                 ? 'No staff members found' 
                 : `No ${filterStatus} staff members found`
@@ -912,7 +883,7 @@ export default function StaffManager() {
           </div>
         ) : (
           <div style={{ padding: '32px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+            <div className="mb-6">
               <div style={{
                 width: '40px',
                 height: '40px',
@@ -933,13 +904,7 @@ export default function StaffManager() {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {filteredAndSortedStaff.map(staffMember => (
-                <div key={staffMember.id} style={{
-                  border: '2px solid #f1f5f9',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  backgroundColor: staffMember.is_active ? 'white' : '#f8fafc',
-                  transition: 'all 0.3s ease-in-out'
-                }} className="staff-card">
+                <div key={staffMember.id} className="p-6" className="staff-card">
                   {editingStaff?.id === staffMember.id ? (
                     // Edit Mode
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -1163,12 +1128,7 @@ export default function StaffManager() {
                     // View Mode
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div style={{ flex: 1 }}>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '16px',
-                          marginBottom: '16px'
-                        }}>
+                        <div className="mb-4">
                           <h3 style={{
                             fontSize: '1.4rem',
                             fontWeight: '700',
@@ -1196,70 +1156,35 @@ export default function StaffManager() {
                           color: '#64748b',
                           marginBottom: '16px'
                         }}>
-                          <div style={{
-                            padding: '12px',
-                            backgroundColor: '#f8fafc',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0'
-                          }}>
+                          <div className="p-3">
                             <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#475569' }}>💼 <strong>Position:</strong></p>
                             <p style={{ margin: '0' }}>{staffMember.job_position || 'No position assigned'}</p>
                           </div>
-                          <div style={{
-                            padding: '12px',
-                            backgroundColor: '#f8fafc',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0'
-                          }}>
+                          <div className="p-3">
                             <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#475569' }}>📧 <strong>Email:</strong></p>
                             <p style={{ margin: '0' }}>{staffMember.email}</p>
                           </div>
-                          <div style={{
-                            padding: '12px',
-                            backgroundColor: '#f8fafc',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0'
-                          }}>
+                          <div className="p-3">
                             <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#475569' }}>📞 <strong>Phone:</strong></p>
                             <p style={{ margin: '0' }}>{staffMember.phone}</p>
                           </div>
-                          <div style={{
-                            padding: '12px',
-                            backgroundColor: '#f8fafc',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0'
-                          }}>
+                          <div className="p-3">
                             <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#475569' }}>📅 <strong>Hired:</strong></p>
                             <p style={{ margin: '0' }}>{format(new Date(staffMember.hire_date), 'MMM d, yyyy')}</p>
                           </div>
-                          <div style={{
-                            padding: '12px',
-                            backgroundColor: '#f8fafc',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0'
-                          }}>
+                          <div className="p-3">
                             <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#475569' }}>💰 <strong>Rate:</strong></p>
                             <p style={{ margin: '0' }}>${staffMember.hourly_rate}/hr</p>
                           </div>
-                          <div style={{
-                            padding: '12px',
-                            backgroundColor: '#f8fafc',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0'
-                          }}>
+                          <div className="p-3">
                             <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#475569' }}>📊 <strong>Commission:</strong></p>
                             <p style={{ margin: '0' }}>{staffMember.commission_rate}%</p>
                           </div>
                         </div>
 
                         {staffMember.specializations && staffMember.specializations.length > 0 && (
-                          <div style={{ marginBottom: '16px' }}>
-                            <p style={{
-                              fontSize: '0.95rem',
-                              fontWeight: '600',
-                              color: '#475569',
-                              marginBottom: '8px'
-                            }}>✨ Specializations:</p>
+                          <div className="mb-4">
+                            <p className="mb-2">✨ Specializations:</p>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                               {staffMember.specializations.map((spec, index) => (
                                 <span key={index} style={{
@@ -1279,12 +1204,7 @@ export default function StaffManager() {
                         )}
 
                         {staffMember.bio && (
-                          <div style={{
-                            padding: '12px',
-                            backgroundColor: '#f0f9ff',
-                            borderRadius: '8px',
-                            border: '1px solid #bae6fd'
-                          }}>
+                          <div className="p-3">
                             <p style={{
                               fontSize: '0.95rem',
                               color: '#0369a1',

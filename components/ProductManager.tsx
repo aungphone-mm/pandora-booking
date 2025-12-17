@@ -183,82 +183,30 @@ export default function ProductManager() {
       }
     })
 
-  const getStatusColor = (isActive: boolean) => {
-    return isActive
-      ? { backgroundColor: '#dcfce7', color: '#166534' }
-      : { backgroundColor: '#fee2e2', color: '#991b1b' }
-  }
-
   if (loading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        padding: '24px'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '300px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            border: '2px solid #ec4899',
-            borderTop: '2px solid transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-center items-center h-[300px]">
+          <div className="w-8 h-8 border-2 border-pink-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '24px'
-    }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '24px'
-      }}>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold'
-        }}>Product Management</h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold">Product Management</h2>
+        <div className="flex gap-2">
           <button
             onClick={() => window.open('/admin/product-categories', '_blank')}
-            style={{
-              backgroundColor: '#3b82f6',
-              color: 'white',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '600'
-            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded font-semibold transition-colors"
           >
             Manage Categories
           </button>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            style={{
-              backgroundColor: '#ec4899',
-              color: 'white',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '600'
-            }}
+            className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-3 rounded font-semibold transition-colors"
           >
             {showAddForm ? 'Cancel' : 'Add Product'}
           </button>
@@ -266,42 +214,19 @@ export default function ProductManager() {
       </div>
 
       {error && (
-        <div style={{
-          marginBottom: '24px',
-          padding: '16px',
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '8px'
-        }}>
-          <p style={{ color: '#b91c1c', fontWeight: '500' }}>{error}</p>
+        <div className="p-4">
+          <p className="text-red-700 font-medium">{error}</p>
         </div>
       )}
 
       {/* Filters and Sorting */}
-      <div style={{
-        marginBottom: '24px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '16px',
-        alignItems: 'center'
-      }}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '4px'
-          }}>Filter by Category</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">📂 Filter by Category</label>
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            style={{
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="w-full p-3 border-2 border-gray-300 rounded-lg outline-none focus:border-pink-500 transition-colors"
           >
             <option value="all">All Categories</option>
             {categories.map(category => (
@@ -311,128 +236,53 @@ export default function ProductManager() {
         </div>
 
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '4px'
-          }}>Filter by Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">📊 Filter by Status</label>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            style={{
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="w-full p-3 border-2 border-gray-300 rounded-lg outline-none focus:border-pink-500 transition-colors"
           >
             <option value="all">All Products</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
+            <option value="active">✅ Active Only</option>
+            <option value="inactive">❌ Inactive Only</option>
           </select>
         </div>
 
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '4px'
-          }}>Sort by</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">🔄 Sort by</label>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'category')}
-            style={{
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none'
-            }}
+            className="w-full p-3 border-2 border-gray-300 rounded-lg outline-none focus:border-pink-500 transition-colors"
           >
-            <option value="name">Name</option>
-            <option value="price">Price</option>
+            <option value="name">Name (A-Z)</option>
+            <option value="price">Price (High to Low)</option>
             <option value="category">Category</option>
           </select>
         </div>
       </div>
 
       {/* Summary Stats */}
-      <div style={{
-        marginBottom: '24px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: '16px'
-      }}>
-        <div style={{
-          backgroundColor: '#f9fafb',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#6b7280'
-          }}>Total Products</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#111827'
-          }}>{products.length}</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-200 p-6 rounded-xl border border-slate-300 shadow-md text-center">
+          <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Total Products</h3>
+          <p className="text-4xl font-extrabold text-slate-800">{products.length}</p>
         </div>
-        <div style={{
-          backgroundColor: '#dcfce7',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#166534'
-          }}>Active</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#166534'
-          }}>
+        <div className="bg-gradient-to-br from-green-50 to-green-200 p-6 rounded-xl border border-green-500 shadow-md text-center">
+          <h3 className="text-sm font-semibold text-green-800 uppercase tracking-wide mb-2">Active</h3>
+          <p className="text-4xl font-extrabold text-green-800">
             {products.filter(p => p.is_active).length}
           </p>
         </div>
-        <div style={{
-          backgroundColor: '#fee2e2',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#991b1b'
-          }}>Inactive</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#991b1b'
-          }}>
+        <div className="bg-gradient-to-br from-red-50 to-red-200 p-6 rounded-xl border border-red-500 shadow-md text-center">
+          <h3 className="text-sm font-semibold text-red-800 uppercase tracking-wide mb-2">Inactive</h3>
+          <p className="text-4xl font-extrabold text-red-800">
             {products.filter(p => !p.is_active).length}
           </p>
         </div>
-        <div style={{
-          backgroundColor: '#dbeafe',
-          padding: '16px',
-          borderRadius: '8px'
-        }}>
-          <h3 style={{
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: '#1e40af'
-          }}>Categories</h3>
-          <p style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            color: '#1e40af'
-          }}>
+        <div className="bg-gradient-to-br from-blue-50 to-blue-200 p-6 rounded-xl border border-blue-500 shadow-md text-center">
+          <h3 className="text-sm font-semibold text-blue-800 uppercase tracking-wide mb-2">Categories</h3>
+          <p className="text-4xl font-extrabold text-blue-800">
             {categories.length}
           </p>
         </div>
@@ -440,131 +290,68 @@ export default function ProductManager() {
 
       {/* Add Product Form */}
       {showAddForm && (
-        <div style={{
-          marginBottom: '24px',
-          padding: '24px',
-          border: '2px solid #ec4899',
-          borderRadius: '8px',
-          backgroundColor: '#fef7ff'
-        }}>
-          <h3 style={{
-            fontSize: '1.25rem',
-            fontWeight: 'bold',
-            marginBottom: '16px',
-            color: '#a21caf'
-          }}>Add New Product</h3>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '16px',
-            marginBottom: '16px'
-          }}>
+        <div className="bg-gradient-to-br from-pink-50 to-pink-100 border-2 border-pink-400 rounded-xl p-6 mb-6 shadow-lg">
+          <h3 className="text-xl font-bold text-pink-800 mb-4">➕ Add New Product</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <input
               type="text"
-              placeholder="Product name"
+              placeholder="✨ Product name"
               value={newProduct.name}
               onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-              style={{
-                padding: '12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                outline: 'none'
-              }}
+              className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg outline-none focus:border-pink-600 transition-colors font-medium"
             />
             <select
               value={newProduct.category_id}
               onChange={(e) => setNewProduct({ ...newProduct, category_id: e.target.value })}
-              style={{
-                padding: '12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                outline: 'none'
-              }}
+              className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg outline-none focus:border-pink-600 transition-colors font-medium"
             >
-              <option value="">Select category</option>
+              <option value="">📂 Select category</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
             <input
               type="number"
-              placeholder="Price"
+              placeholder="💰 Price"
               step="0.01"
               value={newProduct.price}
               onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) || 0 })}
-              style={{
-                padding: '12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                outline: 'none'
-              }}
+              className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg outline-none focus:border-pink-600 transition-colors font-medium"
             />
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '12px'
-            }}>
+            <div className="flex items-center gap-3 px-4 py-3 bg-white border-2 border-pink-300 rounded-lg">
               <input
                 type="checkbox"
                 id="active-new"
                 checked={newProduct.is_active}
                 onChange={(e) => setNewProduct({ ...newProduct, is_active: e.target.checked })}
-                style={{ marginRight: '8px' }}
+                className="w-5 h-5 cursor-pointer"
               />
-              <label htmlFor="active-new" style={{
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#374151'
-              }}>
-                Active
+              <label htmlFor="active-new" className="text-sm font-semibold text-gray-700 cursor-pointer">
+                {newProduct.is_active ? '✅ Active' : '❌ Inactive'}
               </label>
             </div>
           </div>
           
           <textarea
-            placeholder="Product description"
+            placeholder="📝 Product description (optional)"
             value={newProduct.description}
             onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              outline: 'none',
-              marginBottom: '16px',
-              minHeight: '80px'
-            }}
+            className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg outline-none focus:border-pink-600 transition-colors font-medium mb-4 min-h-[100px] resize-y"
           />
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="flex gap-3">
             <button
               onClick={handleAddProduct}
-              style={{
-                backgroundColor: '#ec4899',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '600'
-              }}
+              className="bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg"
             >
-              Add Product
+              ✅ Add Product
             </button>
             <button
               onClick={() => setShowAddForm(false)}
-              style={{
-                backgroundColor: '#6b7280',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '600'
-              }}
+              className="bg-gradient-to-br from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg"
             >
-              Cancel
+              ❌ Cancel
             </button>
           </div>
         </div>
@@ -572,12 +359,9 @@ export default function ProductManager() {
 
       {/* Products List */}
       {filteredAndSortedProducts.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '48px 0'
-        }}>
-          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🛍️</div>
-          <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+        <div className="text-center">
+          <div className="mb-4">🛍️</div>
+          <p className="text-gray-600 text-lg">
             {filterCategory !== 'all' || filterStatus !== 'all'
               ? `No products found with current filters.`
               : 'No products found. Add your first product to get started.'
@@ -585,43 +369,24 @@ export default function ProductManager() {
           </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="flex flex-col gap-4">
           {filteredAndSortedProducts.map(product => (
-            <div key={product.id} style={{
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              padding: '20px',
-              backgroundColor: product.is_active ? 'white' : '#f9fafb'
-            }}>
+            <div key={product.id} className={`border border-gray-200 rounded-lg p-5 ${product.is_active ? 'bg-white' : 'bg-gray-50'}`}>
               {editingProduct?.id === product.id ? (
                 // Edit Mode
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                    gap: '16px'
-                  }}>
+                <div className="flex flex-col gap-4">
+                  <div className="grid gap-4">
                     <input
                       type="text"
                       value={editingProduct.name}
                       onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
-                      style={{
-                        padding: '12px',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '8px',
-                        outline: 'none'
-                      }}
+                      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600"
                       placeholder="Product name"
                     />
                     <select
                       value={editingProduct.category_id}
                       onChange={(e) => setEditingProduct({ ...editingProduct, category_id: e.target.value })}
-                      style={{
-                        padding: '12px',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '8px',
-                        outline: 'none'
-                      }}
+                      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600"
                     >
                       <option value="">Select category</option>
                       {categories.map(cat => (
@@ -633,31 +398,18 @@ export default function ProductManager() {
                       step="0.01"
                       value={editingProduct.price}
                       onChange={(e) => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) || 0 })}
-                      style={{
-                        padding: '12px',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '8px',
-                        outline: 'none'
-                      }}
+                      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600"
                       placeholder="Price"
                     />
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '12px'
-                    }}>
+                    <div className="p-3">
                       <input
                         type="checkbox"
                         id={`active-${editingProduct.id}`}
                         checked={editingProduct.is_active}
                         onChange={(e) => setEditingProduct({ ...editingProduct, is_active: e.target.checked })}
-                        style={{ marginRight: '8px' }}
+                        className="mr-2"
                       />
-                      <label htmlFor={`active-${editingProduct.id}`} style={{
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#374151'
-                      }}>
+                      <label htmlFor={`active-${editingProduct.id}`} className="text-sm font-medium text-gray-700">
                         Active
                       </label>
                     </div>
@@ -666,43 +418,20 @@ export default function ProductManager() {
                   <textarea
                     value={editingProduct.description}
                     onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      outline: 'none',
-                      minHeight: '80px'
-                    }}
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-pink-600 min-h-[80px]"
                     placeholder="Product description"
                   />
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleUpdateProduct(editingProduct)}
-                      style={{
-                        backgroundColor: '#16a34a',
-                        color: 'white',
-                        padding: '12px 24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontWeight: '600'
-                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold transition-colors"
                     >
                       Save Changes
                     </button>
                     <button
                       onClick={() => setEditingProduct(null)}
-                      style={{
-                        backgroundColor: '#6b7280',
-                        color: 'white',
-                        padding: '12px 24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontWeight: '600'
-                      }}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded font-semibold transition-colors"
                     >
                       Cancel
                     </button>
@@ -710,47 +439,21 @@ export default function ProductManager() {
                 </div>
               ) : (
                 // View Mode
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      marginBottom: '12px'
-                    }}>
-                      <h3 style={{
-                        fontSize: '1.25rem',
-                        fontWeight: 'bold',
-                        color: product.is_active ? '#111827' : '#6b7280'
-                      }}>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <h3 className={`text-xl font-bold ${product.is_active ? 'text-gray-900' : 'text-gray-500'}`}>
                         {product.name}
                       </h3>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        padding: '4px 8px',
-                        borderRadius: '12px',
-                        fontWeight: '500',
-                        ...getStatusColor(product.is_active)
-                      }}>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                         {product.is_active ? 'Active' : 'Inactive'}
                       </span>
-                      <span style={{
-                        fontSize: '1rem',
-                        fontWeight: 'bold',
-                        color: '#059669'
-                      }}>
+                      <span className="text-base font-bold text-emerald-600">
                         {product.price}Ks
                       </span>
                     </div>
                     
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                      gap: '16px',
-                      fontSize: '0.875rem',
-                      color: '#6b7280',
-                      marginBottom: '12px'
-                    }}>
+                    <div className="text-sm text-gray-600">
                       <div>
                         <p><strong>Category:</strong> {product.category?.name || 'No category'}</p>
                         <p><strong>Created:</strong> {format(new Date(product.created_at), 'MMM d, yyyy')}</p>
@@ -758,55 +461,26 @@ export default function ProductManager() {
                     </div>
 
                     {product.description && (
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280',
-                        fontStyle: 'italic'
-                      }}>{product.description}</p>
+                      <p className="text-sm text-gray-600">{product.description}</p>
                     )}
                   </div>
 
-                  <div style={{
-                    display: 'flex',
-                    gap: '8px',
-                    marginLeft: '16px'
-                  }}>
+                  <div className="flex gap-2 ml-4">
                     <button
                       onClick={() => setEditingProduct(product)}
-                      style={{
-                        color: '#3b82f6',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className="text-blue-600 hover:text-blue-700 underline text-sm transition-colors"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => toggleProductStatus(product.id, product.is_active)}
-                      style={{
-                        color: product.is_active ? '#dc2626' : '#16a34a',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className={`hover:opacity-75 underline text-sm transition-opacity ${product.is_active ? 'text-red-600' : 'text-green-600'}`}
                     >
                       {product.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                     <button
                       onClick={() => handleDeleteProduct(product.id)}
-                      style={{
-                        color: '#dc2626',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        textDecoration: 'underline'
-                      }}
+                      className="text-red-600 hover:text-red-700 underline text-sm transition-colors"
                     >
                       Delete
                     </button>
