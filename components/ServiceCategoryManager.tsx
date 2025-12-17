@@ -369,7 +369,7 @@ export default function ServiceCategoryManager() {
 
             <div className="flex flex-col gap-5">
               {categories.map((category, index) => (
-                <div key={category.id} className="p-6" className="category-card">
+                <div key={category.id} className="category-card p-6">
                   {editingCategory?.id === category.id ? (
                     // Edit Mode
                     <div className="flex flex-col gap-5">
