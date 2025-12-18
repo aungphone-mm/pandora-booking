@@ -16,12 +16,17 @@ type Appointment = {
   status: 'pending' | 'confirmed' | 'cancelled'
   notes?: string
   created_at: string
-  service: {
+  appointment_services: {
     id: string
-    name: string
+    quantity: number
     price: number
-    duration: number
-  }
+    service: {
+      id: string
+      name: string
+      price: number
+      duration: number
+    }
+  }[]
   staff?: {
     id: string
     full_name: string
@@ -155,7 +160,12 @@ export default function AppointmentManager() {
         .from('appointments')
         .select(`
           *,
-          service:services(id, name, price, duration),
+          appointment_services(
+            id,
+            quantity,
+            price,
+            service:services(id, name, price, duration)
+          ),
           appointment_products(
             id,
             quantity,
@@ -211,9 +221,13 @@ export default function AppointmentManager() {
       const combinedData = appointmentsData?.map(appointment => {
         const userProfile = profilesData.find(profile => profile.id === appointment.user_id)
         const staffInfo = staffData.find(staff => staff.id === appointment.staff_id)
-        
+
         return {
           ...appointment,
+          appointment_services: appointment.appointment_services?.map((as: any) => ({
+            ...as,
+            service: Array.isArray(as.service) ? as.service[0] : as.service
+          })) || [],
           user: userProfile || null,
           staff: staffInfo || null
         }
@@ -377,12 +391,22 @@ export default function AppointmentManager() {
     }
   }
 
+  const getServices = (appointment: Appointment) => {
+    return appointment.appointment_services.map(as => ({
+      ...as.service,
+      quantity: as.quantity,
+      bookedPrice: as.price
+    }))
+  }
+
   const calculateTotal = (appointment: Appointment) => {
-    const servicePrice = appointment.service?.price || 0
+    const servicesTotal = getServices(appointment).reduce(
+      (sum, service) => sum + (service.bookedPrice * service.quantity), 0
+    )
     const productsTotal = appointment.appointment_products?.reduce(
         (sum, ap) => sum + (ap.product.price * ap.quantity), 0
       ) || 0
-      return servicePrice + productsTotal
+      return servicesTotal + productsTotal
     }
 
   if (loading) {
@@ -488,101 +512,33 @@ export default function AppointmentManager() {
       </div>
 
       {/* Enhanced Summary Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: window.innerWidth <= 768 ? '1fr 1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: window.innerWidth <= 768 ? '12px' : '20px'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.06)',
-          textAlign: 'center'
-        }} className="appointment-card">
+      <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 md:gap-5">
+        <div className="appointment-card bg-gradient-to-br from-slate-50 to-slate-200 p-6 rounded-2xl border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.06)] text-center">
           <div className="mb-2">📊</div>
           <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider m-0 mb-2">Total Appointments</h3>
           <p className="text-5xl font-extrabold text-slate-800 m-0">{appointments.length}</p>
         </div>
         
-        <div style={{
-          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #f59e0b',
-          boxShadow: '0 6px 20px rgba(245, 158, 11, 0.15)',
-          textAlign: 'center'
-        }} className="appointment-card">
+        <div className="appointment-card bg-gradient-to-br from-amber-50 to-amber-200 p-6 rounded-2xl border border-amber-500 shadow-[0_6px_20px_rgba(245,158,11,0.15)] text-center">
           <div className="mb-2">⏳</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#92400e',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Pending</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#92400e',
-            margin: '0'
-          }}>
+          <h3 className="text-sm font-semibold text-amber-800 uppercase tracking-wider m-0 mb-2">Pending</h3>
+          <p className="text-5xl font-extrabold text-amber-800 m-0">
             {appointments.filter(a => a.status === 'pending').length}
           </p>
         </div>
         
-        <div style={{
-          background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #16a34a',
-          boxShadow: '0 6px 20px rgba(34, 197, 94, 0.15)',
-          textAlign: 'center'
-        }} className="appointment-card">
+        <div className="appointment-card bg-gradient-to-br from-green-100 to-green-200 p-6 rounded-2xl border border-green-700 shadow-[0_6px_20px_rgba(34,197,94,0.15)] text-center">
           <div className="mb-2">✅</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#166534',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Confirmed</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#166534',
-            margin: '0'
-          }}>
+          <h3 className="text-sm font-semibold text-green-800 uppercase tracking-wider m-0 mb-2">Confirmed</h3>
+          <p className="text-5xl font-extrabold text-green-800 m-0">
             {appointments.filter(a => a.status === 'confirmed').length}
           </p>
         </div>
         
-        <div style={{
-          background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-          padding: '24px',
-          borderRadius: '16px',
-          border: '1px solid #dc2626',
-          boxShadow: '0 6px 20px rgba(220, 38, 38, 0.15)',
-          textAlign: 'center'
-        }} className="appointment-card">
+        <div className="appointment-card bg-gradient-to-br from-red-100 to-red-200 p-6 rounded-2xl border border-red-600 shadow-[0_6px_20px_rgba(220,38,38,0.15)] text-center">
           <div className="mb-2">❌</div>
-          <h3 style={{
-            fontSize: '0.9rem',
-            fontWeight: '600',
-            color: '#991b1b',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: '0 0 8px 0'
-          }}>Cancelled</h3>
-          <p style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#991b1b',
-            margin: '0'
-          }}>
+          <h3 className="text-sm font-semibold text-red-800 uppercase tracking-wider m-0 mb-2">Cancelled</h3>
+          <p className="text-5xl font-extrabold text-red-800 m-0">
             {appointments.filter(a => a.status === 'cancelled').length}
           </p>
         </div>
@@ -622,10 +578,7 @@ export default function AppointmentManager() {
               </thead>
               <tbody>
                 {filteredAndSortedAppointments.map((appointment, index) => (
-                  <tr key={appointment.id} style={{
-                    borderBottom: '1px solid #f1f5f9',
-                    backgroundColor: index % 2 === 0 ? 'white' : '#fafbfc'
-                  }} className="table-row">
+                  <tr key={appointment.id} className={`border-b border-slate-100 ${index % 2 === 0 ? "bg-white" : "bg-slate-50"}`}>
                     <td className="p-6">
                       <div>
                         <p className="font-semibold text-lg text-slate-800 m-0 mb-1">{appointment.customer_name}</p>
@@ -689,10 +642,19 @@ export default function AppointmentManager() {
                     </td>
                     <td className="p-6">
                       <div>
-                        <p className="font-semibold text-lg text-slate-800 m-0 mb-1">💅 {appointment.service?.name}</p>
-                        <p className="text-sm text-slate-500 m-0 mb-2">
-                          💰 {appointment.service?.price}Ks • ⏱️ {appointment.service?.duration} min
-                        </p>
+                        {getServices(appointment).map((service, idx) => (
+                          <div key={idx} className="mb-2">
+                            <p className="font-semibold text-lg text-slate-800 m-0 mb-1">
+                              💅 {service.name} {service.quantity > 1 && `×${service.quantity}`}
+                            </p>
+                            <p className="text-sm text-slate-500 m-0">
+                              💰 {service.bookedPrice.toLocaleString()}Ks • ⏱️ {service.duration} min
+                            </p>
+                          </div>
+                        ))}
+                        {getServices(appointment).length === 0 && (
+                          <p className="text-sm text-slate-400 italic">No service assigned</p>
+                        )}
                         {appointment.appointment_products && appointment.appointment_products.length > 0 && (
                           <div style={{
                             fontSize: '0.8rem',
@@ -703,9 +665,9 @@ export default function AppointmentManager() {
                             borderRadius: '8px',
                             border: '1px solid #e2e8f0'
                           }}>
-                            <p style={{ fontWeight: '600', margin: '0 0 4px 0' }}>🛍️ Add-ons:</p>
+                            <p className="font-semibold m-0 mb-1">🛍️ Add-ons:</p>
                             {appointment.appointment_products.map((ap) => (
-                              <p key={ap.id} style={{ margin: '2px 0' }}>
+                              <p key={ap.id} className="my-0.5">
                                 • {ap.product.name} ×{ap.quantity} ({(ap.product.price * ap.quantity).toLocaleString()}Ks)
                               </p>
                             ))}
@@ -758,12 +720,7 @@ export default function AppointmentManager() {
                         <p className="font-semibold text-lg text-slate-800 m-0 mb-1">
                           📅 {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
                         </p>
-                        <p style={{
-                          fontSize: '0.95rem',
-                          color: '#3b82f6',
-                          margin: '0 0 8px 0',
-                          fontWeight: '600'
-                        }}>🕐 {appointment.appointment_time}</p>
+                        <p className="text-base text-blue-500 font-semibold">🕐 {appointment.appointment_time}</p>
                         <p style={{
                           fontSize: '0.8rem',
                           color: '#94a3b8',
@@ -809,28 +766,12 @@ export default function AppointmentManager() {
                     <td className="p-6">
                       <button
                         onClick={() => deleteAppointment(appointment.id)}
-                        style={{
-                          background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-                          color: '#dc2626',
-                          border: '1px solid #dc2626',
-                          borderRadius: '8px',
-                          padding: '8px 16px',
-                          cursor: 'pointer',
-                          fontSize: '0.875rem',
-                          fontWeight: '600'
-                        }}
-                        className="action-button"
+                        className="w-full bg-gradient-to-br from-red-600 to-red-700 text-white border-none rounded-lg py-2 px-4 cursor-pointer text-sm font-semibold shadow-[0_4px_12px_rgba(220,38,38,0.3)] hover:from-red-700 hover:to-red-800"
                       >
                         🗑️ Delete
                       </button>
                       {appointment.notes && (
-                        <div style={{
-                          marginTop: '8px',
-                          padding: '8px 12px',
-                          backgroundColor: '#fffbeb',
-                          borderRadius: '8px',
-                          border: '1px solid #fbbf24'
-                        }}>
+                        <div className="mt-2 py-2 px-3 bg-amber-50 border-l-4 border-amber-500 rounded text-sm text-amber-900">
                           <p style={{
                             fontSize: '0.8rem',
                             color: '#92400e',
@@ -869,19 +810,26 @@ export default function AppointmentManager() {
                   </div>
                   
                   <div className="mb-4">
-                    <p className="mb-2">
-                      💅 {appointment.service?.name}
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      💰 {appointment.service?.price}Ks • ⏱️ {appointment.service?.duration} min
-                    </p>
+                    {getServices(appointment).map((service, idx) => (
+                      <div key={idx} className="mb-2">
+                        <p className="mb-2">
+                          💅 {service.name} {service.quantity > 1 && `×${service.quantity}`}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          💰 {service.bookedPrice.toLocaleString()}Ks • ⏱️ {service.duration} min
+                        </p>
+                      </div>
+                    ))}
+                    {getServices(appointment).length === 0 && (
+                      <p className="text-sm text-slate-400 italic">No service assigned</p>
+                    )}
                   </div>
                   
                   <div className="mb-4">
                     <p className="mb-2">
                       📅 {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
                     </p>
-                    <p style={{ fontSize: '0.95rem', color: '#3b82f6', fontWeight: '600' }}>
+                    <p className="text-base text-blue-500 font-semibold">
                       🕐 {appointment.appointment_time}
                     </p>
                   </div>
@@ -911,25 +859,13 @@ export default function AppointmentManager() {
                     
                     <button
                       onClick={() => deleteAppointment(appointment.id)}
-                      style={{
-                        background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-                        color: '#dc2626',
-                        border: '1px solid #dc2626',
-                        borderRadius: '8px',
-                        padding: '8px 16px',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        fontWeight: '600'
-                      }}
+                      className="w-full bg-gradient-to-br from-red-600 to-red-700 text-white border-none rounded-lg py-2 px-4 cursor-pointer text-sm font-semibold shadow-[0_4px_12px_rgba(220,38,38,0.3)] hover:from-red-700 hover:to-red-800"
                     >
                       🗑️ Delete
                     </button>
                   </div>
                   
-                  <div style={{
-                    borderTop: '1px solid #e2e8f0',
-                    paddingTop: '16px'
-                  }}>
+                  <div className="border-t border-slate-200 pt-4">
                     <label className="mb-2">Assign Staff:</label>
                     <select
                       value={appointment.staff_id || ''}
@@ -938,13 +874,7 @@ export default function AppointmentManager() {
                         e.target.value || null
                       )}
                       disabled={updatingStaff === appointment.id}
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        fontSize: '0.9rem',
-                        border: '2px solid #e2e8f0'
-                      }}
+                      className="w-full py-2 px-3 border-2 border-slate-200 rounded-lg outline-none focus:border-indigo-500"
                     >
                       <option value="">👤 No Staff Assigned</option>
                       {staff.map((staffMember) => (

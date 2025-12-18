@@ -84,7 +84,12 @@ export default function AdminDashboard() {
           .from('appointments')
           .select(`
             *,
-            service:services(name, price),
+            appointment_services(
+              id,
+              quantity,
+              price,
+              service:services(name, price)
+            ),
             user:profiles(full_name)
           `)
           .order('created_at', { ascending: false })
@@ -93,7 +98,10 @@ export default function AdminDashboard() {
 
       // Calculate today's revenue
       type TodayAppointment = {
-        service: { price: number } | { price: number }[] | null
+        appointment_services: Array<{
+          quantity: number
+          price: number
+        }>
         appointment_products?: Array<{
           quantity: number
           product: { price: number } | { price: number }[] | null
@@ -104,7 +112,10 @@ export default function AdminDashboard() {
       const { data: todayAppointments } = await supabase
         .from('appointments')
         .select(`
-          service:services(price),
+          appointment_services(
+            quantity,
+            price
+          ),
           appointment_products(
             quantity,
             product:products(price)
@@ -114,17 +125,12 @@ export default function AdminDashboard() {
         .eq('status', 'confirmed')
 
       const todayRevenue = (todayAppointments as TodayAppointment[])?.reduce((total, apt) => {
-        // Handle service price - service might be an array or single object
-        let servicePrice = 0
-        if (apt.service) {
-          if (Array.isArray(apt.service)) {
-            servicePrice = apt.service[0]?.price || 0
-          } else {
-            servicePrice = apt.service.price || 0
-          }
-        }
+        // Calculate services total
+        const serviceTotal = apt.appointment_services.reduce(
+          (sum, as) => sum + (as.price * as.quantity), 0
+        )
 
-        // Handle product total with proper typing
+        // Calculate products total
         const productTotal = apt.appointment_products?.reduce(
           (sum: number, ap) => {
             let productPrice = 0
@@ -139,7 +145,7 @@ export default function AdminDashboard() {
           }, 0
         ) || 0
 
-        return total + servicePrice + productTotal
+        return total + serviceTotal + productTotal
       }, 0) || 0
 
       // Update stats
@@ -154,17 +160,30 @@ export default function AdminDashboard() {
         todayRevenue
       })
 
-      setRecentAppointments(recentAppointmentsResult.data || [])
+      // Transform data: Supabase returns nested relations as arrays, unwrap them
+      const transformedAppointments = (recentAppointmentsResult.data || []).map((apt: any) => ({
+        ...apt,
+        appointment_services: apt.appointment_services?.map((as: any) => ({
+          ...as,
+          service: Array.isArray(as.service) ? as.service[0] : as.service
+        })) || []
+      }))
+
+      setRecentAppointments(transformedAppointments)
 
       // Generate recent activity
-      const activities: RecentActivity[] = recentAppointmentsResult.data?.slice(0, 5).map((apt: Appointment) => ({
-        id: apt.id,
-        type: 'appointment' as const,
-        title: `New appointment: ${apt.customer_name}`,
-        description: `${apt.service?.name} scheduled for ${format(new Date(apt.appointment_date), 'MMM d')}`,
-        time: format(new Date(apt.created_at), 'h:mm a'),
-        status: apt.status
-      })) || []
+      const activities: RecentActivity[] = transformedAppointments.slice(0, 5).map((apt: Appointment) => {
+        const serviceName = apt.appointment_services?.[0]?.service?.name || 'Service'
+
+        return {
+          id: apt.id,
+          type: 'appointment' as const,
+          title: `New appointment: ${apt.customer_name}`,
+          description: `${serviceName} scheduled for ${format(new Date(apt.appointment_date), 'MMM d')}`,
+          time: format(new Date(apt.created_at), 'h:mm a'),
+          status: apt.status
+        }
+      })
 
       setRecentActivity(activities)
 
@@ -416,23 +435,30 @@ export default function AdminDashboard() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {recentAppointments.slice(0, 5).map((appointment, index) => (
-                <div key={appointment.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative transition-all duration-200 hover:bg-slate-100 hover:translate-x-1 hover:shadow-[0_4px_15px_rgba(0,0,0,0.08)] animate-[slideIn_0.3s_ease-out]">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-semibold text-lg text-slate-800">{appointment.customer_name}</span>
-                    <span className={`text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wide ${getStatusColor(appointment.status)}`}>
-                      {appointment.status}
-                    </span>
+              {recentAppointments.slice(0, 5).map((appointment, index) => {
+                const firstService = appointment.appointment_services?.[0]
+                const serviceName = firstService?.service?.name || 'Service N/A'
+                const hasMultiple = appointment.appointment_services.length > 1
+
+                return (
+                  <div key={appointment.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative transition-all duration-200 hover:bg-slate-100 hover:translate-x-1 hover:shadow-[0_4px_15px_rgba(0,0,0,0.08)] animate-[slideIn_0.3s_ease-out]">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="font-semibold text-lg text-slate-800">{appointment.customer_name}</span>
+                      <span className={`text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wide ${getStatusColor(appointment.status)}`}>
+                        {appointment.status}
+                      </span>
+                    </div>
+                    <div className="text-base text-slate-600 mb-1 font-medium">
+                      💅 {serviceName}
+                      {hasMultiple && <span className="text-xs ml-1">(+{appointment.appointment_services.length - 1} more)</span>}
+                    </div>
+                    <div className="text-sm text-slate-500 flex items-center gap-4">
+                      <span>📅 {format(new Date(appointment.appointment_date), 'MMM d')}</span>
+                      <span>🕐 {appointment.appointment_time}</span>
+                    </div>
                   </div>
-                  <div className="text-base text-slate-600 mb-1 font-medium">
-                    💅 {appointment.service?.name}
-                  </div>
-                  <div className="text-sm text-slate-500 flex items-center gap-4">
-                    <span>📅 {format(new Date(appointment.appointment_date), 'MMM d')}</span>
-                    <span>🕐 {appointment.appointment_time}</span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

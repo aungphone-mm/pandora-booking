@@ -1,7 +1,7 @@
 // ACCOUNT PAGE
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import type { AppointmentWithRelations, AppointmentProduct } from '@/lib/types'
+import type { AppointmentWithRelations, AppointmentProduct, AppointmentService } from '@/lib/types'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -19,7 +19,12 @@ const { data: appointments } = await supabase
   .from('appointments')
   .select(`
     *,
-    service:services(name, price, duration),
+    appointment_services(
+      id,
+      quantity,
+      price,
+      service:services(name, price, duration)
+    ),
     appointment_products(
       id,
       quantity,
@@ -31,11 +36,13 @@ const { data: appointments } = await supabase
 
   // Helper function to calculate total
   const calculateTotal = (appointment: AppointmentWithRelations) => {
-    const servicePrice = appointment.service?.price || 0
+    const servicesTotal = appointment.appointment_services.reduce(
+      (sum, as) => sum + (as.price * as.quantity), 0
+    )
     const productsTotal = appointment.appointment_products?.reduce(
       (sum: number, ap: AppointmentProduct) => sum + (ap.product.price * ap.quantity), 0
     ) || 0
-    return servicePrice + productsTotal
+    return servicesTotal + productsTotal
   }
 
   return (
@@ -57,12 +64,23 @@ const { data: appointments } = await supabase
               <div key={appointment.id} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold">{appointment.service?.name}</h3>
+                    <div className="mb-2">
+                      {appointment.appointment_services.map((as: AppointmentService, idx: number) => (
+                        <div key={as.id} className={idx > 0 ? 'mt-2' : ''}>
+                          <h3 className="font-semibold">
+                            {as.service.name}
+                            {as.quantity > 1 && ` x${as.quantity}`}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Duration: {as.service.duration} minutes • {as.price.toLocaleString()}Ks
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                     <p className="text-gray-600 mb-1">
                       Date: {new Date(appointment.appointment_date).toLocaleDateString()}
                     </p>
                     <p className="text-gray-600 mb-1">Time: {appointment.appointment_time}</p>
-                    <p className="text-gray-600 mb-1">Duration: {appointment.service?.duration} minutes</p>
                     {appointment.appointment_products && appointment.appointment_products.length > 0 && (
                       <div className="text-sm text-gray-600 mt-2">
                         <p className="font-medium">Add-ons:</p>
@@ -76,10 +94,7 @@ const { data: appointments } = await supabase
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-lg">
-                      {calculateTotal(appointment).toFixed(2)}Ks
-                    </p>
-                    <p className="text-sm text-gray-600 mb-2">
-                      Service: {appointment.service?.price}Ks
+                      {calculateTotal(appointment).toLocaleString()}Ks
                     </p>
                     <span className={`inline-block px-2 py-1 rounded text-sm ${
                       appointment.status === 'confirmed'

@@ -10,10 +10,25 @@ type Appointment = {
   appointment_date: string
   appointment_time: string
   status: 'pending' | 'confirmed' | 'cancelled'
-  service: {
-    name: string
+  appointment_services: {
+    id: string
+    quantity: number
     price: number
-  } | null
+    service: {
+      name: string
+      price: number
+      duration: number
+    }
+  }[]
+  appointment_products?: {
+    id: string
+    quantity: number
+    product: {
+      id: string
+      name: string
+      price: number
+    }
+  }[]
 }
 
 export default function MonthlyCalendarView() {
@@ -44,7 +59,17 @@ export default function MonthlyCalendarView() {
           appointment_date,
           appointment_time,
           status,
-          service:services(name, price)
+          appointment_services(
+            id,
+            quantity,
+            price,
+            service:services(name, price, duration)
+          ),
+          appointment_products(
+            id,
+            quantity,
+            product:products(id, name, price)
+          )
         `)
         .gte('appointment_date', format(monthStart, 'yyyy-MM-dd'))
         .lte('appointment_date', format(monthEnd, 'yyyy-MM-dd'))
@@ -52,10 +77,17 @@ export default function MonthlyCalendarView() {
 
       if (fetchError) throw fetchError
 
-      // Transform data: Supabase returns service as array, unwrap it
+      // Transform data: Supabase returns nested relations as arrays, unwrap them
       const transformedData = (data || []).map((apt: any) => ({
         ...apt,
-        service: Array.isArray(apt.service) ? apt.service[0] : apt.service
+        appointment_services: apt.appointment_services?.map((as: any) => ({
+          ...as,
+          service: Array.isArray(as.service) ? as.service[0] : as.service
+        })) || [],
+        appointment_products: apt.appointment_products?.map((ap: any) => ({
+          ...ap,
+          product: Array.isArray(ap.product) ? ap.product[0] : ap.product
+        })) || []
       }))
 
       setAppointments(transformedData)
@@ -77,6 +109,27 @@ export default function MonthlyCalendarView() {
     return appointments.filter(apt =>
       isSameDay(new Date(apt.appointment_date), date)
     )
+  }
+
+  const getServiceInfo = (appointment: Appointment) => {
+    if (appointment.appointment_services.length === 0) return null
+
+    const firstService = appointment.appointment_services[0]
+    return {
+      name: firstService.service.name,
+      price: firstService.price,
+      hasMultiple: appointment.appointment_services.length > 1
+    }
+  }
+
+  const calculateTotal = (appointment: Appointment) => {
+    const servicesTotal = appointment.appointment_services.reduce(
+      (sum, as) => sum + (as.price * as.quantity), 0
+    )
+    const productsTotal = appointment.appointment_products?.reduce(
+      (sum, ap) => sum + (ap.product.price * ap.quantity), 0
+    ) || 0
+    return servicesTotal + productsTotal
   }
 
   const getStatusColor = (status: string) => {
@@ -241,34 +294,71 @@ export default function MonthlyCalendarView() {
             </p>
           ) : (
             <div className="flex flex-col gap-3">
-              {selectedDateAppointments.map(apt => (
-                <div
-                  key={apt.id}
-                  className="bg-white rounded-xl p-4 border border-sky-200 shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <p className="font-bold text-lg text-slate-800 m-0 mb-1">
-                        {apt.customer_name}
-                      </p>
-                      <p className="text-base text-slate-500 m-0">
-                        💅 {apt.service?.name || 'Service N/A'}
-                      </p>
+              {selectedDateAppointments.map(apt => {
+                return (
+                  <div
+                    key={apt.id}
+                    className="bg-white rounded-xl p-5 border border-sky-200 shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <p className="font-bold text-lg text-slate-800 m-0 mb-2">
+                          {apt.customer_name}
+                        </p>
+
+                        {/* Services List */}
+                        <div className="mb-2">
+                          <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Services:</p>
+                          {apt.appointment_services.map((as, idx) => (
+                            <div key={as.id} className="text-sm text-slate-700 mb-1">
+                              💅 <span className="font-medium">{as.service.name}</span>
+                              {as.quantity > 1 && <span className="text-xs"> ×{as.quantity}</span>}
+                              <span className="text-slate-500 ml-2">
+                                {as.price.toLocaleString()}Ks • {as.service.duration} min
+                              </span>
+                            </div>
+                          ))}
+                          {apt.appointment_services.length === 0 && (
+                            <p className="text-sm text-slate-400 italic">No services</p>
+                          )}
+                        </div>
+
+                        {/* Products List */}
+                        {apt.appointment_products && apt.appointment_products.length > 0 && (
+                          <div className="mt-2 p-2 bg-slate-50 rounded-lg border border-slate-200">
+                            <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Add-ons:</p>
+                            {apt.appointment_products.map(ap => (
+                              <div key={ap.id} className="text-sm text-slate-600">
+                                🛍️ {ap.product.name} ×{ap.quantity}
+                                <span className="text-slate-500 ml-1">
+                                  ({(ap.product.price * ap.quantity).toLocaleString()}Ks)
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="text-right ml-4">
+                        <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase border block mb-2 ${
+                          apt.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-500' :
+                          apt.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-500' :
+                          'bg-red-50 text-red-800 border-red-500'
+                        }`}>
+                          {apt.status}
+                        </span>
+                        <p className="text-lg font-bold text-emerald-600 m-0">
+                          💰 {calculateTotal(apt).toLocaleString()}Ks
+                        </p>
+                      </div>
                     </div>
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase border ${
-                      apt.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-500' :
-                      apt.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-500' :
-                      'bg-red-50 text-red-800 border-red-500'
-                    }`}>
-                      {apt.status}
-                    </span>
+
+                    <div className="flex gap-4 text-sm text-slate-500 pt-2 border-t border-slate-200">
+                      <span>🕐 {apt.appointment_time}</span>
+                    </div>
                   </div>
-                  <div className="flex gap-4 text-sm text-slate-600">
-                    <span>🕐 {apt.appointment_time}</span>
-                    <span>💰 {apt.service?.price?.toLocaleString() || '0'}Ks</span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
