@@ -50,7 +50,7 @@ npm start
 
 - **`app/`** - Next.js App Router pages and layouts
   - `app/page.tsx` - Public home page
-  - `app/auth/` - Login and registration pages
+  - `app/auth/` - Authentication pages (login, register, forgot-password, reset-password)
   - `app/booking/` - Customer booking flow
   - `app/account/` - User account management
   - `app/admin/` - Protected admin panel (requires `is_admin` role)
@@ -60,9 +60,11 @@ npm start
     - `/admin/health-check` - Database health monitoring
   - `app/api/` - API routes organized by feature
     - `api/analytics/` - Analytics endpoints (summary, detailed, export)
-    - `api/bookings/` - Booking CRUD operations
+    - `api/bookings/` - Booking CRUD operations (create, search)
     - `api/check-availability/` - Real-time availability checking
     - `api/auth/` - Authentication operations
+    - `api/sessions/` - Session tracking endpoints
+    - `api/gallery/` - Gallery photo management and reordering
 
 - **`components/`** - React components (Manager components and UI elements)
   - Manager components: `AdminDashboard`, `StaffManager`, `ServiceManager`, `AppointmentManager`, etc.
@@ -269,6 +271,13 @@ See `PWA_SETUP.md` for complete setup guide.
   - Booking records with customer info, service, date/time
   - `status` field: 'pending', 'confirmed', 'completed', 'cancelled'
   - `user_id` (nullable) - Links to registered users or null for guest bookings
+  - `service_id` (nullable, legacy) - Now uses `appointment_services` junction table
+
+- **`appointment_services`**
+  - Junction table for multiple services per appointment (new schema)
+  - `appointment_id`, `service_id`, `price` (captured at booking time), `quantity`
+  - Allows booking multiple services in a single appointment
+  - Migration: `add_multiple_services_support.sql`
 
 - **`appointment_products`**
   - Junction table for products added to appointments
@@ -279,6 +288,12 @@ See `PWA_SETUP.md` for complete setup guide.
   - `user_id` (nullable) - Links to registered users or null for guest sessions
   - Includes: browser_name, os_name, device_type, screen_resolution, timezone, etc.
   - See `database/migrations/create_user_sessions_table.sql` for full schema
+
+- **`gallery_photos`** (Gallery Management)
+  - Photos for salon gallery display
+  - `image_url`, `caption`, `display_order`, `is_active`
+  - Admin-managed, publicly viewable
+  - Migration: `create_gallery_photos_table.sql`
 
 **Full schema details in `README.md` (lines 81-141).**
 
@@ -296,6 +311,7 @@ Both variables must be public (`NEXT_PUBLIC_*`) as they're used in client compon
 
 ### Customer Features
 - Registration/login with Supabase Auth
+- Forgot password / password reset flow
 - Single-page booking form with real-time availability checking
 - Service selection with categories
 - Product add-ons during booking
@@ -333,6 +349,7 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
 - **Analytics**: See `BUSINESS_INTELLIGENCE.md` for analytics features
 - **Analytics Troubleshooting**: See `ANALYTICS_TROUBLESHOOTING.md`
 - **Session Tracking**: See `docs/SESSION_TRACKING.md` for complete tracking system documentation
+- **Password Reset**: See `docs/PASSWORD_RESET_SETUP.md` for forgot password configuration and troubleshooting
 - **PWA Setup**: See `PWA_SETUP.md` for Progressive Web App installation and configuration
 - **Mobile Fixes**: See `MOBILE_FIXES.md` for responsive design implementations
 - **Admin UI Enhancements**: See `docs/ENHANCED_ADMIN_PAGES.md` for UI/UX improvements
@@ -345,9 +362,15 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
 **High-risk untested code:**
 1. `middleware.ts` - Authentication/authorization (security-critical, 95 LOC)
 2. `lib/analytics/engine.ts` - Financial calculations (410 LOC)
-3. `app/api/bookings/route.ts` - Booking operations (revenue-critical)
+3. `app/api/bookings/route.ts` - Booking operations (revenue-critical, handles multiple services)
 4. `app/api/check-availability/route.ts` - Prevents double-booking
 5. `lib/tracking/sessionTracker.ts` - Session tracking and device detection (privacy-sensitive)
+
+**Important Schema Migration:**
+- The system migrated from single-service to multiple-services per appointment
+- Legacy `appointments.service_id` remains for backward compatibility but is nullable
+- New bookings use `appointment_services` junction table
+- Price is captured at booking time for historical accuracy
 
 **When modifying these areas, exercise extreme caution as they lack test coverage.**
 
