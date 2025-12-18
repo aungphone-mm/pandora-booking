@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import type { AppointmentWithRelations, AppointmentProduct, AppointmentService } from '@/lib/types'
+import ProfileEditForm from '@/components/ProfileEditForm'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -49,12 +50,11 @@ const { data: appointments } = await supabase
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">My Account</h1>
 
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
-        <p className="text-gray-600 mb-2">Email: {user.email}</p>
-        <p className="text-gray-600 mb-2">Name: {user.user_metadata?.full_name || 'Not set'}</p>
-        <p className="text-gray-600">Phone: {user.user_metadata?.phone || 'Not set'}</p>
-      </div>
+      <ProfileEditForm
+        initialName={user.user_metadata?.full_name || ''}
+        initialPhone={user.user_metadata?.phone || ''}
+        email={user.email || ''}
+      />
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">My Appointments</h2>
