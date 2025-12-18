@@ -584,40 +584,17 @@ export default function AppointmentManager() {
                         <p className="font-semibold text-lg text-slate-800 m-0 mb-1">{appointment.customer_name}</p>
                         <p className="text-sm text-slate-500 m-0 mb-0.5">📧 {appointment.customer_email}</p>
                         <p className="text-sm text-slate-500 m-0 mb-2">📞 {appointment.customer_phone}</p>
-                        <span style={{
-                          fontSize: '0.8rem',
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          backgroundColor: appointment.user_id ? '#dcfce7' : '#fef3c7',
-                          color: appointment.user_id ? '#166534' : '#92400e',
-                          fontWeight: '600',
-                          border: appointment.user_id ? '1px solid #16a34a' : '1px solid #f59e0b'
-                        }}>
+                        <span className={`text-[0.8rem] px-3 py-1 rounded-[20px] font-semibold ${appointment.user_id ? 'bg-green-50 text-green-800 border border-green-600' : 'bg-amber-50 text-amber-900 border border-amber-500'}`}>
                           {appointment.user_id ? '👤 Registered User' : '👥 Guest Booking'}
                         </span>
                         {appointment.user?.full_name && (
-                          <p style={{
-                            fontSize: '0.8rem',
-                            color: '#3b82f6',
-                            margin: '4px 0 0 0',
-                            fontWeight: '500'
-                          }}>🔗 Account: {appointment.user.full_name}</p>
+                          <p className="text-[0.8rem] text-blue-500 mt-1 mb-0 font-medium">🔗 Account: {appointment.user.full_name}</p>
                         )}
                       </div>
                     </td>
                     <td className="p-6">
                       <div>
-                        <div style={{
-                          fontFamily: 'monospace',
-                          fontSize: '0.7rem',
-                          color: '#6b7280',
-                          backgroundColor: '#f9fafb',
-                          padding: '6px 8px',
-                          borderRadius: '4px',
-                          border: '1px solid #e5e7eb',
-                          wordBreak: 'break-all',
-                          marginBottom: '6px'
-                        }}>
+                        <div className="font-mono text-[0.7rem] text-gray-500 bg-gray-50 px-2 py-1.5 rounded border border-gray-200 break-all mb-1.5">
                           {appointment.id}
                         </div>
                         <button
@@ -625,16 +602,7 @@ export default function AppointmentManager() {
                             navigator.clipboard.writeText(appointment.id)
                             alert('Booking ID copied!')
                           }}
-                          style={{
-                            padding: '4px 8px',
-                            fontSize: '0.65rem',
-                            backgroundColor: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: '600'
-                          }}
+                          className="px-2 py-1 text-[0.65rem] bg-blue-500 text-white border-none rounded cursor-pointer font-semibold"
                         >
                           📋 Copy
                         </button>
@@ -656,15 +624,7 @@ export default function AppointmentManager() {
                           <p className="text-sm text-slate-400 italic">No service assigned</p>
                         )}
                         {appointment.appointment_products && appointment.appointment_products.length > 0 && (
-                          <div style={{
-                            fontSize: '0.8rem',
-                            color: '#6b7280',
-                            marginTop: '8px',
-                            padding: '8px 12px',
-                            backgroundColor: '#f8fafc',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0'
-                          }}>
+                          <div className="text-[0.8rem] text-gray-500 mt-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
                             <p className="font-semibold m-0 mb-1">🛍️ Add-ons:</p>
                             {appointment.appointment_products.map((ap) => (
                               <p key={ap.id} className="my-0.5">
@@ -679,23 +639,11 @@ export default function AppointmentManager() {
                       <select
                         value={appointment.staff_id || ''}
                         onChange={(e) => updateAppointmentStaff(
-                          appointment.id, 
+                          appointment.id,
                           e.target.value || null
                         )}
                         disabled={updatingStaff === appointment.id}
-                        style={{
-                          width: '100%',
-                          padding: '12px 16px',
-                          borderRadius: '12px',
-                          fontSize: '0.9rem',
-                          border: '2px solid #e2e8f0',
-                          cursor: updatingStaff === appointment.id ? 'not-allowed' : 'pointer',
-                          opacity: updatingStaff === appointment.id ? 0.5 : 1,
-                          backgroundColor: 'white',
-                          color: '#1e293b',
-                          fontWeight: '500'
-                        }}
-                        className="filter-select"
+                        className={`filter-select w-full px-4 py-3 rounded-xl text-[0.9rem] border-2 border-slate-200 bg-white text-slate-800 font-medium ${updatingStaff === appointment.id ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                       >
                         <option value="">👤 No Staff Assigned</option>
                         {staff.map((staffMember) => (
@@ -705,12 +653,7 @@ export default function AppointmentManager() {
                         ))}
                       </select>
                       {appointment.staff && (
-                        <p style={{
-                          fontSize: '0.8rem',
-                          color: '#10b981',
-                          margin: '6px 0 0 0',
-                          fontWeight: '600'
-                        }}>
+                        <p className="text-[0.8rem] text-emerald-500 mt-1.5 mb-0 font-semibold">
                           ✅ Staff Assigned
                         </p>
                       )}
@@ -721,42 +664,27 @@ export default function AppointmentManager() {
                           📅 {format(new Date(appointment.appointment_date), 'MMM d, yyyy')}
                         </p>
                         <p className="text-base text-blue-500 font-semibold">🕐 {appointment.appointment_time}</p>
-                        <p style={{
-                          fontSize: '0.8rem',
-                          color: '#94a3b8',
-                          margin: '0'
-                        }}>
+                        <p className="text-[0.8rem] text-slate-400 m-0">
                           ➕ Created: {format(new Date(appointment.created_at), 'MMM d, h:mm a')}
                         </p>
                       </div>
                     </td>
                     <td className="p-6">
-                      <p style={{ 
-                        fontWeight: '700',
-                        fontSize: '1.2rem',
-                        color: '#059669',
-                        margin: '0'
-                      }}>💰 {calculateTotal(appointment).toLocaleString()}Ks</p>
+                      <p className="font-bold text-xl text-emerald-600 m-0">💰 {calculateTotal(appointment).toLocaleString()}Ks</p>
                     </td>
                     <td className="p-6">
                       <select
                         value={appointment.status}
                         onChange={(e) => updateAppointmentStatus(
-                          appointment.id, 
+                          appointment.id,
                           e.target.value as 'pending' | 'confirmed' | 'cancelled'
                         )}
                         disabled={updatingStatus === appointment.id}
-                        style={{
-                          padding: '8px 16px',
-                          borderRadius: '12px',
-                          fontSize: '0.9rem',
-                          fontWeight: '600',
-                          cursor: updatingStatus === appointment.id ? 'not-allowed' : 'pointer',
-                          opacity: updatingStatus === appointment.id ? 0.5 : 1,
-                          minWidth: '120px',
-                          ...getStatusColor(appointment.status)
-                        }}
-                        className="status-select"
+                        className={`status-select px-4 py-2 rounded-xl text-[0.9rem] font-semibold min-w-[120px] ${updatingStatus === appointment.id ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${
+                          appointment.status === 'pending' ? 'bg-amber-100 text-amber-800 border-2 border-amber-500' :
+                          appointment.status === 'confirmed' ? 'bg-green-100 text-green-800 border-2 border-green-600' :
+                          'bg-red-100 text-red-800 border-2 border-red-600'
+                        }`}
                       >
                         <option value="pending">⏳ Pending</option>
                         <option value="confirmed">✅ Confirmed</option>
@@ -772,13 +700,7 @@ export default function AppointmentManager() {
                       </button>
                       {appointment.notes && (
                         <div className="mt-2 py-2 px-3 bg-amber-50 border-l-4 border-amber-500 rounded text-sm text-amber-900">
-                          <p style={{
-                            fontSize: '0.8rem',
-                            color: '#92400e',
-                            margin: '0',
-                            fontStyle: 'italic',
-                            fontWeight: '500'
-                          }}>
+                          <p className="text-[0.8rem] text-amber-900 m-0 italic font-medium">
                             📝 Note: {appointment.notes}
                           </p>
                         </div>
@@ -795,12 +717,7 @@ export default function AppointmentManager() {
               {filteredAndSortedAppointments.map((appointment) => (
                 <div key={appointment.id} className="mobile-card">
                   <div className="mb-4">
-                    <h3 style={{ 
-                      fontWeight: '600',
-                      fontSize: '1.1rem',
-                      color: '#1e293b',
-                      margin: '0 0 8px 0'
-                    }}>{appointment.customer_name}</h3>
+                    <h3 className="font-semibold text-[1.1rem] text-slate-800 m-0 mb-2">{appointment.customer_name}</h3>
                     <p className="text-sm text-slate-500 my-1">
                       📧 {appointment.customer_email}
                     </p>
@@ -838,19 +755,15 @@ export default function AppointmentManager() {
                     <select
                       value={appointment.status}
                       onChange={(e) => updateAppointmentStatus(
-                        appointment.id, 
+                        appointment.id,
                         e.target.value as 'pending' | 'confirmed' | 'cancelled'
                       )}
                       disabled={updatingStatus === appointment.id}
-                      style={{
-                        padding: '8px 16px',
-                        borderRadius: '12px',
-                        fontSize: '0.9rem',
-                        fontWeight: '600',
-                        flex: '1',
-                        minWidth: '120px',
-                        ...getStatusColor(appointment.status)
-                      }}
+                      className={`px-4 py-2 rounded-xl text-[0.9rem] font-semibold flex-1 min-w-[120px] ${
+                        appointment.status === 'pending' ? 'bg-amber-100 text-amber-800 border-2 border-amber-500' :
+                        appointment.status === 'confirmed' ? 'bg-green-100 text-green-800 border-2 border-green-600' :
+                        'bg-red-100 text-red-800 border-2 border-red-600'
+                      }`}
                     >
                       <option value="pending">⏳ Pending</option>
                       <option value="confirmed">✅ Confirmed</option>
@@ -886,12 +799,7 @@ export default function AppointmentManager() {
                   </div>
                   
                   <div className="p-3">
-                    <p style={{ 
-                      fontWeight: '700',
-                      fontSize: '1.1rem',
-                      color: '#059669',
-                      margin: '0'
-                    }}>
+                    <p className="font-bold text-[1.1rem] text-emerald-600 m-0">
                       Total: 💰 {calculateTotal(appointment).toLocaleString()}Ks
                     </p>
                   </div>
