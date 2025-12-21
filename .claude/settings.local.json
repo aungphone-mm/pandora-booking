@@ -4,7 +4,17 @@
       "Bash(for:*)",
       "Bash(do [ -f \"$file\" ])",
       "Bash(echo \"=== $file ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(cat:*)",
+      "Bash(/dev/null)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

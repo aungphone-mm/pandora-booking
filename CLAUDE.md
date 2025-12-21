@@ -58,6 +58,8 @@ npm start
     - `/admin/reports` - Business Intelligence reports
     - `/admin/advanced-reports` - Advanced analytics
     - `/admin/health-check` - Database health monitoring
+    - `/admin/payroll` - Payroll management dashboard
+    - `/admin/staff-earnings` - Staff earnings tracker
   - `app/api/` - API routes organized by feature
     - `api/analytics/` - Analytics endpoints (summary, detailed, export)
     - `api/bookings/` - Booking CRUD operations (create, search)
@@ -65,17 +67,20 @@ npm start
     - `api/auth/` - Authentication operations
     - `api/sessions/` - Session tracking endpoints
     - `api/gallery/` - Gallery photo management and reordering
+    - `api/payroll/` - Payroll calculation, bonuses, approval endpoints
 
 - **`components/`** - React components (Manager components and UI elements)
   - Manager components: `AdminDashboard`, `StaffManager`, `ServiceManager`, `AppointmentManager`, etc.
   - Booking: `SinglePageBookingForm` (1,074 LOC - complex form logic)
   - Analytics: `AnalyticsDashboardWidget`, `AnalyticsInsights`, `AnalyticsComponents`
   - Session Tracking: `SessionTrackingProvider`, `SessionAnalyticsDashboard`
+  - Payroll: `PayrollDashboard`, `StaffEarningsTracker`
   - PWA: `InstallPWA` - Progressive Web App install prompt component
 
 - **`lib/`** - Utilities and business logic
   - `lib/supabase/` - Database client factories
   - `lib/analytics/engine.ts` - Analytics computation engine (410 LOC)
+  - `lib/payroll/engine.ts` - Payroll calculation engine (370+ LOC)
   - `lib/auth-helpers.ts` - Authentication utility functions
   - `lib/tracking/sessionTracker.ts` - Session tracking and device detection
 
@@ -85,6 +90,7 @@ npm start
 - **`database/`** - Database schemas and migrations
   - `database/migrations/` - SQL migration files
     - `create_user_sessions_table.sql` - Session tracking table schema
+    - `create_payroll_system.sql` - Payroll system tables (8 tables)
 
 ### Supabase Integration Patterns
 
@@ -348,6 +354,8 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
 - **Testing**: Zero test coverage - see `TESTING_ROADMAP.md` for implementation plan
 - **Analytics**: See `BUSINESS_INTELLIGENCE.md` for analytics features
 - **Analytics Troubleshooting**: See `ANALYTICS_TROUBLESHOOTING.md`
+- **Payroll System**: See `PAYROLL_QUICK_START.md` for quick setup guide
+- **Payroll Documentation**: See `docs/PAYROLL_SYSTEM.md` for complete technical documentation
 - **Session Tracking**: See `docs/SESSION_TRACKING.md` for complete tracking system documentation
 - **Password Reset**: See `docs/PASSWORD_RESET_SETUP.md` for forgot password configuration and troubleshooting
 - **PWA Setup**: See `PWA_SETUP.md` for Progressive Web App installation and configuration
@@ -356,15 +364,17 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
 - **Feature Docs**: See `docs/` directory for additional detailed feature documentation
   - `ADMIN_PANEL_IMPROVEMENTS.md` - Admin panel enhancements
   - `APPOINTMENTS_PAGE_ENHANCEMENTS.md` - Appointment management improvements
+  - `PAYROLL_SYSTEM.md` - Complete payroll system documentation
 
 ## Critical Code Areas
 
 **High-risk untested code:**
 1. `middleware.ts` - Authentication/authorization (security-critical, 95 LOC)
 2. `lib/analytics/engine.ts` - Financial calculations (410 LOC)
-3. `app/api/bookings/route.ts` - Booking operations (revenue-critical, handles multiple services)
-4. `app/api/check-availability/route.ts` - Prevents double-booking
-5. `lib/tracking/sessionTracker.ts` - Session tracking and device detection (privacy-sensitive)
+3. `lib/payroll/engine.ts` - Payroll calculations (370+ LOC, financially critical)
+4. `app/api/bookings/route.ts` - Booking operations (revenue-critical, handles multiple services)
+5. `app/api/check-availability/route.ts` - Prevents double-booking
+6. `lib/tracking/sessionTracker.ts` - Session tracking and device detection (privacy-sensitive)
 
 **Important Schema Migration:**
 - The system migrated from single-service to multiple-services per appointment
@@ -405,7 +415,13 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
    - Respect user privacy (see privacy guidelines in `SESSION_TRACKING.md`)
    - Ensure GDPR compliance for data collection
 
-6. **PWA Considerations**:
+6. **Payroll System**:
+   - Run migration first: `database/migrations/create_payroll_system.sql`
+   - Use `PayrollEngine` class for calculations
+   - Hours auto-estimated from appointment durations (no attendance needed)
+   - See `PAYROLL_QUICK_START.md` for setup guide
+
+7. **PWA Considerations**:
    - Test offline functionality
    - Ensure icons are properly sized
    - Update manifest.json if adding new routes/shortcuts

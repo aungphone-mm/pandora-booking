@@ -13,7 +13,7 @@ type Appointment = {
   customer_phone: string
   appointment_date: string
   appointment_time: string
-  status: 'pending' | 'confirmed' | 'cancelled'
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
   notes?: string
   created_at: string
   appointment_services: {
@@ -242,7 +242,7 @@ export default function AppointmentManager() {
     }
   }
 
-  const updateAppointmentStatus = async (appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
+  const updateAppointmentStatus = async (appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed') => {
     try {
       setUpdatingStatus(appointmentId)
       setError(null)
@@ -480,6 +480,7 @@ export default function AppointmentManager() {
               <option value="all">All Statuses</option>
               <option value="pending">⏳ Pending</option>
               <option value="confirmed">✅ Confirmed</option>
+              <option value="completed">✔️ Completed</option>
               <option value="cancelled">❌ Cancelled</option>
             </select>
           </div>
@@ -534,7 +535,15 @@ export default function AppointmentManager() {
             {appointments.filter(a => a.status === 'confirmed').length}
           </p>
         </div>
-        
+
+        <div className="appointment-card bg-gradient-to-br from-blue-100 to-blue-200 p-6 rounded-2xl border border-blue-700 shadow-[0_6px_20px_rgba(59,130,246,0.15)] text-center">
+          <div className="mb-2">✔️</div>
+          <h3 className="text-sm font-semibold text-blue-800 uppercase tracking-wider m-0 mb-2">Completed</h3>
+          <p className="text-5xl font-extrabold text-blue-800 m-0">
+            {appointments.filter(a => a.status === 'completed').length}
+          </p>
+        </div>
+
         <div className="appointment-card bg-gradient-to-br from-red-100 to-red-200 p-6 rounded-2xl border border-red-600 shadow-[0_6px_20px_rgba(220,38,38,0.15)] text-center">
           <div className="mb-2">❌</div>
           <h3 className="text-sm font-semibold text-red-800 uppercase tracking-wider m-0 mb-2">Cancelled</h3>
@@ -677,17 +686,19 @@ export default function AppointmentManager() {
                         value={appointment.status}
                         onChange={(e) => updateAppointmentStatus(
                           appointment.id,
-                          e.target.value as 'pending' | 'confirmed' | 'cancelled'
+                          e.target.value as 'pending' | 'confirmed' | 'completed' | 'cancelled'
                         )}
                         disabled={updatingStatus === appointment.id}
                         className={`status-select px-4 py-2 rounded-xl text-[0.9rem] font-semibold min-w-[120px] ${updatingStatus === appointment.id ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${
                           appointment.status === 'pending' ? 'bg-amber-100 text-amber-800 border-2 border-amber-500' :
                           appointment.status === 'confirmed' ? 'bg-green-100 text-green-800 border-2 border-green-600' :
+                          appointment.status === 'completed' ? 'bg-blue-100 text-blue-800 border-2 border-blue-600' :
                           'bg-red-100 text-red-800 border-2 border-red-600'
                         }`}
                       >
                         <option value="pending">⏳ Pending</option>
                         <option value="confirmed">✅ Confirmed</option>
+                        <option value="completed">✔️ Completed</option>
                         <option value="cancelled">❌ Cancelled</option>
                       </select>
                     </td>
@@ -756,17 +767,19 @@ export default function AppointmentManager() {
                       value={appointment.status}
                       onChange={(e) => updateAppointmentStatus(
                         appointment.id,
-                        e.target.value as 'pending' | 'confirmed' | 'cancelled'
+                        e.target.value as 'pending' | 'confirmed' | 'completed' | 'cancelled'
                       )}
                       disabled={updatingStatus === appointment.id}
                       className={`px-4 py-2 rounded-xl text-[0.9rem] font-semibold flex-1 min-w-[120px] ${
                         appointment.status === 'pending' ? 'bg-amber-100 text-amber-800 border-2 border-amber-500' :
                         appointment.status === 'confirmed' ? 'bg-green-100 text-green-800 border-2 border-green-600' :
+                        appointment.status === 'completed' ? 'bg-blue-100 text-blue-800 border-2 border-blue-600' :
                         'bg-red-100 text-red-800 border-2 border-red-600'
                       }`}
                     >
                       <option value="pending">⏳ Pending</option>
                       <option value="confirmed">✅ Confirmed</option>
+                      <option value="completed">✔️ Completed</option>
                       <option value="cancelled">❌ Cancelled</option>
                     </select>
                     
