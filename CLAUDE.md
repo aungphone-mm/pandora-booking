@@ -59,7 +59,21 @@ npm start
     - `/admin/advanced-reports` - Advanced analytics
     - `/admin/health-check` - Database health monitoring
     - `/admin/payroll` - Payroll management dashboard
+    - `/admin/payroll-settings` - Payroll system configuration
     - `/admin/staff-earnings` - Staff earnings tracker
+    - `/admin/performance-tiers` - Performance tier management
+    - `/admin/staff-bonuses` - Individual staff bonus management
+    - `/admin/team-bonuses` - Team-wide bonus management
+    - `/admin/gallery` - Salon gallery photo management
+    - `/admin/appointments` - Appointment management interface
+    - `/admin/staff` - Staff CRUD management
+    - `/admin/services` - Service CRUD management
+    - `/admin/service-categories` - Service category management
+    - `/admin/products` - Product CRUD management
+    - `/admin/product-categories` - Product category management
+    - `/admin/timeslots` - Time slot configuration
+    - `/admin/staff-categories` - Staff category management
+    - `/admin/staff-report` - Comprehensive staff performance & payroll reports (NEW)
   - `app/api/` - API routes organized by feature
     - `api/analytics/` - Analytics endpoints (summary, detailed, export)
     - `api/bookings/` - Booking CRUD operations (create, search)
@@ -68,6 +82,12 @@ npm start
     - `api/sessions/` - Session tracking endpoints
     - `api/gallery/` - Gallery photo management and reordering
     - `api/payroll/` - Payroll calculation, bonuses, approval endpoints
+    - `api/payroll-settings/` - Payroll configuration management
+    - `api/performance-tiers/` - Performance tier CRUD operations
+    - `api/staff-bonuses/` - Individual staff bonus operations
+    - `api/team-bonuses/` - Team bonus operations
+    - `api/profile/` - User profile management
+    - `api/staff-report/` - Staff report generation (HTML/JSON export)
 
 - **`components/`** - React components (Manager components and UI elements)
   - Manager components: `AdminDashboard`, `StaffManager`, `ServiceManager`, `AppointmentManager`, etc.
@@ -75,12 +95,15 @@ npm start
   - Analytics: `AnalyticsDashboardWidget`, `AnalyticsInsights`, `AnalyticsComponents`
   - Session Tracking: `SessionTrackingProvider`, `SessionAnalyticsDashboard`
   - Payroll: `PayrollDashboard`, `StaffEarningsTracker`
+  - Reports: `StaffReportGenerator` - Comprehensive staff report generation UI
   - PWA: `InstallPWA` - Progressive Web App install prompt component
 
 - **`lib/`** - Utilities and business logic
   - `lib/supabase/` - Database client factories
   - `lib/analytics/engine.ts` - Analytics computation engine (410 LOC)
   - `lib/payroll/engine.ts` - Payroll calculation engine (370+ LOC)
+  - `lib/reports/staffReportEngine.ts` - Staff report data aggregation engine
+  - `lib/reports/htmlTemplateGenerator.ts` - PDF-ready HTML template generator
   - `lib/auth-helpers.ts` - Authentication utility functions
   - `lib/tracking/sessionTracker.ts` - Session tracking and device detection
 
@@ -206,6 +229,63 @@ await trackPageView('page-name')
 
 See `docs/SESSION_TRACKING.md` for complete documentation.
 
+### Staff Report System
+
+**Core Module:** `lib/reports/staffReportEngine.ts`
+
+The application includes a comprehensive staff reporting system that generates detailed performance and payroll reports:
+
+**Report Sections:**
+- **Section 1: Executive Summary** - Team overview, top performers, payroll summary, key insights
+- **Section 2: Individual Staff Profiles** - Performance scorecard, metrics, payroll breakdown, rankings, goals
+- **Section 3: Team Comparative Analysis** - Performance matrix, distributions, quadrant analysis
+- **Section 4: Insights & Recommendations** - Strategic insights, actionable items, staffing recommendations
+
+**Key Features:**
+- Combines AnalyticsEngine and PayrollEngine data
+- Calculates performance scores (0-100) based on revenue, appointments, completion rate
+- Ranks staff by revenue, efficiency, retention, appointments
+- Performance quadrant analysis (star performers, revenue drivers, needs improvement, etc.)
+- Complete payroll breakdown with commission tiers, bonuses, deductions
+- Export to HTML (print-to-PDF) or JSON
+- Print-optimized layout with page breaks and professional styling
+
+**Admin Dashboard:**
+- Navigate to `/admin/staff-report` to generate reports
+- Select month and year
+- Generate HTML report (opens in new tab for printing)
+- Or download JSON data for further analysis
+
+**Database:**
+- Pulls from: staff, appointments, appointment_services, appointment_products
+- Uses PayrollEngine for commission calculations
+- Uses AnalyticsEngine for performance metrics
+
+**API Endpoints:**
+- `POST /api/staff-report` - Generate report with month/year/format parameters
+- `GET /api/staff-report` - Get current month report in JSON
+
+**Usage:**
+```typescript
+import { StaffReportEngine } from '@/lib/reports/staffReportEngine'
+
+const engine = new StaffReportEngine()
+const report = await engine.generateCompleteReport({
+  startDate: '2024-12-01',
+  endDate: '2024-12-31',
+  month: 12,
+  year: 2024
+})
+```
+
+**PDF Generation:**
+- HTML template generator creates print-ready HTML
+- Use browser Print function (Ctrl+P / Cmd+P) to save as PDF
+- Optimized for A4 paper with proper page breaks
+- Color-coded metrics (green/yellow/red) and professional styling
+
+See `docs/STAFF_REPORT_SYSTEM.md` for complete documentation.
+
 ### Progressive Web App (PWA) Features
 
 **Core Configuration:** `next.config.js` with `next-pwa`
@@ -301,6 +381,23 @@ See `PWA_SETUP.md` for complete setup guide.
   - Admin-managed, publicly viewable
   - Migration: `create_gallery_photos_table.sql`
 
+- **`payroll_settings`** (Payroll Configuration)
+  - Configurable parameters for payroll calculations
+  - `setting_key` (unique), `setting_value` (numeric), `description`, `updated_by`
+  - Default settings: product_commission_rate, buffer_time_minutes, retention bonuses
+  - Anyone can read, only admins can update
+  - Migration: `create_payroll_settings.sql`
+
+**Payroll System Tables** (see `database/migrations/create_payroll_system.sql`):
+- `staff_commission_tiers` - Commission rates based on revenue thresholds
+- `payroll_periods` - Monthly payroll cycles with approval status
+- `staff_payrolls` - Individual staff payroll records per period
+- `staff_bonuses` - Individual staff bonuses with reason and approver
+- `team_bonuses` - Team-wide bonuses distributed to all staff
+- `payroll_deductions` - Deductions applied to payroll (taxes, benefits, etc.)
+- `payroll_adjustments` - Manual adjustments to payroll amounts
+- `performance_tiers` - Performance-based bonus tiers
+
 **Full schema details in `README.md` (lines 81-141).**
 
 ## Environment Variables
@@ -332,6 +429,15 @@ Both variables must be public (`NEXT_PUBLIC_*`) as they're used in client compon
   - Time slots
   - Appointments
 - Business Intelligence reports (`/admin/reports`, `/admin/advanced-reports`)
+- Payroll Management:
+  - Payroll dashboard with automatic calculations (`/admin/payroll`)
+  - Staff earnings tracker (`/admin/staff-earnings`)
+  - Payroll settings configuration (`/admin/payroll-settings`)
+  - Performance tier management (`/admin/performance-tiers`)
+  - Individual staff bonuses (`/admin/staff-bonuses`)
+  - Team-wide bonuses (`/admin/team-bonuses`)
+- Session tracking analytics (`/admin/sessions`)
+- Gallery photo management (`/admin/gallery`)
 - Data export functionality (CSV/JSON)
 - Health check tools (`/admin/health-check`)
 
@@ -356,6 +462,8 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
 - **Analytics Troubleshooting**: See `ANALYTICS_TROUBLESHOOTING.md`
 - **Payroll System**: See `PAYROLL_QUICK_START.md` for quick setup guide
 - **Payroll Documentation**: See `docs/PAYROLL_SYSTEM.md` for complete technical documentation
+- **Payroll Settings**: Configurable via `/admin/payroll-settings` (commission rates, bonuses, buffer time)
+- **Staff Reports**: See `docs/STAFF_REPORT_SYSTEM.md` for comprehensive staff reporting system documentation
 - **Session Tracking**: See `docs/SESSION_TRACKING.md` for complete tracking system documentation
 - **Password Reset**: See `docs/PASSWORD_RESET_SETUP.md` for forgot password configuration and troubleshooting
 - **PWA Setup**: See `PWA_SETUP.md` for Progressive Web App installation and configuration
@@ -365,6 +473,7 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
   - `ADMIN_PANEL_IMPROVEMENTS.md` - Admin panel enhancements
   - `APPOINTMENTS_PAGE_ENHANCEMENTS.md` - Appointment management improvements
   - `PAYROLL_SYSTEM.md` - Complete payroll system documentation
+  - `STAFF_REPORT_SYSTEM.md` - Comprehensive staff reporting system
 
 ## Critical Code Areas
 
@@ -416,9 +525,11 @@ Path alias `@/*` maps to root directory (configured in `tsconfig.json`).
    - Ensure GDPR compliance for data collection
 
 6. **Payroll System**:
-   - Run migration first: `database/migrations/create_payroll_system.sql`
+   - Run migrations first: `create_payroll_system.sql` and `create_payroll_settings.sql`
    - Use `PayrollEngine` class for calculations
    - Hours auto-estimated from appointment durations (no attendance needed)
+   - Payroll settings are configurable via `/admin/payroll-settings` (no code changes needed)
+   - Settings include: commission rates, retention bonuses, buffer time, performance tiers
    - See `PAYROLL_QUICK_START.md` for setup guide
 
 7. **PWA Considerations**:
@@ -500,7 +611,15 @@ const { data, error } = await supabase
 ### Useful Commands
 
 ```bash
-# Database migrations (if using Supabase CLI)
+# Database migrations (run SQL files manually in Supabase SQL Editor)
+# Required migrations in order:
+# 1. create_payroll_system.sql
+# 2. create_payroll_settings.sql
+# 3. create_user_sessions_table.sql
+# 4. create_gallery_photos_table.sql
+# 5. add_multiple_services_support.sql
+
+# If using Supabase CLI:
 supabase db push
 
 # Generate PWA icons (after updating icon.svg)

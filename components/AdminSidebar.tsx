@@ -13,6 +13,7 @@ export default function AdminSidebar() {
     { href: '/admin', label: 'Dashboard', icon: '🏠' },
     { href: '/admin/reports', label: 'Business Intelligence', badge: 'BI', icon: '📊' },
     { href: '/admin/advanced-reports', label: 'Advanced Analytics', badge: 'NEW', icon: '🚀' },
+    { href: '/admin/staff-report', label: 'Staff Report', badge: 'NEW', icon: '📄' },
     { href: '/admin/appointments', label: 'Appointments', icon: '📅' },
     { href: '/admin/staff', label: 'Staff Management', icon: '👥' },
     { href: '/admin/payroll', label: 'Payroll Management', badge: 'NEW', icon: '💰' },
